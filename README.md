@@ -117,8 +117,8 @@ de los diez integrantes.
 
 | # | Integrante | Funcionalidad | Sección | Responsabilidad |
 | ---: | --- | --- | --- | --- |
-| 1 | `[Completar]` | R2 — Historia y Rivales | Equipo | Individual |
-| 2 | `[Completar]` | R3 — Configurar Equipo | Equipo | Individual |
+| 1 | `[Valentin Penayo]` | R2 — Historia y Rivales | Equipo | Individual |
+| 2 | `Fernando Mavit` | R3 — Configurar Equipo | Equipo | Individual |
 | 3 | `[Completar]` | R5 — Fase de Grupos | Camino | Individual |
 | 4 | `Ignacio Morales` | R6 — Fase Eliminatoria | Camino | Individual |
 | 5 | `Eliana Yasmin Carro` | R7 — Camino del Equipo | Camino | Individual |
@@ -126,8 +126,8 @@ de los diez integrantes.
 | 7 | `[Completar; idealmente, Tech Lead]` | R9 — Batalla Final | Batalla Final | Grupal |
 | 8 | `[Facundo Ivan Atienza]` | R10 — Eventos en Vivo | Batalla Final | Individual |
 | 9 | `[Completar]` | R11 — Estado del Equipo | Batalla Final | Individual |
-| 10 | `[Completar]` | R12 — Estadísticas y Premios | Resultados | Individual |
-| 11 | `Luz Martinez La Paz` | R13 — Historial | Resultados | Individual |
+| 10 | `[Valentin Penayo]` | R12 — Estadísticas y Premios | Resultados | Individual |
+| 11 | `[Luz Martinez]` | R13 — Historial | Resultados | Individual |
 
 > **R9 — Batalla Final es obligatoria para la aprobación del TP y responsabilidad
 del grupo completo.**
