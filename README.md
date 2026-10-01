@@ -122,7 +122,7 @@ de los diez integrantes.
 | 3 | `[Completar]` | R5 — Fase de Grupos | Camino | Individual |
 | 4 | `Ignacio Morales` | R6 — Fase Eliminatoria | Camino | Individual |
 | 5 | `Eliana Yasmin Carro` | R7 — Camino del Equipo | Camino | Individual |
-| 6 | `[Completar]` | R8 — Preparar Batalla Final | Batalla Final | Individual |
+| 6 | `Leonel Isaias Ibarra` | R8 — Preparar Batalla Final | Batalla Final | Individual |
 | 7 | `[Completar; idealmente, Tech Lead]` | R9 — Batalla Final | Batalla Final | Grupal |
 | 8 | `[Facundo Ivan Atienza]` | R10 — Eventos en Vivo | Batalla Final | Individual |
 | 9 | `[Completar]` | R11 — Estado del Equipo | Batalla Final | Individual |
