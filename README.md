@@ -117,7 +117,7 @@ de los diez integrantes.
 
 | # | Integrante | Funcionalidad | Sección | Responsabilidad |
 | ---: | --- | --- | --- | --- |
-| 1 | `[Valentin Penayo]` | R2 — Historia y Rivales | Equipo | Individual |
+| 1 | `[Facundo Roman]` | R2 — Historia y Rivales | Equipo | Individual |
 | 2 | `Fernando Mavit` | R3 — Configurar Equipo | Equipo | Individual |
 | 3 | `[Completar]` | R5 — Fase de Grupos | Camino | Individual |
 | 4 | `Ignacio Morales` | R6 — Fase Eliminatoria | Camino | Individual |
