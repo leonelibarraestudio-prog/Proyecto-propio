@@ -119,7 +119,7 @@ de los diez integrantes.
 | ---: | --- | --- | --- | --- |
 | 1 | `[Facundo Roman]` | R2 — Historia y Rivales | Equipo | Individual |
 | 2 | `Fernando Mavit` | R3 — Configurar Equipo | Equipo | Individual |
-| 3 | `[Completar]` | R5 — Fase de Grupos | Camino | Individual |
+| 3 | `[Santiago Arlia]` | R5 — Fase de Grupos | Camino | Individual |
 | 4 | `Ignacio Morales` | R6 — Fase Eliminatoria | Camino | Individual |
 | 5 | `Eliana Yasmin Carro` | R7 — Camino del Equipo | Camino | Individual |
 | 6 | `Leonel Isaias Ibarra` | R8 — Preparar Batalla Final | Batalla Final | Individual |
