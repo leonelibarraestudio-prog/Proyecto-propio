@@ -66,7 +66,7 @@ Torneo Multiversal.
 
 ### Equipo asignado
 
-**TEAM_ID:** `[Completar con el ID del personaje asignado]`
+**TEAM_ID:** `falcon`
 
 El personaje asignado identifica al Team que utilizará el grupo durante todo el
 Trabajo Práctico.
@@ -101,7 +101,7 @@ Entre sus responsabilidades se incluyen:
 - Centralizar consultas técnicas y comunicación con la cátedra.
 - Ayudar a destrabar problemas técnicos dentro del equipo.
 
-**Nombre del Tech Lead:** `[Agustín Montero]`
+**Nombre del Tech Lead:** `Agustín Montero`
 
 ### Integrantes por funcionalidad
 
@@ -123,9 +123,9 @@ de los diez integrantes.
 | 4 | `Ignacio Morales` | R6 — Fase Eliminatoria | Camino | Individual |
 | 5 | `Eliana Yasmin Carro` | R7 — Camino del Equipo | Camino | Individual |
 | 6 | `Leonel Isaias Ibarra` | R8 — Preparar Batalla Final | Batalla Final | Individual |
-| 7 | `[Agustín Montero; idealmente, Tech Lead]` | R9 — Batalla Final | Batalla Final | Grupal |
+| 7 | `Agustín Montero; idealmente` | R9 — Batalla Final | Batalla Final | Grupal |
 | 8 | `[Facundo Ivan Atienza]` | R10 — Eventos en Vivo | Batalla Final | Individual |
-| 9 | `[Agustín Montero]` | R11 — Estado del Equipo | Batalla Final | Individual |
+| 9 | `Agustín Montero` | R11 — Estado del Equipo | Batalla Final | Individual |
 | 10 | `[Valentin Penayo]` | R12 — Estadísticas y Premios | Resultados | Individual |
 | 11 | `[Luz Martinez]` | R13 — Historial | Resultados | Individual |
 
