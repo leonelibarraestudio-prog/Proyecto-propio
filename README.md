@@ -123,7 +123,7 @@ de los diez integrantes.
 | 4 | `Ignacio Morales` | R6 — Fase Eliminatoria | Camino | Individual |
 | 5 | `Eliana Yasmin Carro` | R7 — Camino del Equipo | Camino | Individual |
 | 6 | `Leonel Isaias Ibarra` | R8 — Preparar Batalla Final | Batalla Final | Individual |
-| 7 | `Agustín Montero; idealmente` | R9 — Batalla Final | Batalla Final | Grupal |
+| 7 | `Agustín Montero` | R9 — Batalla Final | Batalla Final | Grupal |
 | 8 | `[Facundo Ivan Atienza]` | R10 — Eventos en Vivo | Batalla Final | Individual |
 | 9 | `Agustín Montero` | R11 — Estado del Equipo | Batalla Final | Individual |
 | 10 | `[Valentin Penayo]` | R12 — Estadísticas y Premios | Resultados | Individual |
