@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { KnockoutStageApi } from './model/knockout-stage-api.interface';
 import { KnockoutStageService } from './service/knockout-stage.service';
 
 @Component({
@@ -8,9 +9,13 @@ import { KnockoutStageService } from './service/knockout-stage.service';
   standalone: false,
 })
 export class KnockoutStageComponent implements OnInit {
-  constructor(private readonly knockoutstageService: KnockoutStageService) {}
+  constructor(private readonly knockoutStageService: KnockoutStageService) {}
 
   ngOnInit(): void {
-    this.knockoutstageService.initialize();
+    this.knockoutStageService.initialize();
+  }
+
+  get data(): KnockoutStageApi | null {
+    return this.knockoutStageService.getKnockoutStage();
   }
 }

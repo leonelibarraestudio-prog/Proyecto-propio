@@ -1,11 +1,20 @@
-import { Controller } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AbstractController } from '../../basic/abstract.controller';
+import { ResponseObject } from '../../basic/response-object.interface';
+import { KnockoutStageModel } from './model/knockout-stage.model';
 import { KnockoutStageService } from './knockout-stage.service';
 
-@ApiTags('knockout-stage')
+@ApiTags('Knockout Stage')
 @Controller('journey/knockout-stage')
-export class KnockoutStageController {
-  constructor(private readonly knockoutstageService: KnockoutStageService) {}
+export class KnockoutStageController extends AbstractController {
+  constructor(private readonly knockoutStageService: KnockoutStageService) {
+    super();
+  }
 
-  // TODO: Add the feature endpoints during the student implementation.
+  @Get()
+  @ApiOperation({ summary: 'Get the current knockout stage data.' })
+  async getKnockoutStage(): Promise<ResponseObject<KnockoutStageModel>> {
+    return this.createOkResponse(await this.knockoutStageService.getKnockoutStage());
+  }
 }
