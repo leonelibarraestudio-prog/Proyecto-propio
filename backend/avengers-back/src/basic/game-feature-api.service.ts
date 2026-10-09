@@ -8,6 +8,8 @@ import {
   FinalRelationshipCatalogApi,
   FinalSimulateJourneyApi,
   FinalTeamConfigurationDataApi,
+  FinalStageApi,
+  FinalStageEventsApi,
 } from './model/game-api/final-contract.model';
 import { HeroCatalogApi, RelationshipCatalogApi } from './model/game-api/hero-catalog.model';
 import {
@@ -143,6 +145,17 @@ export class GameFeatureApiService {
 
   currentTeams(teamId: string) {
     return this.api.get<FinalJourneyTeamsApi>(`/teams/${teamId}/journeys/current/teams`);
+  }
+
+    finalStage(teamId: string, lang: string) {
+    return this.api.get<FinalStageApi>(`/teams/${teamId}/journeys/current/final-stage`, { lang });
+  }
+
+  finalStageEvents(teamId: string, lang: string) {
+    return this.api.get<FinalStageEventsApi>(
+      `/teams/${teamId}/journeys/current/final-stage/events`,
+      { lang },
+    );
   }
 
   private ability(ability: import('./model/game-api/final-contract.model').FinalAbilityApi) {
