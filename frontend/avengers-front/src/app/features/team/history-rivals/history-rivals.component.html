@@ -1,3 +1,50 @@
+
 <main class="student-feature-shell">
-  <app-feature-pending></app-feature-pending>
+  <h1>Historial y rivales</h1>
+  <p>Consultá las partidas completadas de tu equipo y sus rivales.</p>
+
+  <p *ngIf="viewModel.status === 'loading'">
+    Cargando historial...
+  </p>
+
+  <section *ngIf="viewModel.status === 'error'">
+    <h2>No se pudo cargar el historial</h2>
+    <p>{{ viewModel.error }}</p>
+    <p *ngIf="viewModel.errorCode">
+      Código: {{ viewModel.errorCode }}
+    </p>
+    <button type="button" (click)="historyRivalsRetry()">
+      Reintentar
+    </button>
+  </section>
+
+  <section *ngIf="viewModel.status === 'empty'">
+    <h2>Todavía no hay partidas completadas</h2>
+    <p>Cuando tu equipo complete una partida, aparecerá acá.</p>
+  </section>
+
+  <section *ngIf="viewModel.status === 'data' && viewModel.data">
+    <p>
+      Equipo: <strong>{{ viewModel.data.teamId }}</strong>
+    </p>
+
+    <p>
+      Partidas completadas: {{ viewModel.data.items.length }}
+    </p>
+
+    <article
+      class="history-card"
+      *ngFor="let item of viewModel.data.items"
+    >
+      <h2>{{ item.opponentFinalistName }}</h2>
+
+      <p><strong>Rival ID:</strong> {{ item.opponentFinalistId }}</p>
+      <p><strong>Resultado:</strong> {{ item.outcomeCode }}</p>
+      <p><strong>Final:</strong> {{ item.endingCode }}</p>
+      <p><strong>Estrategia:</strong> {{ item.spendingStrategyCode }}</p>
+      <p><strong>Resumen:</strong> {{ item.endingSummary }}</p>
+      <p><strong>Inicio:</strong> {{ item.createdAt }}</p>
+      <p><strong>Finalización:</strong> {{ item.completedAt }}</p>
+    </article>
+  </section>
 </main>

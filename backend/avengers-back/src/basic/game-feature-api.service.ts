@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { GameApiService } from './game-api.service';
 import {
   FinalAssignedTeamCatalogApi,
@@ -8,6 +8,7 @@ import {
   FinalRelationshipCatalogApi,
   FinalSimulateJourneyApi,
   FinalTeamConfigurationDataApi,
+  FinalHistoryApi,
 } from './model/game-api/final-contract.model';
 import { HeroCatalogApi, RelationshipCatalogApi } from './model/game-api/hero-catalog.model';
 import {
@@ -25,6 +26,12 @@ export class GameFeatureApiService {
   profile(teamId: string, lang = 'en') {
     return this.api.get<TeamProfileApi>(`/teams/${teamId}/profile`, { lang });
   }
+
+
+async history(teamId: string, lang = 'en') {
+  return this.api.get<FinalHistoryApi>(`/teams/${teamId}/history`, { lang });
+}
+
 
   async assignedTeams(lang = 'en') {
     const catalog = await this.api.get<FinalAssignedTeamCatalogApi>('/teams', { lang });
