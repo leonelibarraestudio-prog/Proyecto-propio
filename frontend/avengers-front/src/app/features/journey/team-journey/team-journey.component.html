@@ -6,22 +6,21 @@
     <p class="page-subtitle">{{ i18nService.t('r7.subtitle') }}</p>
   </header>
 
-  <app-loading-state 
-    *ngIf="teamJourneyService.status === 'loading'" 
-    [message]="i18nService.t('loading')">
+  <app-loading-state
+    *ngIf="teamJourneyService.status === 'loading'"
+    [message]="i18nService.t('loading')"
+  >
   </app-loading-state>
 
   <app-error-state
     *ngIf="teamJourneyService.status === 'error'"
     [message]="i18nService.t('error')"
-    [messageCode]="teamJourneyService.errorCode">
+    [messageCode]="teamJourneyService.errorCode"
+  >
   </app-error-state>
-  
-  <ng-container 
-    *ngIf="teamJourneyService.status === 'ready' && teamJourneyService.data as journey">
-    <app-empty-state
-  *ngIf="!journey.attemptId"
-  [message]="i18nService.t('noJourney')">
+
+  <ng-container *ngIf="teamJourneyService.status === 'ready' && teamJourneyService.data as journey">
+    <app-empty-state *ngIf="!journey.attemptId" [message]="i18nService.t('noJourney')">
     </app-empty-state>
 
     <dl>
