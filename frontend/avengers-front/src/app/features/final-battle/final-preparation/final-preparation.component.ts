@@ -10,6 +10,10 @@ import { FinalPreparationService } from './service/final-preparation.service';
 export class FinalPreparationComponent implements OnInit {
   constructor(private readonly finalpreparationService: FinalPreparationService) {}
 
+  get pageState() {
+  return this.finalpreparationService.getViewModel();
+}
+
   ngOnInit(): void {
     this.finalpreparationService.initialize();
   }

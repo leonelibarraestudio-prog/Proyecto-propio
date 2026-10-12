@@ -1,11 +1,21 @@
-import { Controller } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AbstractController } from '../../basic/abstract.controller';
+import { ResponseObject } from '../../basic/response-object.interface';
+import { FinalPreparationModel } from './model/store-api.model';
 import { FinalPreparationService } from './final-preparation.service';
 
 @ApiTags('final-preparation')
 @Controller('final-stage/preparation')
-export class FinalPreparationController {
-  constructor(private readonly finalpreparationService: FinalPreparationService) {}
+export class FinalPreparationController extends AbstractController {
+  constructor(private readonly finalPreparationService: FinalPreparationService) {
+    super();
+  }
 
-  // TODO: Add the feature endpoints during the student implementation.
+  @Get()
+  @ApiOperation({ summary: 'Read store, inventory and reward points for the final preparation.' })
+  async getPreparation(): Promise<ResponseObject<FinalPreparationModel>> {
+    return this.createOkResponse(await this.finalPreparationService.getPreparation());
+  }
+
 }

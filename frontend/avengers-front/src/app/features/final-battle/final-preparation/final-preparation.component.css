@@ -5,3 +5,8 @@
 .student-feature-shell {
   min-height: 100%;
 }
+
+pre {
+  max-height: 95vh;
+  overflow: auto;
+}

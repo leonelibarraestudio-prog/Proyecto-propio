@@ -1,3 +1,5 @@
 <main class="student-feature-shell">
-  <app-feature-pending></app-feature-pending>
+  <p *ngIf="pageState.status === 'loading'">Cargando...</p>
+  <p *ngIf="pageState.status === 'error'">{{ pageState.error }}</p>
+  <pre *ngIf="pageState.status === 'data'">{{ pageState.data | json }}</pre>
 </main>
