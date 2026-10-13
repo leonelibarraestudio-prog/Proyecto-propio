@@ -1,3 +1,19 @@
 <main class="student-feature-shell">
-  <app-feature-pending></app-feature-pending>
+  <ng-container
+    *ngIf="estadoDeLaFaseDeGrupos as estadoVisibleDeLaFaseDeGrupos"
+  >
+    <p *ngIf="estadoVisibleDeLaFaseDeGrupos.status === 'loading'">
+      Cargando grupos...
+    </p>
+
+    <p *ngIf="estadoVisibleDeLaFaseDeGrupos.status === 'error'">
+      {{ estadoVisibleDeLaFaseDeGrupos.error }}
+    </p>
+
+    <p *ngIf="estadoVisibleDeLaFaseDeGrupos.status === 'empty'">
+      No hay grupos para mostrar.
+    </p>
+
+    <pre *ngIf="estadoVisibleDeLaFaseDeGrupos.status === 'data'">{{ estadoVisibleDeLaFaseDeGrupos.datosFaseDeGrupos | json }}</pre>
+  </ng-container>
 </main>

@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { GroupStageService } from './service/group-stage.service';
+import {
+  EstadoVistaFaseDeGrupos,
+  GroupStageService,
+} from './service/group-stage.service';
 
 @Component({
   selector: 'app-group-stage',
@@ -9,6 +12,10 @@ import { GroupStageService } from './service/group-stage.service';
 })
 export class GroupStageComponent implements OnInit {
   constructor(private readonly groupstageService: GroupStageService) {}
+
+  get estadoDeLaFaseDeGrupos(): EstadoVistaFaseDeGrupos {
+    return this.groupstageService.obtenerEstadoDeLaFaseDeGrupos();
+  }
 
   ngOnInit(): void {
     this.groupstageService.initialize();
