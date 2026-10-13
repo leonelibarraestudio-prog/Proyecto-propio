@@ -9,6 +9,9 @@ import { TeamStatusService } from './service/team-status.service';
 })
 export class TeamStatusComponent implements OnInit {
   constructor(private readonly teamstatusService: TeamStatusService) {}
+  get pageState() {
+    return this.teamstatusService.getViewModel();
+  }
 
   ngOnInit(): void {
     this.teamstatusService.initialize();
