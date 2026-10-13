@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { LiveEventsViewModel } from './model/live-events-view-model.interface';
 import { LiveEventsService } from './service/live-events.service';
 
 @Component({
@@ -8,9 +9,13 @@ import { LiveEventsService } from './service/live-events.service';
   standalone: false,
 })
 export class LiveEventsComponent implements OnInit {
-  constructor(private readonly liveeventsService: LiveEventsService) {}
+  constructor(private readonly liveEventsService: LiveEventsService) {}
+
+  get pageState(): LiveEventsViewModel {
+    return this.liveEventsService.getViewModel();
+  }
 
   ngOnInit(): void {
-    this.liveeventsService.initialize();
+    this.liveEventsService.initialize();
   }
 }

@@ -9,6 +9,8 @@ import {
   FinalSimulateJourneyApi,
   FinalTeamConfigurationDataApi,
   FinalHistoryApi,
+  FinalStageApi,
+  FinalStageEventsApi,
 } from './model/game-api/final-contract.model';
 import { HeroCatalogApi, RelationshipCatalogApi } from './model/game-api/hero-catalog.model';
 import {
@@ -27,11 +29,9 @@ export class GameFeatureApiService {
     return this.api.get<TeamProfileApi>(`/teams/${teamId}/profile`, { lang });
   }
 
-
-async history(teamId: string, lang = 'en') {
-  return this.api.get<FinalHistoryApi>(`/teams/${teamId}/history`, { lang });
-}
-
+  async history(teamId: string, lang = 'en') {
+    return this.api.get<FinalHistoryApi>(`/teams/${teamId}/history`, { lang });
+  }
 
   async assignedTeams(lang = 'en') {
     const catalog = await this.api.get<FinalAssignedTeamCatalogApi>('/teams', { lang });
@@ -150,6 +150,17 @@ async history(teamId: string, lang = 'en') {
 
   currentTeams(teamId: string) {
     return this.api.get<FinalJourneyTeamsApi>(`/teams/${teamId}/journeys/current/teams`);
+  }
+
+  finalStage(teamId: string, lang: string) {
+    return this.api.get<FinalStageApi>(`/teams/${teamId}/journeys/current/final-stage`, { lang });
+  }
+
+  finalStageEvents(teamId: string, lang: string) {
+    return this.api.get<FinalStageEventsApi>(
+      `/teams/${teamId}/journeys/current/final-stage/events`,
+      { lang },
+    );
   }
 
   private ability(ability: import('./model/game-api/final-contract.model').FinalAbilityApi) {

@@ -1,11 +1,20 @@
-import { Controller } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AbstractController } from '../../basic/abstract.controller';
+import { ResponseObject } from '../../basic/response-object.interface';
+import { LiveEventsModel } from './model/live-events.model';
 import { LiveEventsService } from './live-events.service';
 
 @ApiTags('live-events')
 @Controller('final-stage/events')
-export class LiveEventsController {
-  constructor(private readonly liveeventsService: LiveEventsService) {}
+export class LiveEventsController extends AbstractController {
+  constructor(private readonly liveEventsService: LiveEventsService) {
+    super();
+  }
 
-  // TODO: Add the feature endpoints during the student implementation.
+  @Get()
+  @ApiOperation({ summary: 'Get the status and published events of the current Final.' })
+  async getEvents(): Promise<ResponseObject<LiveEventsModel>> {
+    return this.createOkResponse(await this.liveEventsService.getEvents());
+  }
 }
