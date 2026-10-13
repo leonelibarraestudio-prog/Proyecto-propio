@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { I18nService } from '../../../core/services/i18n.service';
 import { TeamJourneyService } from './service/team-journey.service';
 
 @Component({
@@ -8,9 +9,13 @@ import { TeamJourneyService } from './service/team-journey.service';
   standalone: false,
 })
 export class TeamJourneyComponent implements OnInit {
-  constructor(private readonly teamjourneyService: TeamJourneyService) {}
+  constructor(
+    public readonly teamJourneyService: TeamJourneyService,
+    // Provides translations for the HTML.
+    public readonly i18nService: I18nService,
+  ) {}
 
   ngOnInit(): void {
-    this.teamjourneyService.initialize();
+    this.teamJourneyService.initialize();
   }
 }
