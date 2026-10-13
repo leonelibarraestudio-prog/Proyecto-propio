@@ -1,3 +1,43 @@
-<main class="student-feature-shell">
-  <app-feature-pending></app-feature-pending>
+<main class="awards-page">
+  <header class="awards-header">
+    <h1>Premios y estadísticas</h1>
+    <p>Conocé a los héroes destacados de la Journey.</p>
+  </header>
+
+  <p *ngIf="loading" class="awards-message">
+    Cargando premios...
+  </p>
+
+  <section *ngIf="!loading && error" class="awards-error">
+    {{ error }}
+  </section>
+
+  <section *ngIf="!loading && !error && awards.length === 0"
+           class="awards-message">
+    Todavía no hay premios disponibles. Completá una Journey para consultar
+    los resultados oficiales.
+  </section>
+
+  <section *ngIf="!loading && !error && awards.length > 0"
+           class="awards-grid">
+
+    <article class="award-card" *ngFor="let award of awards">
+      <span class="award-icon">🏆</span>
+
+      <h2>{{ award.label }}</h2>
+
+      <p class="award-description">
+        {{ award.explanation }}
+      </p>
+
+      <div class="award-winner" *ngIf="award.winner">
+        <h3>Ganador</h3>
+        <pre>{{ award.winner | json }}</pre>
+      </div>
+
+      <p class="award-reason" *ngIf="award.reason">
+        {{ award.reason }}
+      </p>
+    </article>
+  </section>
 </main>
