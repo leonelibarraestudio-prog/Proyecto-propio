@@ -10,6 +10,10 @@ import { HistoryService } from './service/history.service';
 export class HistoryComponent implements OnInit {
   constructor(private readonly historyService: HistoryService) {}
 
+    get viewModel() {
+    return this.historyService.getViewModel();
+  }
+
   ngOnInit(): void {
     this.historyService.initialize();
   }
