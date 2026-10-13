@@ -1,3 +1,15 @@
-<main class="student-feature-shell">
-  <app-feature-pending></app-feature-pending>
-</main>
+<div style="padding: 20px;">
+  <h2>CONFIGURAR EQUIPO</h2>
+  
+  <div *ngIf="teamConfigData; else loadingOrError">
+    <h3>Configuración recibida desde el Backend:</h3>
+    <pre style="background: #1e1e1e; color: #00ffcc; padding: 15px; border-radius: 8px; overflow-x: auto;">
+{{ teamConfigData | json }}
+    </pre>
+  </div>
+
+  <ng-template #loadingOrError>
+    <p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p>
+    <p *ngIf="!errorMessage">Cargando datos del equipo...</p>
+  </ng-template>
+</div>

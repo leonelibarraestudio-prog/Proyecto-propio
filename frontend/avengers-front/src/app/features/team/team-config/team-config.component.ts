@@ -8,9 +8,20 @@ import { TeamConfigService } from './service/team-config.service';
   standalone: false,
 })
 export class TeamConfigComponent implements OnInit {
-  constructor(private readonly teamconfigService: TeamConfigService) {}
+  teamConfigData: any = null;
+  errorMessage: string = '';
+
+  constructor(private readonly teamConfigService: TeamConfigService) {}
 
   ngOnInit(): void {
-    this.teamconfigService.initialize();
+    this.teamConfigService.getTeamConfig().subscribe({
+      next: (data) => {
+        this.teamConfigData = data;
+      },
+      error: (err) => {
+        console.error('Error al obtener la configuración:', err);
+        this.errorMessage = 'No se pudo cargar la configuración del equipo.';
+      }
+    });
   }
 }
