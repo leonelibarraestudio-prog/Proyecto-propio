@@ -369,4 +369,7 @@ controller → service
 
 ---
 
+## Documentación de cambios R11:
+Checkpoint 2 — R11: Se implementó el endpoint GET /gameCore/final-stage/status y su consumo desde el Service de Angular. La solicitud del Frontend no requiere body ni parámetros; el Backend obtiene el equipo y el idioma de su configuración y consulta la Game API enviando lang. Se verificó una respuesta HTTP 200 con el envoltorio estándar y datos reales descritos por FinalStageStateApi, su visualización en pantalla y la ausencia de errores en consola. También se verificó que el Backend informa JOURNEY_REQUIRED cuando no existe un Journey. Angular dispone de un mensaje genérico ante errores de consulta. Ambos proyectos compilan. El alcance actual incluye el estado general de la Final; los equipos y sus recursos quedan pendientes para completar R11.
+
 *Programación III — UTN — 2026*

@@ -1,11 +1,17 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TeamStatusService } from './team-status.service';
+import { AbstractController } from '../../basic/abstract.controller';
 
 @ApiTags('team-status')
 @Controller('final-stage/status')
-export class TeamStatusController {
-  constructor(private readonly teamstatusService: TeamStatusService) {}
+export class TeamStatusController extends AbstractController {
+  constructor(private readonly teamstatusService: TeamStatusService) {
+    super();
+  }
 
-  // TODO: Add the feature endpoints during the student implementation.
+@Get()
+async getTeamStatus() {
+  return this.createOkResponse(await this.teamstatusService.getTeamStatus())
+};
 }

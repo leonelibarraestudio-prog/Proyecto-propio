@@ -1,3 +1,43 @@
 <main class="student-feature-shell">
-  <app-feature-pending></app-feature-pending>
+  <header class="page-heading">
+    <!-- Uses I18nService to display the page text in the selected language. -->
+    <span class="caption-box">{{ i18nService.t('r7.caption') }}</span>
+    <h1 class="page-title">{{ i18nService.t('r7.title') }}</h1>
+    <p class="page-subtitle">{{ i18nService.t('r7.subtitle') }}</p>
+  </header>
+
+  <app-loading-state
+    *ngIf="teamJourneyService.status === 'loading'"
+    [message]="i18nService.t('loading')"
+  >
+  </app-loading-state>
+
+  <app-error-state
+    *ngIf="teamJourneyService.status === 'error'"
+    [message]="i18nService.t('error')"
+    [messageCode]="teamJourneyService.errorCode"
+  >
+  </app-error-state>
+
+  <ng-container *ngIf="teamJourneyService.status === 'ready' && teamJourneyService.data as journey">
+    <app-empty-state *ngIf="!journey.attemptId" [message]="i18nService.t('noJourney')">
+    </app-empty-state>
+
+    <dl>
+      <dt>{{ i18nService.text('Team', 'Equipo') }}</dt>
+      <dd>{{ journey.teamId }}</dd>
+
+      <dt>{{ i18nService.text('Attempt', 'Intento') }}</dt>
+      <dd>{{ journey.attemptId ?? '-' }}</dd>
+
+      <dt>{{ i18nService.text('Status', 'Estado') }}</dt>
+      <dd>{{ journey.status ?? '-' }}</dd>
+
+      <dt>{{ i18nService.text('Stages', 'Etapas') }}</dt>
+      <dd>{{ journey.stageCount ?? '-' }}</dd>
+
+      <dt>{{ i18nService.text('Encounters', 'Encuentros') }}</dt>
+      <dd>{{ journey.encounterCount ?? '-' }}</dd>
+    </dl>
+  </ng-container>
 </main>

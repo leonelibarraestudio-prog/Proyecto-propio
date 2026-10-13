@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { HistoryRivalsService } from './service/history-rivals.service';
 
@@ -8,9 +9,18 @@ import { HistoryRivalsService } from './service/history-rivals.service';
   standalone: false,
 })
 export class HistoryRivalsComponent implements OnInit {
-  constructor(private readonly historyrivalsService: HistoryRivalsService) {}
+  constructor(
+    private readonly historyRivalsService: HistoryRivalsService,
+  ) {}
+
+  get viewModel() {
+    return this.historyRivalsService.getViewModel();
+  }
 
   ngOnInit(): void {
-    this.historyrivalsService.initialize();
+    this.historyRivalsService.initialize();
   }
+  historyRivalsRetry(): void {
+  this.historyRivalsService.initialize();
+}
 }

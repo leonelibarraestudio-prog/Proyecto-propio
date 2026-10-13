@@ -5,3 +5,24 @@
 .student-feature-shell {
   min-height: 100%;
 }
+
+dl {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 10px 16px;
+  max-width: 420px;
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background: #111827;
+}
+
+dt {
+  font-weight: 600;
+}
+
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
