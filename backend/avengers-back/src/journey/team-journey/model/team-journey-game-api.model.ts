@@ -55,10 +55,10 @@ export interface JourneyRoundApi {
   winnerTeamId: string | null;
   damageByTeam: Array<{ teamId: string; damageDealt: number }>;
   activeHeroIdsByTeam: Array<{ teamId: string; heroIds: string[] }>;
-  events: JourneyEventApi[] | null;
+  events: JourneyEventApi[];
 }
 
-// Deailed Encounter
+// Detailed Encounter
 export interface JourneyEncounterDetailApi extends JourneyEncounterApi {
   rounds: JourneyRoundApi[];
   extraRound: JourneyRoundApi | null;
