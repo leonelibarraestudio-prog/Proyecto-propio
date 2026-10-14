@@ -1,6 +1,6 @@
 import { JourneyRoundApi } from './team-journey-game-api.model';
 
-// Team, leader, and list of heroes.
+// Team with its leader and heroes.
 export interface JourneyRoster {
   teamId: string;
   name: string;
@@ -8,7 +8,7 @@ export interface JourneyRoster {
   heroes: Array<{ id: string; name: string }>;
 }
 
-// Player-team encounter displayed in the timeline.
+// Encounter summary for the Journey timeline.
 export interface JourneyEncounterItem {
   encounterId: string;
   stageCode: string;
@@ -19,7 +19,7 @@ export interface JourneyEncounterItem {
   damageReceived: number | null;
 }
 
-// Current Journey and information shared by its encounters.
+// Summary of the team's current Journey.
 export interface TeamJourneyModel {
   teamId: string;
   attemptId: string | null;
@@ -36,7 +36,7 @@ export interface TeamJourneyModel {
   } | null;
 }
 
-// Published rounds of the selected encounter.
+// Detail of the selected encounter.
 export interface TeamJourneyDetailModel {
   encounterId: string;
   rounds: JourneyRoundApi[];
