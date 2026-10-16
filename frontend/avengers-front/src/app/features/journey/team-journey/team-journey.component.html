@@ -1,9 +1,12 @@
-<main class="student-feature-shell">
+<main class="student-feature-shell r7-shell">
   <header class="page-heading">
     <!-- Uses I18nService to display the page text in the selected language. -->
     <span class="caption-box">{{ i18nService.t('r7.caption') }}</span>
     <h1 class="page-title">{{ i18nService.t('r7.title') }}</h1>
     <p class="page-subtitle">{{ i18nService.t('r7.subtitle') }}</p>
+    <button type="button" (click)="teamJourneyService.initialize()">
+      {{ i18nService.text('Refresh Journey', 'Actualizar recorrido') }}
+    </button>
   </header>
 
   <app-loading-state
@@ -23,21 +26,12 @@
     <app-empty-state *ngIf="!journey.attemptId" [message]="i18nService.t('noJourney')">
     </app-empty-state>
 
-    <dl>
-      <dt>{{ i18nService.text('Team', 'Equipo') }}</dt>
-      <dd>{{ journey.teamId }}</dd>
-
-      <dt>{{ i18nService.text('Attempt', 'Intento') }}</dt>
-      <dd>{{ journey.attemptId ?? '-' }}</dd>
-
-      <dt>{{ i18nService.text('Status', 'Estado') }}</dt>
-      <dd>{{ journey.status ?? '-' }}</dd>
-
-      <dt>{{ i18nService.text('Stages', 'Etapas') }}</dt>
-      <dd>{{ journey.stageCount ?? '-' }}</dd>
-
-      <dt>{{ i18nService.text('Encounters', 'Encuentros') }}</dt>
-      <dd>{{ journey.encounterCount ?? '-' }}</dd>
-    </dl>
+    <ng-container *ngIf="journey.attemptId">
+      <p>
+        {{ i18nService.text('Journey stages', 'Etapas del Journey') }}: {{ journey.stageCount }} ·
+        {{ i18nService.text('Total Journey encounters', 'Encuentros totales del Journey') }}:
+        {{ journey.encounterCount }}
+      </p>
+    </ng-container>
   </ng-container>
 </main>
