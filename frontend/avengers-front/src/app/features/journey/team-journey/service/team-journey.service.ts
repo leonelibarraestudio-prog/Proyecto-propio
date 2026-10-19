@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Subscription } from 'rxjs';
-
 import { ApiService } from 'src/app/core/services/api.service';
 import { BaseApiService } from 'src/app/core/services/base-api.service';
 import { toApiError } from '../../../../core/models/api-error.interface';
-
 import {
   JourneyRound,
   TeamJourneyDetailModel,
@@ -13,10 +11,6 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class TeamJourneyService extends BaseApiService {
-  constructor(api: ApiService) {
-    super(api);
-  }
-
   status: 'loading' | 'ready' | 'error' = 'loading';
 
   errorCode: string | null = null;
@@ -37,12 +31,14 @@ export class TeamJourneyService extends BaseApiService {
 
   private detailRequest?: Subscription;
 
-  initialize(): void {
-    // Cancel subscriptions
-    this.journeyRequest?.unsubscribe();
-    this.detailRequest?.unsubscribe();
+  private transitionTimer?: ReturnType<typeof setTimeout>;
 
-    // Status reset
+  constructor(api: ApiService) {
+    super(api);
+  }
+
+  initialize(): void {
+    this.dispose();
     this.status = 'loading';
     this.errorCode = null;
     this.data = null;
@@ -52,13 +48,15 @@ export class TeamJourneyService extends BaseApiService {
     this.selectedEncounterId = null;
     this.selectedRoundIndex = 0;
 
-    // Sends the journey request to the backend.
     this.journeyRequest = this.getData<TeamJourneyModel>('/journey/team').subscribe({
       next: (receivedData) => {
         this.data = receivedData;
+        const firstEncounter = receivedData.encounters[0];
+        if (receivedData.attemptId && firstEncounter) {
+          this.selectEncounter(firstEncounter.encounterId);
+        }
         this.status = 'ready';
       },
-      // Handles errors received from the backend.
       error: (receivedError) => {
         this.errorCode = toApiError(receivedError).messageCode ?? null;
         this.status = 'error';
@@ -67,25 +65,43 @@ export class TeamJourneyService extends BaseApiService {
   }
 
   selectEncounter(encounterId: string): void {
-    // Cancels the previous encounter request.
+    if (
+      this.selectedEncounterId === encounterId &&
+      (this.detailStatus === 'ready' || this.detailStatus === 'loading')
+    ) {
+      return;
+    }
     this.detailRequest?.unsubscribe();
-
-    // Resets the encounter detail.
+    clearTimeout(this.transitionTimer);
     this.selectedEncounterId = encounterId;
-    this.selectedRoundIndex = 0;
-    this.detail = null;
     this.detailErrorCode = null;
     this.detailStatus = 'loading';
 
-    // Sends the encounter detail request to the backend.
+    // Retain the old detail during its short exit transition.
+    const transitionStarted = Date.now();
+    const hadDetail = this.detail !== null;
     const path = `/journey/team/encounters/${encodeURIComponent(encounterId)}`;
-
     this.detailRequest = this.getData<TeamJourneyDetailModel>(path).subscribe({
       next: (receivedDetail) => {
-        this.detail = receivedDetail;
-        this.detailStatus = 'ready';
+        const rounds = [...receivedDetail.rounds];
+        if (receivedDetail.extraRound) {
+          rounds.push(receivedDetail.extraRound);
+        }
+        for (const round of rounds) {
+          round.events.sort((first, second) => first.sequence - second.sequence);
+          for (const event of round.events) {
+            event.narrative?.lines.sort(
+              (first, second) => first.lineSequence - second.lineSequence,
+            );
+          }
+        }
+        const delay = hadDetail ? Math.max(0, 160 - (Date.now() - transitionStarted)) : 0;
+        this.transitionTimer = setTimeout(() => {
+          this.detail = receivedDetail;
+          this.selectedRoundIndex = 0;
+          this.detailStatus = 'ready';
+        }, delay);
       },
-      // Handles errors received from the backend.
       error: (receivedError) => {
         this.detailErrorCode = toApiError(receivedError).messageCode ?? null;
         this.detailStatus = 'error';
@@ -93,34 +109,37 @@ export class TeamJourneyService extends BaseApiService {
     });
   }
 
-  // Returns all available rounds, including the extra round if it exists.
   get availableRounds(): JourneyRound[] {
     if (!this.detail) {
       return [];
     }
-
-    if (this.detail.extraRound) {
-      return [...this.detail.rounds, this.detail.extraRound];
-    }
-
-    return this.detail.rounds;
+    return this.detail.extraRound
+      ? [...this.detail.rounds, this.detail.extraRound]
+      : this.detail.rounds;
   }
 
-  // Returns the currently selected round.
   get selectedRound(): JourneyRound | null {
-    return this.availableRounds[this.selectedRoundIndex] ?? null;
+    if (!this.detail) {
+      return null;
+    }
+    if (this.selectedRoundIndex < this.detail.rounds.length) {
+      return this.detail.rounds[this.selectedRoundIndex] ?? null;
+    }
+    return this.selectedRoundIndex === this.detail.rounds.length ? this.detail.extraRound : null;
   }
 
-  // Changes the selected round if the index is valid.
   selectRound(index: number): void {
+    if (this.detailStatus !== 'ready') {
+      return;
+    }
     if (index >= 0 && index < this.availableRounds.length) {
       this.selectedRoundIndex = index;
     }
   }
 
-  // Cancels active subscriptions.
   dispose(): void {
     this.journeyRequest?.unsubscribe();
     this.detailRequest?.unsubscribe();
+    clearTimeout(this.transitionTimer);
   }
 }

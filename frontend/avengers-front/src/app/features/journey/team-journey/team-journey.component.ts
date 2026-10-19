@@ -4,7 +4,17 @@ import { I18nService } from '../../../core/services/i18n.service';
 import { HeroArtworkResolverService } from '../../../core/services/hero-artwork-resolver.service';
 
 import { TeamJourneyService } from './service/team-journey.service';
-import { JourneyEvent, JourneyRoster } from './model/team-journey-api.interface';
+import { JourneyEvent, JourneyRoster, JourneyRound } from './model/team-journey-api.interface';
+
+// Groups published events for display without changing the API data.
+interface CombatEventGroup {
+  event: JourneyEvent;
+  text: string;
+  effects: Array<{
+    event: JourneyEvent;
+    text: string;
+  }>;
+}
 
 @Component({
   selector: 'app-team-journey',
@@ -13,80 +23,70 @@ import { JourneyEvent, JourneyRoster } from './model/team-journey-api.interface'
   standalone: false,
 })
 export class TeamJourneyComponent implements OnInit, OnDestroy {
+  private groupedRound: JourneyRound | null = null;
+
+  private groupedLanguage = '';
+
+  private groups: CombatEventGroup[] = [];
+
   constructor(
     public readonly teamJourneyService: TeamJourneyService,
-    // Provides translations for the HTML.
     public readonly i18nService: I18nService,
-    // Provides hero images for the HTML.
     public readonly artwork: HeroArtworkResolverService,
   ) {}
 
-  // Component initialization.
   ngOnInit(): void {
     this.teamJourneyService.initialize();
   }
 
-  // Component cleanup.
   ngOnDestroy(): void {
     this.teamJourneyService.dispose();
   }
 
-  // Get player team.
+  // Restarts the entrance animation when the selected round changes.
+  get displayedRounds(): JourneyRound[] {
+    const round = this.teamJourneyService.selectedRound;
+
+    return round ? [round] : [];
+  }
+
   get playerTeam(): JourneyRoster | null {
     const teamId = this.teamJourneyService.data?.teamId;
 
     return teamId ? this.teamById(teamId) : null;
   }
 
-  // Get opponent team.
   get opponentTeam(): JourneyRoster | null {
+    // Keeps the previous opponent visible during the exit transition.
+    const encounterId = this.teamJourneyService.detail?.encounterId;
+
     const encounter = this.teamJourneyService.data?.encounters.find(
-      (item) => item.encounterId === this.teamJourneyService.selectedEncounterId,
+      (item) => item.encounterId === encounterId,
     );
 
     return encounter ? this.teamById(encounter.opponentTeamId) : null;
   }
 
-  // Get teams to display.
-  get displayedTeams(): JourneyRoster[] {
-    const teams: JourneyRoster[] = [];
-
-    if (this.playerTeam) {
-      teams.push(this.playerTeam);
-    }
-
-    if (this.opponentTeam) {
-      teams.push(this.opponentTeam);
-    }
-
-    return teams;
-  }
-
-  // Get initiative leader.
-  get initiativeLeaderId(): string | null {
-    const teamId = this.teamJourneyService.selectedRound?.initiativeTeamId;
-
-    return teamId ? (this.teamById(teamId)?.leaderId ?? null) : null;
-  }
-
-  // Get final status.
-  get finalStatusLabel(): string {
-    const status = this.teamJourneyService.data?.final?.status;
-
-    return status ?? '-';
-  }
-
-  // Find team by ID.
   teamById(teamId: string): JourneyRoster | null {
     return this.teamJourneyService.data?.teams.find((team) => team.teamId === teamId) ?? null;
   }
 
-  // Get team name.
   teamName(teamId: string | null): string {
-    return teamId ? (this.teamById(teamId)?.name ?? teamId) : '-';
+    if (!teamId) {
+      return '-';
+    }
+
+    const team = this.teamById(teamId);
+
+    if (!team) {
+      return teamId;
+    }
+
+    const name = team.name.replace(/\s+Team$/i, '').replace(/^Equipo\s+/i, '');
+
+    return this.i18nService.text(`${name} Team`, `Equipo ${name}`);
   }
 
-  // Get hero name.
   heroName(heroId: string | null): string {
     if (!heroId) {
       return '-';
@@ -103,16 +103,19 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
     return heroId;
   }
 
-  // Check if hero is active.
+  // Returns target hero names separated by commas.
+  targetNames(heroIds: string[]): string {
+    return heroIds.map((heroId) => this.heroName(heroId)).join(', ');
+  }
+
   isActiveHero(teamId: string, heroId: string): boolean {
-    const active = this.teamJourneyService.selectedRound?.activeHeroIdsByTeam.find(
+    const activeTeam = this.teamJourneyService.selectedRound?.activeHeroIdsByTeam.find(
       (team) => team.teamId === teamId,
     );
 
-    return active?.heroIds.includes(heroId) ?? false;
+    return activeTeam?.heroIds.includes(heroId) ?? false;
   }
 
-  // Get stage label.
   stageLabel(code: string): string {
     const labels: Record<string, [string, string]> = {
       GROUP_STAGE: ['Group stage', 'Fase de grupos'],
@@ -126,36 +129,256 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
     return label ? this.i18nService.text(label[0], label[1]) : code;
   }
 
-  // Get result label.
   resultLabel(code: string | null): string {
-    if (code === 'WIN') {
-      return this.i18nService.text('Win', 'Victoria');
-    }
+    const labels: Record<string, [string, string]> = {
+      WIN: ['Win', 'Victoria'],
+      LOSS: ['Loss', 'Derrota'],
+      DRAW: ['Draw', 'Empate'],
+    };
 
-    if (code === 'LOSS') {
-      return this.i18nService.text('Loss', 'Derrota');
-    }
+    const label = labels[code ?? ''];
 
-    if (code === 'DRAW') {
-      return this.i18nService.text('Draw', 'Empate');
-    }
-
-    return code ?? '-';
+    return label
+      ? this.i18nService.text(label[0], label[1])
+      : (code ?? this.i18nService.text('No result', 'Sin resultado'));
   }
 
-  // Order events.
-  orderedEvents(events: JourneyEvent[]): JourneyEvent[] {
-    return [...events].sort((first, second) => first.sequence - second.sequence);
+  finalLabel(status: string, outcome: string | null): string {
+    const labels: Record<string, [string, string]> = {
+      PENDING: ['Pending', 'Pendiente'],
+      READY: ['Pending', 'Pendiente'],
+      ACTIVE: ['In progress', 'En curso'],
+      COMPLETED: ['Completed', 'Completada'],
+      VICTORY: ['Victory', 'Victoria'],
+      DEFEAT: ['Defeat', 'Derrota'],
+      ABANDON: ['Abandoned', 'Abandonada'],
+      WIN: ['Win', 'Victoria'],
+      LOSS: ['Loss', 'Derrota'],
+      DRAW: ['Draw', 'Empate'],
+    };
+
+    const value = outcome ?? status;
+    const label = labels[value];
+
+    return label ? this.i18nService.text(label[0], label[1]) : value;
   }
 
-  // Order narrative lines.
-  narrativeLines(event: JourneyEvent) {
-    return [...(event.narrative?.lines ?? [])].sort(
-      (first, second) => first.lineSequence - second.lineSequence,
+  roundLabel(round: JourneyRound): string {
+    if (round.roundType === 'EXTRA_ROUND' || round === this.teamJourneyService.detail?.extraRound) {
+      return this.i18nService.text('Extra round', 'Ronda extra');
+    }
+
+    return `${this.i18nService.text('Round', 'Ronda')} ${round.number}`;
+  }
+
+  eventIcon(event: JourneyEvent): string {
+    switch (event.eventCode) {
+      case 'ACTION':
+        return event.values.actionCode === 'SUPPORT_SPECIAL' ? '✦' : '⚔';
+
+      case 'DAMAGE':
+        return '✹';
+
+      case 'HEAL':
+      case 'RECOVERY':
+        return '✚';
+
+      case 'KO':
+        return '↓';
+
+      case 'STAT_GAIN':
+        return '↑';
+
+      case 'AUTO_PURCHASE_USE':
+        return '◇';
+
+      default:
+        return '•';
+    }
+  }
+
+  // Rebuilds the display groups only when the round or language changes.
+  get eventGroups(): CombatEventGroup[] {
+    const round = this.teamJourneyService.selectedRound;
+    const language = this.i18nService.text('en', 'es');
+
+    if (round !== this.groupedRound || language !== this.groupedLanguage) {
+      this.groupedRound = round;
+      this.groupedLanguage = language;
+      this.groups = this.buildEventGroups(round?.events ?? []);
+    }
+
+    return this.groups;
+  }
+
+  private buildEventGroups(events: JourneyEvent[]): CombatEventGroup[] {
+    const groups: CombatEventGroup[] = [];
+    let currentAction: CombatEventGroup | null = null;
+
+    for (const event of events) {
+      const isEffect = ['DAMAGE', 'HEAL', 'KO', 'STAT_GAIN'].includes(event.eventCode);
+
+      const sameActor =
+        currentAction !== null &&
+        event.actorHeroId !== null &&
+        event.actorHeroId === currentAction.event.actorHeroId;
+
+      const actionTargets = currentAction?.event.targetHeroIds ?? [];
+
+      const sameTargets =
+        currentAction !== null &&
+        event.targetHeroIds.length > 0 &&
+        event.targetHeroIds.every((heroId) => actionTargets.includes(heroId));
+
+      // Groups consecutive effects with the same actor and valid targets.
+      if (currentAction && isEffect && sameActor && sameTargets) {
+        currentAction.effects.push({
+          event,
+          text: this.effectText(event),
+        });
+
+        continue;
+      }
+
+      const group: CombatEventGroup = {
+        event,
+        text: this.eventText(event),
+        effects: [],
+      };
+
+      groups.push(group);
+
+      currentAction = event.eventCode === 'ACTION' ? group : null;
+    }
+
+    for (const group of groups) {
+      const effect = group.effects[0];
+
+      if (
+        group.effects.length === 1 &&
+        effect &&
+        effect.event.eventCode === 'DAMAGE' &&
+        group.event.targetHeroIds.length === 1 &&
+        effect.event.values.amount !== undefined
+      ) {
+        const amount = effect.event.values.amount;
+
+        group.text =
+          group.text.replace(/\.$/, '') +
+          this.i18nService.text(` and dealt ${amount} damage.`, ` y causó ${amount} de daño.`);
+
+        group.effects = [];
+      } else if (group.effects.length > 0) {
+        // The effect lines already identify the affected heroes.
+        group.text = this.actionText(group.event, false);
+      }
+    }
+
+    return groups;
+  }
+
+  private actionText(event: JourneyEvent, includeTargets: boolean): string {
+    const actions: Record<string, [string, string]> = {
+      BASIC_ATTACK: ['a basic attack', 'un ataque básico'],
+      OFFENSIVE_SPECIAL: ['an offensive special', 'un especial ofensivo'],
+      SUPPORT_SPECIAL: ['a support special', 'un especial de apoyo'],
+    };
+
+    const action = actions[event.values.actionCode ?? ''];
+
+    if (!action) {
+      return this.narrativeText(event);
+    }
+
+    const actor = this.heroName(event.actorHeroId);
+    const actionName = this.i18nService.text(action[0], action[1]);
+
+    const targets = includeTargets ? this.targetNames(event.targetHeroIds) : '';
+
+    return (
+      this.i18nService.text(`${actor} performed ${actionName}`, `${actor} realizó ${actionName}`) +
+      (targets ? this.i18nService.text(` on ${targets}`, ` sobre ${targets}`) : '') +
+      '.'
     );
   }
 
-  // Scroll timeline.
+  private effectText(event: JourneyEvent): string {
+    const targets = this.targetNames(event.targetHeroIds);
+    const amount = event.values.amount;
+
+    if (amount !== undefined && event.eventCode === 'DAMAGE') {
+      return this.i18nService.text(
+        `${targets}: ${amount} damage.`,
+        `${targets}: ${amount} de daño.`,
+      );
+    }
+
+    if (amount !== undefined && event.eventCode === 'HEAL') {
+      return this.i18nService.text(
+        `${targets}: ${amount} energy restored.`,
+        `${targets}: ${amount} de energía recuperada.`,
+      );
+    }
+
+    return this.eventText(event);
+  }
+
+  eventText(event: JourneyEvent): string {
+    if (event.eventCode === 'ACTION') {
+      return this.actionText(event, true);
+    }
+
+    const actor = event.actorHeroId
+      ? this.heroName(event.actorHeroId)
+      : this.teamName(event.teamId);
+
+    const targets = this.targetNames(event.targetHeroIds);
+    const amount = event.values.amount;
+
+    if (event.eventCode === 'DAMAGE' && amount !== undefined) {
+      return (
+        this.i18nService.text(
+          `${actor} dealt ${amount} damage`,
+          `${actor} causó ${amount} de daño`,
+        ) +
+        (targets ? this.i18nService.text(` to ${targets}`, ` a ${targets}`) : '') +
+        '.'
+      );
+    }
+
+    if (event.eventCode === 'HEAL' && amount !== undefined) {
+      return (
+        this.i18nService.text(
+          `${actor} restored ${amount} energy`,
+          `${actor} recuperó ${amount} de energía`,
+        ) +
+        (targets ? this.i18nService.text(` for ${targets}`, ` para ${targets}`) : '') +
+        '.'
+      );
+    }
+
+    if (event.eventCode === 'KO' && targets) {
+      return this.i18nService.text(`${targets}: knocked out.`, `${targets}: fuera de combate.`);
+    }
+
+    return this.narrativeText(event);
+  }
+
+  private narrativeText(event: JourneyEvent): string {
+    return (
+      event.narrative?.lines.map((line) => line.text).join(' ') ||
+      this.i18nService.text(
+        `Recorded event: ${event.eventCode}.`,
+        `Evento registrado: ${event.eventCode}.`,
+      )
+    );
+  }
+
+  // Caps the delay so long logs become readable quickly.
+  entryDelay(index: number, effectIndex = 0): string {
+    return `${Math.min(index * 45 + effectIndex * 35, 450)}ms`;
+  }
+  
   scrollTimeline(container: HTMLElement, direction: number): void {
     container.scrollBy({
       left: direction * 250,
