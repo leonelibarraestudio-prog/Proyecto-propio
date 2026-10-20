@@ -1,9 +1,84 @@
-<main class="student-feature-shell">
-  <h2>Historial</h2>
+<main class="history-page">
+  <header class="history-header">
+    <span class="history-caption">{{ translate('r13.caption', pageState.lang) }}</span>
+    <h1 class="history-title">{{ translate('r13.title', pageState.lang) }}</h1>
+    <p class="history-subtitle">{{ translate('r13.subtitle', pageState.lang) }}</p>
+  </header>
 
-  <p *ngIf="viewModel.status === 'loading'">Cargando...</p>
-  <p *ngIf="viewModel.status === 'error'">Error: {{ viewModel.error }}</p>
-  <p *ngIf="viewModel.status === 'empty'">Todavía no hay batallas en el historial.</p>
+  <section class="history-summary" *ngIf="pageState.status === 'data' && pageState.data as history">
+    <dl class="history-stat">
+      <dt>Caminos</dt>
+      <dd>{{ history.summary.total }}</dd>
+    </dl>
+    <dl class="history-stat">
+      <dt>Victorias</dt>
+      <dd>{{ history.summary.victories }}</dd>
+    </dl>
+    <dl class="history-stat">
+      <dt>Derrotas</dt>
+      <dd>{{ history.summary.defeats }}</dd>
+    </dl>
+    <dl class="history-stat">
+      <dt>Abandonados</dt>
+      <dd>{{ history.summary.abandoned }}</dd>
+    </dl>
+  </section>
 
-  <pre>{{ viewModel.data | json }}</pre>
+  <section class="history-list" *ngIf="pageState.status === 'data' && pageState.data as history">
+    <article
+      class="history-card"
+      *ngFor="let item of history.items; let i = index; trackBy: trackItem"
+    >
+      <header class="history-card-header">
+        <h2>{{ translate('r13.attempt', pageState.lang) }} {{ history.items.length - i }}</h2>
+        <span class="history-outcome">{{ outcomeLabel(item.outcomeCode) }}</span>
+      </header>
+
+      <dl class="history-details">
+        <div>
+          <dt>{{ translate('r13.createdAt', pageState.lang) }}</dt>
+          <dd>{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+        <div>
+          <dt>{{ translate('r13.completedAt', pageState.lang) }}</dt>
+          <dd>{{ item.completedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+        <div>
+          <dt>{{ translate('r13.opponent', pageState.lang) }}</dt>
+          <dd>{{ item.opponentFinalistName }}</dd>
+        </div>
+        <div>
+          <dt>{{ translate('r13.strategy', pageState.lang) }}</dt>
+          <dd>{{ strategyLabel(item.spendingStrategyCode) }}</dd>
+        </div>
+      </dl>
+
+      <p class="history-ending">
+        <strong>{{ translate('r13.ending', pageState.lang) }}:</strong>
+        {{ item.endingSummary }}
+      </p>
+    </article>
+  </section>
+
+  <app-loading-state *ngIf="pageState.status === 'loading'" message="Cargando..."></app-loading-state>
+
+  <app-error-state
+    *ngIf="pageState.status === 'error'"
+    [message]="pageState.error ?? translate('error', pageState.lang)"
+    [messageCode]="pageState.errorCode ?? null"
+  ></app-error-state>
+
+  <section class="history-empty" *ngIf="pageState.status === 'empty'">
+    <h2>{{ translate('r13.noHistory', pageState.lang) }}</h2>
+    <p>{{ translate('r13.noHistoryCopy', pageState.lang) }}</p>
+  </section>
+
+  <button
+    *ngIf="pageState.status === 'error'"
+    type="button"
+    class="history-retry"
+    (click)="retry()"
+  >
+    {{ translate('retry', pageState.lang) }}
+  </button>
 </main>
