@@ -1,10 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { I18nService } from '../../../core/services/i18n.service';
+import { AppCopyKey, I18nService } from '../../../core/services/i18n.service';
 import { HeroArtworkResolverService } from '../../../core/services/hero-artwork-resolver.service';
 
 import { TeamJourneyService } from './service/team-journey.service';
-import { JourneyEvent, JourneyRoster, JourneyRound } from './model/team-journey-api.interface';
+import {
+  JourneyEncounterItem,
+  JourneyEvent,
+  JourneyRoster,
+  JourneyRound,
+} from './model/team-journey-api.interface';
 
 // Groups published events for display without changing the API data.
 interface CombatEventGroup {
@@ -43,13 +48,6 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
     this.teamJourneyService.dispose();
   }
 
-  // Restarts the entrance animation when the selected round changes.
-  get displayedRounds(): JourneyRound[] {
-    const round = this.teamJourneyService.selectedRound;
-
-    return round ? [round] : [];
-  }
-
   get playerTeam(): JourneyRoster | null {
     const teamId = this.teamJourneyService.data?.teamId;
 
@@ -65,6 +63,17 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
     );
 
     return encounter ? this.teamById(encounter.opponentTeamId) : null;
+  }
+
+  // Matches the summary to the detail still visible during loading.
+  get displayedEncounter(): JourneyEncounterItem | null {
+    const encounterId = this.teamJourneyService.detail?.encounterId;
+
+    return (
+      this.teamJourneyService.data?.encounters.find(
+        (encounter) => encounter.encounterId === encounterId,
+      ) ?? null
+    );
   }
 
   teamById(teamId: string): JourneyRoster | null {
@@ -107,7 +116,6 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
     return name.replace(/^\d+\.\s*/, '');
   }
 
-  // Returns target hero names separated by commas.
   targetNames(heroIds: string[]): string {
     return heroIds.map((heroId) => this.heroName(heroId)).join(', ');
   }
@@ -121,33 +129,42 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
   }
 
   label(code: string | null): string {
-    const labels: Record<string, [string, string]> = {
-      GROUP_STAGE: ['Group stage', 'Fase de grupos'],
-      ROUND_OF_16: ['Round of 16', 'Octavos de final'],
-      QUARTERFINAL: ['Quarterfinal', 'Cuartos de final'],
-      SEMIFINAL: ['Semifinal', 'Semifinal'],
-      WIN: ['Win', 'Victoria'],
-      LOSS: ['Loss', 'Derrota'],
-      DRAW: ['Draw', 'Empate'],
-      READY: ['Pending', 'Pendiente'],
-      ACTIVE: ['In progress', 'En curso'],
-      COMPLETED: ['Completed', 'Completada'],
-      VICTORY: ['Victory', 'Victoria'],
-      DEFEAT: ['Defeat', 'Derrota'],
-      ABANDON: ['Abandoned', 'Abandonada'],
+    const labels: Partial<Record<string, AppCopyKey>> = {
+      GROUP_STAGE: 'groupStage',
+      ROUND_OF_16: 'historyRivals.stage.roundOf16',
+      QUARTERFINAL: 'historyRivals.stage.quarterfinal',
+      SEMIFINAL: 'historyRivals.stage.semifinal',
+      WIN: 'r7.win',
+      LOSS: 'r7.loss',
+      DRAW: 'r7.draw',
+      READY: 'r7.pending',
+      VICTORY: 'r7.win',
+      DEFEAT: 'r7.loss',
+      ABANDON: 'r7.abandoned',
     };
+    const key = labels[code ?? ''];
 
-    const translation = labels[code ?? ''];
+    if (key) {
+      return this.i18nService.t(key);
+    }
 
-    return translation ? this.i18nService.text(...translation) : (code ?? '-');
+    if (code === 'ACTIVE') {
+      return this.i18nService.text('In progress', 'En curso');
+    }
+
+    if (code === 'COMPLETED') {
+      return this.i18nService.text('Completed', 'Completado');
+    }
+
+    return code ?? '-';
   }
 
   roundLabel(round: JourneyRound): string {
     if (round.roundType === 'EXTRA_ROUND' || round === this.teamJourneyService.detail?.extraRound) {
-      return this.i18nService.text('Extra round', 'Ronda extra');
+      return this.i18nService.t('r7.roundType.extra');
     }
 
-    return `${this.i18nService.text('Round', 'Ronda')} ${round.number}`;
+    return this.i18nService.t('r7.roundLabel', { number: round.number });
   }
 
   eventIcon(event: JourneyEvent): string {
@@ -280,13 +297,16 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
   }
 
   private eventText(event: JourneyEvent, compact = false): string {
+    // Without a published actor, preserve the API narrative.
+    if (!event.actorHeroId) {
+      return this.narrativeText(event);
+    }
+
     if (event.eventCode === 'ACTION') {
       return this.actionText(event, true);
     }
 
-    const actor = event.actorHeroId
-      ? this.heroName(event.actorHeroId)
-      : this.teamName(event.teamId);
+    const actor = this.heroName(event.actorHeroId);
 
     const targets = this.targetNames(event.targetHeroIds);
     const amount = event.values.amount;
