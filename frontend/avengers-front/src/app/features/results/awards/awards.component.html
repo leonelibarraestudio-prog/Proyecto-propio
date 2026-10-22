@@ -1,14 +1,69 @@
-﻿<main class="awards-page">
+
+<main class="awards-page">
   <header class="awards-header">
     <h1>Premios y estadísticas</h1>
-    <p>Respuesta recibida del backend</p>
+    <p>Conocé a los héroes destacados de la Journey.</p>
   </header>
 
-  <p *ngIf="loading">Cargando respuesta...</p>
-
-  <p *ngIf="!loading && error" class="awards-error">
-    {{ error }}
+  <p *ngIf="loading" class="awards-message" role="status">
+    Cargando premios...
   </p>
 
-  <pre *ngIf="!loading && !error">{{ response | json }}</pre>
+  <section *ngIf="!loading && error" class="awards-error" role="alert">
+    {{ error }}
+  </section>
+
+  <section
+    *ngIf="!loading && !error && awards.length > 0"
+    class="awards-grid"
+    aria-label="Premios de la Journey"
+  >
+    <article class="award-card" *ngFor="let award of awards">
+      <span class="award-icon" aria-hidden="true">🏆</span>
+      <h2>{{ award.label }}</h2>
+      <p>{{ award.explanation }}</p>
+
+      <div class="award-winner" *ngIf="award.winner">
+        <h3>Ganador</h3>
+        <p>
+          {{
+            award.winner.displayName ||
+              award.winner.name ||
+              'Héroe destacado'
+          }}
+        </p>
+      </div>
+
+      <p class="award-reason" *ngIf="award.reason">
+        {{ award.reason }}
+      </p>
+    </article>
+  </section>
+
+  <section
+    *ngIf="!loading && !error && awards.length === 0 && response"
+    class="awards-details"
+  >
+    <h2>Resultados recibidos</h2>
+
+    <section *ngIf="response.statistics !== undefined">
+      <h3>Estadísticas</h3>
+      <pre>{{ response.statistics | json }}</pre>
+    </section>
+
+    <section *ngIf="response.rewards !== undefined">
+      <h3>Premios</h3>
+      <pre>{{ response.rewards | json }}</pre>
+    </section>
+
+    <p
+      *ngIf="
+        response.statistics === undefined &&
+        response.rewards === undefined
+      "
+      class="awards-message"
+    >
+      La respuesta no contiene premios para mostrar.
+    </p>
+  </section>
 </main>
