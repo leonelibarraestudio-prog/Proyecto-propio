@@ -2,8 +2,24 @@
   display: block;
 }
 
+ul {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+}
+
 .student-feature-shell {
-  min-height: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 12px 20px;
+}
+
+li {
+  background: var(--color-panel-raised);
+  border: 5px solid var(--color-panel-border);
+  padding: 1rem;
 }
 
 pre {

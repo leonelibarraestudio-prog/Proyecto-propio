@@ -1,5 +1,18 @@
 <main class="student-feature-shell">
   <p *ngIf="pageState.status === 'loading'">Cargando...</p>
   <p *ngIf="pageState.status === 'error'">{{ pageState.error }}</p>
-  <pre *ngIf="pageState.status === 'data'">{{ pageState.data | json }}</pre>
+  <section *ngIf="pageState.status === 'data' && pageState.data as preparation">
+    <h2>Puntos disponibles: {{ preparation.rewards.balance }}</h2>
+    <p *ngIf="preparation.inventory.items.length === 0">
+      Todavía no tenes ítems en el inventario.
+    </p>
+    <ul>
+      <li *ngFor="let item of preparation.powerUps">
+        <h3>{{ item.name }}</h3>
+        <span class="tag">{{ item.targetScope === 'HERO' ? 'Héroe' : 'Equipo' }}</span>
+        <p>{{ item.description }}</p>
+        <p>Precio: {{ item.price }}</p>
+    </li>
+    </ul>
+  </section>
 </main>

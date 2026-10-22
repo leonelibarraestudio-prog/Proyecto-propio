@@ -3,9 +3,10 @@ import { ApiService } from '../../../../core/services/api.service';
 import { BaseApiService } from '../../../../core/services/base-api.service';
 import { toApiError } from '../../../../core/models/api-error.interface';
 import { PageState } from '../../../../core/models/page-state.interface';
+import { FinalPreparationApi } from '../model/final-preparation-api.interface';
 
 export interface FinalPreparationViewModel extends PageState {
-  data: unknown | null;
+  data: FinalPreparationApi | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,7 +23,7 @@ export class FinalPreparationService extends BaseApiService {
 
   initialize(): void {
     this.pageState.status = 'loading';
-    this.getData<unknown>('/final-stage/preparation').subscribe({
+    this.getData<FinalPreparationApi>('/final-stage/preparation').subscribe({
       next: (data) => {
         this.pageState.data = data;
         this.pageState.status = 'data';
