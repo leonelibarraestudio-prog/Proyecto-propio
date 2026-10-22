@@ -1,43 +1,393 @@
-<main class="student-feature-shell">
-  <header class="page-heading">
-    <!-- Uses I18nService to display the page text in the selected language. -->
-    <span class="caption-box">{{ i18nService.t('r7.caption') }}</span>
-    <h1 class="page-title">{{ i18nService.t('r7.title') }}</h1>
-    <p class="page-subtitle">{{ i18nService.t('r7.subtitle') }}</p>
+<main class="r7-page">
+  <header class="r7-header">
+    <div class="header-copy">
+      <h1>
+        <span>{{ i18nService.text('TEAM', 'CAMINO DEL') }}</span>
+        <span>{{ i18nService.text('JOURNEY', 'EQUIPO') }}</span>
+      </h1>
+
+      <p>{{ i18nService.t('r7.subtitle') }}</p>
+    </div>
+
+    <div class="header-art" aria-hidden="true">
+      <img src="assets/team-journey/falcon_header.png" alt="" />
+    </div>
   </header>
 
   <app-loading-state
     *ngIf="teamJourneyService.status === 'loading'"
     [message]="i18nService.t('loading')"
-  >
-  </app-loading-state>
+  ></app-loading-state>
 
   <app-error-state
     *ngIf="teamJourneyService.status === 'error'"
     [message]="i18nService.t('error')"
     [messageCode]="teamJourneyService.errorCode"
-  >
-  </app-error-state>
+  ></app-error-state>
 
   <ng-container *ngIf="teamJourneyService.status === 'ready' && teamJourneyService.data as journey">
-    <app-empty-state *ngIf="!journey.attemptId" [message]="i18nService.t('noJourney')">
-    </app-empty-state>
+    <div class="journey-grid" [class.empty]="!journey.encounters.length">
+      <section class="journey-panel">
+        <h2>
+          {{ i18nService.text('TEAM JOURNEY', 'RECORRIDO DEL EQUIPO') }}
+        </h2>
 
-    <dl>
-      <dt>{{ i18nService.text('Team', 'Equipo') }}</dt>
-      <dd>{{ journey.teamId }}</dd>
+        <div
+          class="path-list"
+          role="group"
+          [attr.aria-label]="i18nService.text('Encounters', 'Encuentros')"
+          *ngIf="journey.encounters.length"
+        >
+          <ng-container
+            *ngFor="let encounter of journey.encounters; let last = last; trackBy: trackEncounter"
+          >
+            <button
+              type="button"
+              class="path-stop"
+              [class.win]="encounter.resultCode === 'WIN'"
+              [class.loss]="encounter.resultCode === 'LOSS'"
+              [class.selected]="teamJourneyService.selectedEncounterId === encounter.encounterId"
+              [attr.aria-pressed]="teamJourneyService.selectedEncounterId === encounter.encounterId"
+              (click)="teamJourneyService.selectEncounter(encounter.encounterId)"
+            >
+              <ng-container *ngIf="teamById(encounter.opponentTeamId) as opponent">
+                <span class="path-face">
+                  <img
+                    [src]="artwork.resolve(opponent.leaderId)"
+                    [alt]="heroName(opponent.leaderId)"
+                    (error)="artwork.useFallback($event)"
+                  />
+                </span>
 
-      <dt>{{ i18nService.text('Attempt', 'Intento') }}</dt>
-      <dd>{{ journey.attemptId ?? '-' }}</dd>
+                <strong class="path-name">
+                  {{ heroName(opponent.leaderId) }}
+                </strong>
 
-      <dt>{{ i18nService.text('Status', 'Estado') }}</dt>
-      <dd>{{ journey.status ?? '-' }}</dd>
+                <span class="path-stage">
+                  {{ stageLabel(encounter.stageCode) }}
+                </span>
 
-      <dt>{{ i18nService.text('Stages', 'Etapas') }}</dt>
-      <dd>{{ journey.stageCount ?? '-' }}</dd>
+                <strong class="path-result">
+                  {{ label(encounter.resultCode) }}
+                </strong>
+              </ng-container>
+            </button>
 
-      <dt>{{ i18nService.text('Encounters', 'Encuentros') }}</dt>
-      <dd>{{ journey.encounterCount ?? '-' }}</dd>
-    </dl>
+            <span *ngIf="!last || journey.final" class="path-arrow" aria-hidden="true"> → </span>
+          </ng-container>
+
+          <article
+            *ngIf="journey.final as final"
+            class="path-stop final-stop"
+            [class.pending]="final.status === 'READY'"
+          >
+            <ng-container *ngIf="teamById(final.opponentTeamId) as opponent">
+              <span class="path-face">
+                <img
+                  [src]="artwork.resolve(opponent.leaderId)"
+                  [alt]="heroName(opponent.leaderId)"
+                  (error)="artwork.useFallback($event)"
+                />
+              </span>
+
+              <strong class="path-name">
+                {{ heroName(opponent.leaderId) }}
+              </strong>
+
+              <span class="path-stage">
+                {{ i18nService.text('Final', 'Final') }}
+              </span>
+
+              <strong class="path-result">
+                {{ label(final.outcome ?? final.status) }}
+              </strong>
+            </ng-container>
+          </article>
+        </div>
+
+        <app-empty-state
+          *ngIf="!journey.encounters.length"
+          [message]="
+            journey.attemptId
+              ? i18nService.text('Journey pending', 'Recorrido pendiente')
+              : i18nService.t('r7.noJourney')
+          "
+        ></app-empty-state>
+      </section>
+
+      <div
+        class="detail-state"
+        *ngIf="teamJourneyService.detailStatus === 'loading' && !teamJourneyService.detail"
+      >
+        <app-loading-state [message]="i18nService.t('loading')"></app-loading-state>
+      </div>
+
+      <div class="detail-state" *ngIf="teamJourneyService.detailStatus === 'error'">
+        <app-error-state
+          [message]="i18nService.t('error')"
+          [messageCode]="teamJourneyService.detailErrorCode"
+        ></app-error-state>
+      </div>
+
+      <ng-container
+        *ngIf="teamJourneyService.detail && teamJourneyService.detailStatus !== 'error'"
+      >
+        <div class="detail-state" *ngIf="!teamJourneyService.availableRounds.length">
+          <app-empty-state
+            [message]="i18nService.text('No published rounds.', 'No hay rondas publicadas.')"
+          ></app-empty-state>
+        </div>
+
+        <ng-container *ngIf="teamJourneyService.selectedRound as round">
+          <section
+            class="teams-row"
+            [class.updating]="teamJourneyService.detailStatus === 'loading'"
+          >
+            <ng-container
+              *ngFor="let displayedTeam of [playerTeam, opponentTeam]; let teamIndex = index"
+            >
+              <article
+                class="team-panel"
+                [class.player-team]="teamIndex === 0"
+                [class.opponent-team]="teamIndex === 1"
+                *ngIf="displayedTeam as team"
+              >
+                <header class="team-heading">
+                  <h2>
+                    {{
+                      teamIndex === 0
+                        ? i18nService.text('YOUR TEAM', 'TU EQUIPO')
+                        : i18nService.text('OPPONENT TEAM', 'EQUIPO RIVAL')
+                    }}
+                  </h2>
+
+                  <span>{{ teamName(team.teamId) }}</span>
+                </header>
+
+                <div class="heroes" role="list">
+                  <figure
+                    class="hero"
+                    role="listitem"
+                    *ngFor="let hero of team.heroes; trackBy: trackHero"
+                    [class.leader]="hero.id === team.leaderId"
+                    [class.active]="isActiveHero(team.teamId, hero.id)"
+                  >
+                    <div class="hero-image">
+                      <img
+                        [src]="artwork.resolve(hero.id)"
+                        [alt]="hero.name"
+                        (error)="artwork.useFallback($event)"
+                      />
+                    </div>
+
+                    <figcaption>
+                      {{ cleanHeroName(hero.name) }}
+                    </figcaption>
+
+                    <span class="status-badge">
+                      {{
+                        isActiveHero(team.teamId, hero.id)
+                          ? i18nService.text('ACTIVE', 'ACTIVO')
+                          : i18nService.text('INACTIVE', 'INACTIVO')
+                      }}
+                    </span>
+                  </figure>
+                </div>
+              </article>
+            </ng-container>
+          </section>
+
+          <section
+            class="round-area"
+            [class.updating]="teamJourneyService.detailStatus === 'loading'"
+          >
+            <div class="round-details">
+              <article class="encounter-info" *ngIf="displayedEncounter as encounter">
+                <h2>
+                  {{ i18nService.text('ENCOUNTER INFORMATION', 'INFORMACIÓN DEL ENCUENTRO') }}
+                </h2>
+
+                <dl class="round-stats encounter-stats">
+                  <div class="stat">
+                    <dt>
+                      <span class="stat-icon encounter-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="8"></circle>
+                          <path d="m8.5 12 2.2 2.2 4.8-5"></path>
+                        </svg>
+                      </span>
+                      {{ i18nService.t('status') }}
+                    </dt>
+                    <dd>{{ label(encounter.status) }}</dd>
+                  </div>
+
+                  <div class="stat">
+                    <dt>
+                      <span class="stat-icon encounter-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M8 3h8v5a4 4 0 0 1-8 0V3Z"></path>
+                          <path d="M8 5H5v2a4 4 0 0 0 4 4"></path>
+                          <path d="M16 5h3v2a4 4 0 0 1-4 4"></path>
+                          <path d="M12 12v6M8 21h8M9 18h6v3"></path>
+                        </svg>
+                      </span>
+                      {{ i18nService.t('r7.result') }}
+                    </dt>
+                    <dd>{{ label(encounter.resultCode) }}</dd>
+                  </div>
+
+                  <div class="stat">
+                    <dt>
+                      <span class="stat-icon encounter-icon" aria-hidden="true"> ⚔ </span>
+                      {{ i18nService.text('TOTAL DAMAGE DEALT', 'DAÑO TOTAL INFLIGIDO') }}
+                    </dt>
+                    <dd>{{ encounter.damageDealt ?? '-' }}</dd>
+                  </div>
+
+                  <div class="stat">
+                    <dt>
+                      <span class="stat-icon encounter-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path
+                            d="M12 3 5 6v5c0 4.5 2.8 7.7 7 10 4.2-2.3 7-5.5 7-10V6l-7-3Z"
+                          ></path>
+                        </svg>
+                      </span>
+                      {{ i18nService.text('TOTAL DAMAGE RECEIVED', 'DAÑO TOTAL RECIBIDO') }}
+                    </dt>
+                    <dd>{{ encounter.damageReceived ?? '-' }}</dd>
+                  </div>
+                </dl>
+              </article>
+
+              <nav
+                class="round-selector"
+                [attr.aria-label]="i18nService.text('Round selector', 'Selector de rondas')"
+              >
+                <button
+                  *ngFor="
+                    let availableRound of teamJourneyService.availableRounds;
+                    let index = index
+                  "
+                  type="button"
+                  [class.selected]="teamJourneyService.selectedRoundIndex === index"
+                  [attr.aria-pressed]="teamJourneyService.selectedRoundIndex === index"
+                  [disabled]="teamJourneyService.detailStatus !== 'ready'"
+                  (click)="teamJourneyService.selectRound(index)"
+                >
+                  {{ roundLabel(availableRound) }}
+                </button>
+              </nav>
+
+              <article class="round-info">
+                <h2>
+                  {{ i18nService.text('ROUND INFORMATION', 'INFORMACIÓN DE LA') }}
+                  {{ roundLabel(round) | uppercase }}
+                </h2>
+
+                <dl class="round-stats">
+                  <div class="stat">
+                    <dt>
+                      <span class="stat-icon initiative-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M12 19V5M6.5 10.5 12 5l5.5 5.5"></path>
+                        </svg>
+                      </span>
+                      {{ i18nService.t('r7.initiative') }}
+                    </dt>
+                    <dd>{{ teamName(round.initiativeTeamId) }}</dd>
+                  </div>
+
+                  <div class="stat">
+                    <dt>
+                      <span class="stat-icon trophy" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path
+                            d="M8 3h8v5a4 4 0 0 1-8 0V3ZM8 5H5v2a4 4 0 0 0 4 4M16 5h3v2a4 4 0 0 1-4 4M12 12v6M8 21h8M9 18h6v3"
+                          ></path>
+                        </svg>
+                      </span>
+                      {{ i18nService.t('r7.roundWinner') }}
+                    </dt>
+                    <dd>{{ teamName(round.winnerTeamId) }}</dd>
+                  </div>
+
+                  <div class="stat">
+                    <dt>
+                      <span class="stat-icon encounter-icon" aria-hidden="true"> ⚔ </span>
+                      {{ i18nService.text('DAMAGE DEALT', 'DAÑO INFLIGIDO') }}
+                    </dt>
+                    <dd>{{ roundDamage(journey.teamId) ?? '-' }}</dd>
+                  </div>
+
+                  <div class="stat">
+                    <dt>
+                      <span class="stat-icon encounter-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path
+                            d="M12 3 5 6v5c0 4.5 2.8 7.7 7 10 4.2-2.3 7-5.5 7-10V6l-7-3Z"
+                          ></path>
+                        </svg>
+                      </span>
+                      {{ i18nService.text('DAMAGE RECEIVED', 'DAÑO RECIBIDO') }}
+                    </dt>
+                    <dd>
+                      {{ roundDamage(displayedEncounter?.opponentTeamId ?? null) ?? '-' }}
+                    </dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
+
+            <article class="events-panel">
+              <h2>{{ i18nService.t('events') }}</h2>
+
+              <p class="no-events" *ngIf="!eventGroups.length">
+                {{ i18nService.text('No published events.', 'No hay eventos publicados.') }}
+              </p>
+
+              <div
+                class="events-list"
+                role="list"
+                tabindex="0"
+                [attr.aria-label]="i18nService.text('Round events', 'Eventos de la ronda')"
+              >
+                <article
+                  class="event"
+                  role="listitem"
+                  *ngFor="let group of eventGroups; let eventIndex = index"
+                  [attr.data-tone]="eventTone(group.event)"
+                >
+                  <span class="event-number">{{ eventIndex + 1 }}</span>
+
+                  <div class="event-content">
+                    <span class="event-icon" aria-hidden="true">
+                      {{ eventIcon(group.event) }}
+                    </span>
+
+                    <div class="event-copy">
+                      <p>{{ group.text }}</p>
+
+                      <ul *ngIf="group.effects.length">
+                        <li
+                          *ngFor="let effect of group.effects; let effectIndex = index"
+                          [attr.data-tone]="eventTone(effect.event)"
+                        >
+                          <span class="event-icon" aria-hidden="true">
+                            {{ eventIcon(effect.event) }}
+                          </span>
+
+                          <span>{{ effect.text }}</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </article>
+          </section>
+        </ng-container>
+      </ng-container>
+    </div>
   </ng-container>
 </main>
