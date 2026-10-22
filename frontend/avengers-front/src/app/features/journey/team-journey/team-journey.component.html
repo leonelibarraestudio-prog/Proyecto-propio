@@ -64,7 +64,7 @@
                 </strong>
 
                 <span class="path-stage">
-                  {{ label(encounter.stageCode) }}
+                  {{ stageLabel(encounter.stageCode) }}
                 </span>
 
                 <strong class="path-result">
@@ -238,7 +238,7 @@
 
                   <div class="stat">
                     <dt>
-                      <span class="stat-icon encounter-icon" aria-hidden="true">⚔</span>
+                      <span class="stat-icon encounter-icon" aria-hidden="true"> ⚔ </span>
                       {{ i18nService.text('TOTAL DAMAGE DEALT', 'DAÑO TOTAL INFLIGIDO') }}
                     </dt>
                     <dd>{{ encounter.damageDealt ?? '-' }}</dd>
@@ -312,27 +312,35 @@
                     <dd>{{ teamName(round.winnerTeamId) }}</dd>
                   </div>
 
-                  <div class="stat" *ngFor="let damage of round.damageByTeam">
+                  <div class="stat">
                     <dt>
-                      <span class="stat-icon" aria-hidden="true">⚔</span>
-
-                      {{
-                        damage.teamId === journey.teamId
-                          ? i18nService.text('DAMAGE DEALT', 'DAÑO INFLIGIDO')
-                          : i18nService.text('DAMAGE RECEIVED', 'DAÑO RECIBIDO')
-                      }}
+                      <span class="stat-icon encounter-icon" aria-hidden="true"> ⚔ </span>
+                      {{ i18nService.text('DAMAGE DEALT', 'DAÑO INFLIGIDO') }}
                     </dt>
+                    <dd>{{ roundDamage(journey.teamId) ?? '-' }}</dd>
+                  </div>
 
-                    <dd>{{ damage.damageDealt }}</dd>
+                  <div class="stat">
+                    <dt>
+                      <span class="stat-icon encounter-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path
+                            d="M12 3 5 6v5c0 4.5 2.8 7.7 7 10 4.2-2.3 7-5.5 7-10V6l-7-3Z"
+                          ></path>
+                        </svg>
+                      </span>
+                      {{ i18nService.text('DAMAGE RECEIVED', 'DAÑO RECIBIDO') }}
+                    </dt>
+                    <dd>
+                      {{ roundDamage(displayedEncounter?.opponentTeamId ?? null) ?? '-' }}
+                    </dd>
                   </div>
                 </dl>
               </article>
             </div>
 
             <article class="events-panel">
-              <h2>
-                {{ i18nService.t('events') }}
-              </h2>
+              <h2>{{ i18nService.t('events') }}</h2>
 
               <p class="no-events" *ngIf="!eventGroups.length">
                 {{ i18nService.text('No published events.', 'No hay eventos publicados.') }}
@@ -349,11 +357,8 @@
                   role="listitem"
                   *ngFor="let group of eventGroups; let eventIndex = index"
                   [attr.data-tone]="eventTone(group.event)"
-                  [style.animation-delay]="entryDelay(eventIndex)"
                 >
-                  <span class="event-number">
-                    {{ eventIndex + 1 }}
-                  </span>
+                  <span class="event-number">{{ eventIndex + 1 }}</span>
 
                   <div class="event-content">
                     <span class="event-icon" aria-hidden="true">
@@ -361,23 +366,18 @@
                     </span>
 
                     <div class="event-copy">
-                      <p>
-                        {{ group.text }}
-                      </p>
+                      <p>{{ group.text }}</p>
 
                       <ul *ngIf="group.effects.length">
                         <li
                           *ngFor="let effect of group.effects; let effectIndex = index"
                           [attr.data-tone]="eventTone(effect.event)"
-                          [style.animation-delay]="entryDelay(eventIndex, effectIndex + 1)"
                         >
                           <span class="event-icon" aria-hidden="true">
                             {{ eventIcon(effect.event) }}
                           </span>
 
-                          <span>
-                            {{ effect.text }}
-                          </span>
+                          <span>{{ effect.text }}</span>
                         </li>
                       </ul>
                     </div>

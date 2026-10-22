@@ -1,3 +1,5 @@
+/* Base */
+
 :host {
   --red: #ef4052;
   --gold: var(--color-gold, #f0c040);
@@ -32,12 +34,14 @@
   padding: 8px 12px;
 }
 
+/* Header */
+
 .r7-header {
   position: relative;
   isolation: isolate;
-  flex: 0 0 190px;
+  flex: 0 0 164px;
   overflow: hidden;
-  padding: 24px 28px;
+  padding: 18px 28px;
   border: 1px solid #c3d3e540;
   border-left: 4px solid var(--red);
   background: #081421;
@@ -102,8 +106,8 @@
   object-position: center;
   filter: contrast(1.05) saturate(0.95);
   transition:
-    transform 0.6s ease,
-    filter 0.6s ease;
+    transform 450ms ease,
+    filter 450ms ease;
 }
 
 .r7-header:hover .header-art img {
@@ -122,6 +126,8 @@
 .detail-state {
   grid-column: 1 / -1;
 }
+
+/* Panels */
 
 .journey-panel,
 .team-panel,
@@ -167,14 +173,16 @@
 }
 
 .journey-panel > h2 {
-  padding: 7px 10px 2px;
+  padding: 7px 10px 3px;
   color: var(--text);
 }
+
+/* Journey */
 
 .path-list {
   display: flex;
   align-items: flex-start;
-  padding: 5px 12px 8px;
+  padding: 6px 12px 9px;
   overflow-x: auto;
 }
 
@@ -182,7 +190,7 @@
   --result-color: var(--muted);
 
   display: flex;
-  flex: 1 0 88px;
+  flex: 1 0 86px;
   flex-direction: column;
   align-items: center;
   gap: 2px;
@@ -193,10 +201,6 @@
   color: inherit;
   font: inherit;
   text-align: center;
-  transition:
-    opacity 180ms ease,
-    filter 180ms ease,
-    transform 180ms ease;
 }
 
 button.path-stop {
@@ -212,8 +216,8 @@ button.path-stop {
 }
 
 .path-face {
-  width: 66px;
-  height: 66px;
+  width: 56px;
+  height: 56px;
   overflow: hidden;
   border: 2px solid var(--border);
   border-radius: 50%;
@@ -230,7 +234,7 @@ button.path-stop {
 
 .path-name {
   margin-top: 2px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1.05;
   overflow-wrap: anywhere;
@@ -238,12 +242,12 @@ button.path-stop {
 
 .path-stage {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10.5px;
 }
 
 .path-result {
   color: var(--result-color);
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -270,18 +274,13 @@ button.path-stop {
   text-shadow: 0 0 3px var(--result-color);
 }
 
-.path-stop.selected .path-stage,
-.path-stop.selected .path-result {
-  transform: none;
-}
-
 .path-arrow {
   display: grid;
   place-items: center;
-  flex: 0 0 26px;
-  height: 66px;
+  flex: 0 0 22px;
+  height: 56px;
   color: var(--gold);
-  font-size: 25px;
+  font-size: 21px;
 }
 
 .pending .path-face,
@@ -293,6 +292,8 @@ button.path-stop {
 .pending .path-result {
   color: var(--muted);
 }
+
+/* Teams */
 
 .teams-row {
   display: grid;
@@ -318,20 +319,19 @@ button.path-stop {
 
 .team-heading h2 {
   color: var(--team-color);
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .team-heading span {
-  color: var(--muted);
-  font-size: 12px;
+  display: none;
 }
 
 .heroes {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  align-items: end;
+  align-items: start;
   gap: 5px;
-  padding: 4px 10px 8px;
+  padding: 5px 10px 8px;
 }
 
 .hero {
@@ -341,21 +341,62 @@ button.path-stop {
   min-width: 0;
   gap: 3px;
   margin: 0;
+  padding-top: 14px;
+  position: relative;
   text-align: center;
 }
 
 .hero-image {
-  width: 66px;
-  height: 66px;
+  width: 58px;
+  height: 58px;
   overflow: hidden;
   border: 2px solid var(--border);
   border-radius: 9px;
   background: #152638;
+  flex-shrink: 0;
+  margin-top: 4px;
 }
 
 .hero.leader .hero-image {
-  width: 70px;
-  height: 70px;
+  width: 62px;
+  height: 62px;
+  margin-top: 0;
+  border-color: #f4d7da;
+  box-shadow:
+    0 0 0 1px #ef4052,
+    0 0 12px #ef405280;
+}
+
+.hero.leader::before {
+  content: '♛ LÍDER';
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 1px 5px;
+  border: 1px solid #f5c0c7;
+  border-radius: 3px;
+  background: #682335;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1.15;
+  box-shadow: 0 0 7px #ef405260;
+  pointer-events: none;
+}
+
+.opponent-team .hero.leader .hero-image {
+  border-color: #d8c9ff;
+  box-shadow:
+    0 0 0 1px var(--purple),
+    0 0 12px #8b5cf680;
+}
+
+.opponent-team .hero.leader::before {
+  border-color: #c5afff;
+  background: #422d78;
 }
 
 .hero-image img {
@@ -371,10 +412,15 @@ button.path-stop {
 }
 
 .hero figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
   margin: 0;
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 800;
   line-height: 1.05;
+  text-align: center;
   overflow-wrap: anywhere;
 }
 
@@ -383,7 +429,7 @@ button.path-stop {
   border: 1px solid var(--border);
   background: #17232d;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 9.5px;
 }
 
 .hero.active .status-badge {
@@ -392,11 +438,13 @@ button.path-stop {
   color: var(--green);
 }
 
+/* Encounter details */
+
 .round-area {
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-columns: minmax(430px, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: 480px minmax(0, 1fr);
   gap: 8px;
 }
 
@@ -404,16 +452,20 @@ button.path-stop {
   display: grid;
   min-width: 0;
   min-height: 0;
-  grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-rows: max-content max-content max-content;
+  align-content: start;
   gap: 4px;
 }
 
+/* Round selector */
+
 .round-selector {
   display: flex;
-  justify-content: center;
+  justify-content: safe center;
   align-items: center;
   gap: 4px;
   padding: 0;
+  overflow-x: auto;
 }
 
 .round-selector button {
@@ -437,6 +489,8 @@ button.path-stop {
   font-weight: 700;
 }
 
+/* Round details */
+
 .round-info,
 .encounter-info,
 .events-panel {
@@ -453,65 +507,54 @@ button.path-stop {
   padding: 5px 9px;
 }
 
-.encounter-info {
-  border-color: var(--border);
-  border-left-color: var(--red);
-  box-shadow: none;
-}
-
 .encounter-info > h2 {
   text-shadow: 0 0 5px #ffffff20;
 }
 
 .round-stats {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
+  display: grid;
+  flex: 0 0 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(48px, auto));
+  gap: 5px;
   min-height: 0;
   margin: 0;
-  padding: 1px 12px 4px;
+  padding: 3px 9px 7px;
 }
 
 .stat {
   position: relative;
   display: flex;
-  flex: 1;
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
   min-width: 0;
-  min-height: 30px;
-  padding: 3px 4px 3px 35px;
-  border-bottom: 1px solid #496c8530;
-  animation: enter 280ms ease both;
+  min-height: 48px;
+  padding: 5px 6px 5px 31px;
+  border-radius: 5px;
 }
 
-.stat:nth-child(1) {
-  animation-delay: 0ms;
-}
-
-.stat:nth-child(2) {
-  animation-delay: 45ms;
-}
-
-.stat:nth-child(3) {
-  animation-delay: 90ms;
-}
-
-.stat:nth-child(4) {
-  animation-delay: 135ms;
-}
-
-.encounter-info .stat {
-  border-bottom-color: #ef405232;
-}
-
+.encounter-info .stat,
 .round-info .stat {
-  border-bottom-color: #719db916;
+  border: 1px solid var(--border);
+  background: #0e1c2d;
 }
 
-.stat:last-child {
-  border-bottom: 0;
+.encounter-info .stat-icon {
+  color: #9dbbc9;
+}
+
+.round-info .stat-icon {
+  color: #c7d5e3;
+}
+
+.encounter-info .stat dt {
+  color: #9dbbc9;
+  text-shadow: 0 0 3px #9dbbc926;
+}
+
+.round-info .stat dt {
+  color: #c8d6e3;
 }
 
 .stat-icon {
@@ -525,9 +568,6 @@ button.path-stop {
   color: #ff8293;
   font-size: 17px;
   transform: translateY(-50%);
-  transition:
-    filter 180ms ease,
-    transform 180ms ease;
 }
 
 .stat-icon svg {
@@ -542,16 +582,12 @@ button.path-stop {
 }
 
 .encounter-icon {
-  color: var(--red);
-  filter: drop-shadow(0 0 4px #ef40526b);
-}
-
-.encounter-info .stat dt {
-  text-shadow: 0 0 3px #ef405226;
+  color: #9dbbc9;
+  filter: drop-shadow(0 0 3px #9dbbc933);
 }
 
 .encounter-info .stat dd {
-  text-shadow: 0 0 4px #ef405233;
+  text-shadow: 0 0 4px #9dbbc933;
 }
 
 .initiative-icon svg {
@@ -581,6 +617,8 @@ button.path-stop {
   line-height: 1.08;
   overflow-wrap: anywhere;
 }
+
+/* Events */
 
 [data-tone] {
   --event-color: var(--muted);
@@ -619,7 +657,6 @@ button.path-stop {
   align-items: start;
   gap: 8px;
   margin-bottom: 8px;
-  animation: enter 280ms ease both;
 }
 
 .event-number {
@@ -627,10 +664,10 @@ button.path-stop {
   place-items: center;
   width: 30px;
   height: 30px;
-  border: 1px solid var(--event-color);
+  border: 1px solid var(--gold);
   border-radius: 50%;
   background: #25394a;
-  color: var(--event-color);
+  color: var(--gold);
   font-size: 12px;
 }
 
@@ -691,46 +728,13 @@ button.path-stop {
   font-size: 12px;
 }
 
-.path-face,
-.hero-image,
-.stat,
-.event-content,
-.event-number,
-.round-selector button {
-  transition:
-    transform 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background-color 180ms ease;
-}
-
 .updating {
-  opacity: 0.45;
   pointer-events: none;
 }
 
-@keyframes enter {
-  from {
-    opacity: 0;
-    transform: translateX(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
+/* Interaction */
 
 @media (hover: hover) {
-  button.path-stop:hover .path-face,
-  .hero:hover .hero-image {
-    transform: translateY(-2px);
-  }
-
-  button.path-stop.selected:hover .path-face {
-    transform: translateY(-2px) scale(1.04);
-  }
-
   button.path-stop:not(.selected):hover .path-face,
   .hero:hover .hero-image,
   .event:hover .event-content,
@@ -740,15 +744,19 @@ button.path-stop {
   }
 
   .event:hover .event-number {
-    box-shadow: 0 0 8px var(--event-color);
+    box-shadow: 0 0 8px var(--gold);
   }
 
-  .encounter-info .stat:hover,
-  .round-info .stat:hover {
-    background: #10263a80;
-    border-bottom-color: #91afc780;
+  .encounter-info .stat:hover {
+    background: #0e1c2d;
+    border-color: #7397ae;
     box-shadow: 0 0 8px #719db940;
-    transform: translateX(2px);
+  }
+
+  .round-info .stat:hover {
+    background: #0e1c2d;
+    border-color: #829fb8;
+    box-shadow: 0 0 8px #719db940;
   }
 
   .encounter-info .stat:hover .stat-icon,
@@ -779,6 +787,8 @@ button.path-stop {
   scrollbar-color: var(--border) var(--panel);
 }
 
+/* Responsive */
+
 @media (max-width: 1100px) {
   .r7-page {
     height: auto;
@@ -797,7 +807,6 @@ button.path-stop {
 
   .round-area {
     height: auto;
-    min-height: 0;
   }
 
   .round-details {
@@ -814,11 +823,11 @@ button.path-stop {
 
   .round-stats {
     flex: none;
+    grid-template-rows: repeat(2, minmax(64px, auto));
   }
 
   .stat {
-    flex: none;
-    min-height: 42px;
+    min-height: 64px;
   }
 
   .events-panel {
@@ -843,8 +852,12 @@ button.path-stop {
   }
 
   .r7-header {
-    flex-basis: 190px;
+    flex-basis: 164px;
     padding: 18px;
+  }
+
+  .round-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .path-stop {
@@ -864,13 +877,5 @@ button.path-stop {
   .round-selector button {
     flex: 0 0 60px;
     width: 60px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :host * {
-    animation: none !important;
-    transition: none !important;
-    transform: none !important;
   }
 }

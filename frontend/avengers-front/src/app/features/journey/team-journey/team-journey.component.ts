@@ -142,6 +142,7 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
       DEFEAT: 'r7.loss',
       ABANDON: 'r7.abandoned',
     };
+
     const key = labels[code ?? ''];
 
     if (key) {
@@ -157,6 +158,20 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
     }
 
     return code ?? '-';
+  }
+
+  stageLabel(code: string): string {
+    const label = this.label(code).toLocaleLowerCase();
+
+    return label.charAt(0).toLocaleUpperCase() + label.slice(1);
+  }
+
+  // Reads the published damage without calculating a new total.
+  roundDamage(teamId: string | null): number | null {
+    return (
+      this.teamJourneyService.selectedRound?.damageByTeam.find((damage) => damage.teamId === teamId)
+        ?.damageDealt ?? null
+    );
   }
 
   roundLabel(round: JourneyRound): string {
@@ -297,6 +312,22 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
   }
 
   private eventText(event: JourneyEvent, compact = false): string {
+    if (event.eventCode === 'ACTION_SKIPPED') {
+      if (event.teamId) {
+        const team = this.teamName(event.teamId);
+
+        return this.i18nService.text(
+          `${team} did not take an action this turn.`,
+          `El ${team} no realizó ninguna acción en este turno.`,
+        );
+      }
+
+      return this.i18nService.text(
+        'No action was taken this turn.',
+        'No se realizó ninguna acción en este turno.',
+      );
+    }
+
     // Without a published actor, preserve the API narrative.
     if (!event.actorHeroId) {
       return this.narrativeText(event);
@@ -307,7 +338,6 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
     }
 
     const actor = this.heroName(event.actorHeroId);
-
     const targets = this.targetNames(event.targetHeroIds);
     const amount = event.values.amount;
 
@@ -374,10 +404,5 @@ export class TeamJourneyComponent implements OnInit, OnDestroy {
         `Evento registrado: ${event.eventCode}.`,
       )
     );
-  }
-
-  // Caps the delay so long logs become readable quickly.
-  entryDelay(index: number, effectIndex = 0): string {
-    return `${Math.min(index * 45 + effectIndex * 35, 450)}ms`;
   }
 }
