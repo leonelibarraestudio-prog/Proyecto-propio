@@ -1,12 +1,29 @@
 import { Injectable } from '@angular/core';
 import { ApiError, toApiError } from '../../../../core/models/api-error.interface';
 import { ApiService } from '../../../../core/services/api.service';
+import { AppContextService } from '../../../../core/services/app-context.service';
 import { BaseApiService } from '../../../../core/services/base-api.service';
+import { AppLanguage } from '../../../../core/services/i18n.service';
+
+export interface HistoryItem {
+  attemptId: string;
+  status: string;
+  createdAt: string;
+  completedAt: string;
+  spendingStrategyCode: string;
+  outcomeCode: string;
+  opponentFinalistId: string;
+  opponentFinalistName: string;
+  endingCode: string;
+  terminalReasonCode: string | null;
+  endingSummary: string;
+}
 
 export interface HistoryApi {
   teamId: string;
   language: string;
-  items: unknown[];
+  summary: { total: number; victories: number; defeats: number; abandoned: number };
+  items: HistoryItem[];
 }
 
 export interface HistoryViewModel {
@@ -14,6 +31,7 @@ export interface HistoryViewModel {
   error: string | null;
   errorCode: string | null;
   data: HistoryApi | null;
+  lang: AppLanguage;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -23,9 +41,13 @@ export class HistoryService extends BaseApiService {
     error: null,
     errorCode: null,
     data: null,
+    lang: 'es',
   };
 
-  constructor(api: ApiService) {
+  constructor(
+    api: ApiService,
+    private readonly appContextService: AppContextService,
+  ) {
     super(api);
   }
 
@@ -34,6 +56,7 @@ export class HistoryService extends BaseApiService {
   }
 
   initialize(): void {
+    this.pageState.lang = this.appContextService.getCurrentLang();
     this.pageState.status = 'loading';
     this.pageState.error = null;
     this.pageState.errorCode = null;

@@ -1,27 +1,13 @@
+export interface LiveEventsHeroRefApi {
+  id: string;
+  name: string | null;
+}
+
 export interface LiveEventsNarrativeLineApi {
   lineSequence: number;
   type: string;
-  speakerId: string | null;
+  speaker: LiveEventsHeroRefApi | null;
   text: string;
-}
-
-export interface LiveEventsValuesApi {
-  actorIdentityId?: string;
-  actorHeroId?: string;
-  actorSideCode?: string;
-  targetId?: string;
-  targetHeroIds?: string[];
-  targetSideCode?: string;
-  playerTeamId?: string;
-  opponentTeamId?: string;
-  actionName?: string;
-  actionCode?: string;
-  strategyCode?: string;
-  amount?: number;
-  damage?: number;
-  energy?: number;
-  apChange?: number;
-  abilityPoints?: number;
 }
 
 export interface LiveEventApi {
@@ -29,28 +15,40 @@ export interface LiveEventApi {
   turn: number;
   phase: string;
   eventCode: string;
-  messageCode: string;
-  values: LiveEventsValuesApi;
-  narrative: { lines: LiveEventsNarrativeLineApi[] };
+  actor: LiveEventsHeroRefApi | null;
+  targets: LiveEventsHeroRefApi[];
+  targetSideCode: string | null;
+  actionName: string | null;
+  actionCode: string | null;
+  damage: number | null;
+  amount: number | null;
+  apChange: number | null;
+  abilityPoints: number | null;
+  energy: number | null;
+  strategyCode: string | null;
+  lines: LiveEventsNarrativeLineApi[];
+  targetTeamSide: string | null;
+  statCode: string | null;
+  percent: number | null;
+  duration: number | null;
 }
 
 export interface LiveEventsFinalStageApi {
-  variant: string;
-  attemptId: string;
   status: string;
   phase: string;
   phaseLabel: string;
   normalTurn: number;
   turnState: string;
-  participants: { playerTeamId: string; opponentTeamId: string };
-  completion: {
-    outcomeCode: string;
-    terminalReasonCode: string;
-    endingEventSequences: number[];
-  } | null;
+  completed: boolean;
+  outcomeCode: string | null;
+  playerTeamId: string;
+  opponentTeamId: string;
+  playerTeamName: string | null;
+  opponentTeamName: string | null;
 }
 
 export interface LiveEventsApi {
   finalStage: LiveEventsFinalStageApi;
+  totalEvents: number;
   events: LiveEventApi[];
 }

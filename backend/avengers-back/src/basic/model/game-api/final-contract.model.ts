@@ -218,6 +218,9 @@ export interface FinalStageEventValuesApi {
   energy?: number;
   apChange?: number;
   abilityPoints?: number;
+  statCode?: string;
+  percent?: number;
+  duration?: number;
 }
 
 export interface FinalStageEventApi {
