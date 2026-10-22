@@ -375,6 +375,35 @@ export type AppCopyKey =
   | 'r10.target'
   | 'r10.eventType'
   | 'r10.simulateLink'
+  | 'r10.refresh'
+  | 'r10.refreshing'
+  | 'r10.finalStatus'
+  | 'r10.state.ready'
+  | 'r10.state.active'
+  | 'r10.state.completed'
+  | 'r10.currentTurn'
+  | 'r10.playerTeam'
+  | 'r10.opponentTeam'
+  | 'r10.outcome'
+  | 'r10.eventCount'
+  | 'r10.damage'
+  | 'r10.abilityPoints'
+  | 'r10.energy'
+  | 'r10.type.started'
+  | 'r10.type.action'
+  | 'r10.type.attackHit'
+  | 'r10.type.damage'
+  | 'r10.type.apChange'
+  | 'r10.type.strategyChange'
+  | 'r10.type.swap'
+  | 'r10.type.effect'
+  | 'r10.type.cleanse'
+  | 'r10.type.reveal'
+  | 'r10.type.doomsdayBegins'
+  | 'r10.phase.tournamentFinal'
+  | 'r10.phase.doomsday'
+  | 'r10.turns'
+  | 'r10.affects'
   | 'r11.caption'
   | 'r11.title'
   | 'r11.subtitle'
@@ -807,6 +836,35 @@ const DICTIONARY: Record<AppLanguage, Record<AppCopyKey, string>> = {
     'r10.target': 'TARGET',
     'r10.eventType': 'EVENT',
     'r10.simulateLink': 'SIMULATE JOURNEY',
+    'r10.refresh': 'REFRESH',
+    'r10.refreshing': 'REFRESHING…',
+    'r10.finalStatus': 'FINAL STATUS',
+    'r10.state.ready': 'READY',
+    'r10.state.active': 'IN PROGRESS',
+    'r10.state.completed': 'COMPLETED',
+    'r10.currentTurn': 'CURRENT TURN',
+    'r10.playerTeam': 'PLAYER TEAM',
+    'r10.opponentTeam': 'OPPONENT TEAM',
+    'r10.outcome': 'OUTCOME',
+    'r10.eventCount': '{count} EVENTS',
+    'r10.damage': 'DAMAGE',
+    'r10.abilityPoints': 'AP',
+    'r10.energy': 'ENERGY',
+    'r10.type.started': 'FINAL STARTED',
+    'r10.type.action': 'ACTION',
+    'r10.type.attackHit': 'HIT',
+    'r10.type.damage': 'DAMAGE',
+    'r10.type.apChange': 'RESOURCE',
+    'r10.type.strategyChange': 'STRATEGY CHANGE',
+    'r10.type.swap': 'FORMATION CHANGE',
+    'r10.type.effect': 'EFFECT',
+    'r10.type.cleanse': 'CLEANSE',
+    'r10.type.reveal': 'REVELATION',
+    'r10.type.doomsdayBegins': 'FINAL BATTLE BEGINS',
+    'r10.phase.tournamentFinal': 'TOURNAMENT FINAL',
+    'r10.phase.doomsday': 'DOOMSDAY',
+    'r10.turns': '{count} TURNS',
+    'r10.affects': 'AFFECTS',
     'r11.caption': 'FINAL BATTLE',
     'r11.title': 'TEAM STATUS',
     'r11.subtitle': 'Current tactical state from both sides of the Final Battle.',
@@ -1241,6 +1299,35 @@ const DICTIONARY: Record<AppLanguage, Record<AppCopyKey, string>> = {
     'r10.target': 'OBJETIVO',
     'r10.eventType': 'EVENTO',
     'r10.simulateLink': 'SIMULAR BATALLAS',
+    'r10.refresh': 'ACTUALIZAR',
+    'r10.refreshing': 'ACTUALIZANDO…',
+    'r10.finalStatus': 'ESTADO DE LA FINAL',
+    'r10.state.ready': 'LISTA',
+    'r10.state.active': 'EN CURSO',
+    'r10.state.completed': 'COMPLETADA',
+    'r10.currentTurn': 'TURNO ACTUAL',
+    'r10.playerTeam': 'EQUIPO DEL JUGADOR',
+    'r10.opponentTeam': 'EQUIPO RIVAL',
+    'r10.outcome': 'RESULTADO',
+    'r10.eventCount': '{count} EVENTOS',
+    'r10.damage': 'DAÑO',
+    'r10.abilityPoints': 'PA',
+    'r10.energy': 'ENERGÍA',
+    'r10.type.started': 'INICIO DE LA FINAL',
+    'r10.type.action': 'ACCIÓN',
+    'r10.type.attackHit': 'IMPACTO',
+    'r10.type.damage': 'DAÑO',
+    'r10.type.apChange': 'RECURSO',
+    'r10.type.strategyChange': 'CAMBIO DE ESTRATEGIA',
+    'r10.type.swap': 'CAMBIO DE FORMACIÓN',
+    'r10.type.effect': 'EFECTO',
+    'r10.type.cleanse': 'PURIFICACIÓN',
+    'r10.type.reveal': 'REVELACIÓN',
+    'r10.type.doomsdayBegins': 'COMIENZA LA BATALLA FINAL',
+    'r10.phase.tournamentFinal': 'FINAL DEL TORNEO',
+    'r10.phase.doomsday': 'DOOMSDAY',
+    'r10.turns': '{count} TURNOS',
+    'r10.affects': 'AFECTA A',
     'r11.caption': 'BATALLA FINAL',
     'r11.title': 'ESTADO DEL EQUIPO',
     'r11.subtitle': 'Estado táctico actual de ambos lados de la Batalla Final.',

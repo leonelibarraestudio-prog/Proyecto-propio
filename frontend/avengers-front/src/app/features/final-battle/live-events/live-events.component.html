@@ -1,3 +1,253 @@
-<main class="student-feature-shell">
-  <pre>{{ pageState | json }}</pre>
+<main class="student-feature-shell live-events-page">
+  <header class="live-events-header">
+    <div class="live-events-hero-content">
+      <div class="live-events-eyebrow">
+        <span class="live-events-status-dot" aria-hidden="true"></span>
+        <span>{{ translate('r10.caption', pageState.lang) }}</span>
+      </div>
+
+      <div class="live-events-heading">
+        <h1 class="page-title">
+          <span class="live-events-title-first">{{ titleFirstWord() }}</span>
+          <span class="live-events-title-second">{{ titleRemainder() }}</span>
+        </h1>
+        <p class="page-subtitle">{{ translate('r10.subtitle', pageState.lang) }}</p>
+      </div>
+
+      <div class="live-events-hero-footer" *ngIf="pageState.data as headerData">
+        <span>{{ headerData.finalStage.phaseLabel }}</span>
+      </div>
+    </div>
+
+    <div class="live-events-photo" aria-hidden="true">
+      <img src="assets/live-events/falcon-avengers-wallpaper.png" alt="" />
+    </div>
+  </header>
+
+  <app-loading-state
+    *ngIf="pageState.status === 'loading'"
+    [message]="translate('loading', pageState.lang)"
+  ></app-loading-state>
+
+  <section
+    *ngIf="pageState.status === 'error'"
+    class="live-events-unavailable"
+    role="alert"
+    aria-labelledby="live-events-error-heading"
+  >
+    <div class="live-events-unavailable-symbol" aria-hidden="true">!</div>
+    <div class="live-events-unavailable-copy">
+      <h2 id="live-events-error-heading">{{ translate('error', pageState.lang) }}</h2>
+      <p *ngIf="pageState.errorCode">
+        <code class="live-events-error-code">{{ pageState.errorCode }}</code>
+      </p>
+      <button
+        type="button"
+        class="button button-secondary"
+        [disabled]="pageState.refreshing"
+        (click)="refresh()"
+      >
+        {{ translate('retry', pageState.lang) }}
+      </button>
+    </div>
+  </section>
+
+  <section
+    *ngIf="pageState.status === 'unavailable'"
+    class="live-events-unavailable"
+    role="status"
+    aria-labelledby="live-events-unavailable-heading"
+  >
+    <div class="live-events-unavailable-symbol" aria-hidden="true">!</div>
+    <div class="live-events-unavailable-copy">
+      <h2 id="live-events-unavailable-heading">{{ translate('r10.noBattle', pageState.lang) }}</h2>
+      <p>{{ translate('r10.noBattleCopy', pageState.lang) }}</p>
+      <a class="button" [routerLink]="simulateRoute">
+        {{ translate('r10.simulateLink', pageState.lang) }}
+      </a>
+    </div>
+  </section>
+
+  <ng-container *ngIf="pageState.status === 'data' || pageState.status === 'empty'">
+    <ng-container *ngIf="pageState.data as data">
+      <section
+        class="functional-panel live-events-summary"
+        aria-labelledby="live-events-summary-heading"
+      >
+        <div class="live-events-summary-header">
+          <div class="live-events-summary-heading">
+            <h2 id="live-events-summary-heading">
+              {{ translate('r10.finalStatus', pageState.lang) }}
+            </h2>
+            <small>{{ data.finalStage.phaseLabel }}</small>
+          </div>
+
+          <div class="live-events-summary-actions">
+            <span
+              class="live-events-state"
+              [attr.data-state]="
+                data.finalStage.completed
+                  ? 'completed'
+                  : data.finalStage.status === 'ACTIVE'
+                    ? 'active'
+                    : 'ready'
+              "
+            >
+              ● {{ finalStateLabel() }}
+            </span>
+            <button
+              type="button"
+              class="button button-secondary live-events-refresh"
+              [disabled]="pageState.refreshing"
+              [attr.aria-busy]="pageState.refreshing"
+              (click)="refresh()"
+            >
+              {{
+                translate(pageState.refreshing ? 'r10.refreshing' : 'r10.refresh', pageState.lang)
+              }}
+            </button>
+          </div>
+        </div>
+
+        <div class="live-events-stats">
+          <div class="live-events-stat live-events-stat-team">
+            <img
+              class="live-events-emblem"
+              src="assets/live-events/falcon-emblema.png"
+              alt=""
+              aria-hidden="true"
+            />
+            <div class="live-events-stat-info">
+              <small>{{ translate('r10.playerTeam', pageState.lang) }}</small>
+              <strong>{{ data.finalStage.playerTeamName ?? data.finalStage.playerTeamId }}</strong>
+            </div>
+          </div>
+
+          <div class="live-events-stat">
+            <div class="live-events-stat-info">
+              <small>{{ translate('r10.opponentTeam', pageState.lang) }}</small>
+              <strong>{{
+                data.finalStage.opponentTeamName ?? data.finalStage.opponentTeamId
+              }}</strong>
+            </div>
+          </div>
+
+          <div class="live-events-stat">
+            <div class="live-events-stat-info">
+              <small>{{ translate('r10.currentTurn', pageState.lang) }}</small>
+              <strong>{{ data.finalStage.normalTurn }}</strong>
+            </div>
+          </div>
+
+          <div class="live-events-stat">
+            <div class="live-events-stat-info">
+              <small>{{ translate('r10.events', pageState.lang) }}</small>
+              <strong>{{ data.totalEvents }}</strong>
+            </div>
+          </div>
+
+          <div class="live-events-stat" *ngIf="outcomeLabel() as outcome">
+            <div class="live-events-stat-info">
+              <small>{{ translate('r10.outcome', pageState.lang) }}</small>
+              <strong>{{ outcome }}</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="functional-panel live-events-log" aria-labelledby="live-events-log-heading">
+        <div class="live-events-log-heading">
+          <h2 class="panel-title" id="live-events-log-heading">
+            {{ translate('r10.events', pageState.lang) }}
+          </h2>
+          <span class="live-events-count" aria-live="polite">
+            {{ translate('r10.eventCount', pageState.lang, { count: data.totalEvents }) }}
+          </span>
+        </div>
+
+        <app-empty-state
+          *ngIf="pageState.status === 'empty'"
+          [message]="translate('r10.emptyEvents', pageState.lang)"
+        ></app-empty-state>
+
+        <ol class="live-events-list" *ngIf="data.events.length">
+          <li
+            *ngFor="let event of data.events; trackBy: trackEvent"
+            class="live-event"
+            [attr.data-tone]="eventTone(event)"
+          >
+            <span class="live-event-sequence">
+              {{ event.sequence < 10 ? '0' + event.sequence : event.sequence }}
+            </span>
+
+            <div class="live-event-body">
+              <div class="live-event-meta">
+                <span class="live-event-type">{{ eventTypeLabel(event) }}</span>
+                <span class="live-event-chip" *ngIf="event.turn > 0">
+                  {{ translate('r10.turn', pageState.lang, { turn: event.turn }) }}
+                </span>
+                <span class="live-event-chip">{{ phaseLabel(event.phase) }}</span>
+              </div>
+
+              <div class="live-event-narrative">
+                <p
+                  *ngFor="let line of event.lines; trackBy: trackLine"
+                  class="live-event-line"
+                  [class.live-event-line-dialogue]="isDialogue(line)"
+                >
+                  <strong class="live-event-speaker" *ngIf="line.speaker">{{
+                    heroLabel(line.speaker)
+                  }}</strong>
+                  {{ line.text }}
+                </p>
+              </div>
+
+              <dl class="live-event-facts" *ngIf="hasFacts(event)">
+                <div *ngIf="event.actor">
+                  <dt>{{ translate('r10.actor', pageState.lang) }}</dt>
+                  <dd>{{ heroLabel(event.actor) }}</dd>
+                </div>
+                <div *ngIf="visibleTargets(event).length">
+                  <dt>{{ translate('r10.target', pageState.lang) }}</dt>
+                  <dd>{{ targetsLabel(event) }}</dd>
+                </div>
+                <div *ngIf="event.targetTeamSide">
+                  <dt>{{ translate('r10.affects', pageState.lang) }}</dt>
+                  <dd>{{ sideLabel(event.targetTeamSide) }}</dd>
+                </div>
+                <div *ngIf="event.actionName">
+                  <dt>{{ translate('r10.type.action', pageState.lang) }}</dt>
+                  <dd>{{ event.actionName }}</dd>
+                </div>
+                <div *ngIf="event.damage !== null">
+                  <dt>{{ translate('r10.damage', pageState.lang) }}</dt>
+                  <dd>{{ event.damage }}</dd>
+                </div>
+                <div *ngIf="event.abilityPoints !== null">
+                  <dt>{{ translate('r10.abilityPoints', pageState.lang) }}</dt>
+                  <dd>
+                    {{ event.abilityPoints }}
+                    <small *ngIf="event.apChange">({{ signed(event.apChange) }})</small>
+                  </dd>
+                </div>
+                <div *ngIf="event.energy !== null">
+                  <dt>{{ translate('r10.energy', pageState.lang) }}</dt>
+                  <dd>{{ event.energy }}</dd>
+                </div>
+                <div *ngIf="event.statCode && event.percent !== null">
+                  <dt>{{ statLabel(event.statCode) }}</dt>
+                  <dd>
+                    {{ signedPercent(event.percent) }}
+                    <small *ngIf="event.duration !== null">
+                      · {{ translate('r10.turns', pageState.lang, { count: event.duration }) }}
+                    </small>
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </li>
+        </ol>
+      </section>
+    </ng-container>
+  </ng-container>
 </main>
