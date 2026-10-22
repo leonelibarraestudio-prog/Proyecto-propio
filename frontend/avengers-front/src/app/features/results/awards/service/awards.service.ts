@@ -1,5 +1,4 @@
-
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { Observable, switchMap, throwError } from 'rxjs';
 import { ApiService } from '../../../../core/services/api.service';
 import { ResponseObject } from '../../../../core/models/response-object.interface';
@@ -11,9 +10,25 @@ interface SimulationApi {
   } | null;
 }
 
+export interface Award {
+  code: string;
+  label: string;
+  explanation: string;
+  winner: {
+    name?: string;
+    displayName?: string;
+  } | null;
+  winningFacts: object | null;
+  reason: string;
+}
+
 export interface AwardsResponse {
-  statistics: unknown;
-  rewards: unknown;
+  statistics?: unknown;
+  rewards?: unknown;
+  attemptId?: string;
+  status?: string;
+  completionOutcome?: string;
+  awards?: Award[];
 }
 
 @Injectable({ providedIn: 'root' })
@@ -25,16 +40,20 @@ export class AwardsService {
       switchMap((response) => {
         const simulation = response?.data;
 
-        if (!simulation || !simulation.teamId || !simulation.currentAttempt?.id) {
+        if (!simulation?.teamId || !simulation.currentAttempt?.id) {
           return throwError(
-            () => new Error('No se encontró el equipo o el intento actual de la Journey.'),
+            () =>
+              new Error(
+                'No se encontró el equipo o el intento actual de la Journey.',
+              ),
           );
         }
 
-        const { teamId, currentAttempt } = simulation;
+        const teamId = simulation.teamId;
+        const attemptId = simulation.currentAttempt.id;
 
         return this.api.get<AwardsResponse>(
-          `/results/awards/${encodeURIComponent(teamId)}/${encodeURIComponent(currentAttempt.id)}`,
+          `/results/awards/${encodeURIComponent(teamId)}/${encodeURIComponent(attemptId)}`,
         );
       }),
     );

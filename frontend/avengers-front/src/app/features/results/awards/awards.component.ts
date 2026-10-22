@@ -1,6 +1,6 @@
-
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { AwardsService } from './service/awards.service';
+import type { Award, AwardsResponse } from './service/awards.service';
 
 @Component({
   selector: 'app-awards',
@@ -9,7 +9,8 @@ import { AwardsService } from './service/awards.service';
   standalone: false,
 })
 export class AwardsComponent implements OnInit {
-  response: unknown = null;
+  awards: Award[] = [];
+  response: AwardsResponse | null = null;
   loading = true;
   error = '';
 
@@ -18,13 +19,11 @@ export class AwardsComponent implements OnInit {
   ngOnInit(): void {
     this.awardsService.getAwards().subscribe({
       next: (result) => {
-        console.log('Respuesta de premios:', result);
         this.response = result.data;
+        this.awards = result.data?.awards ?? [];
         this.loading = false;
       },
       error: (err: unknown) => {
-        console.error('Error al cargar premios:', err);
-
         const apiError = err as {
           message?: string;
           error?: { message?: string };
@@ -33,7 +32,7 @@ export class AwardsComponent implements OnInit {
         this.error =
           apiError?.error?.message ??
           apiError?.message ??
-          'No se pudo obtener la respuesta del backend.';
+          'No se pudieron cargar los premios.';
 
         this.loading = false;
       },

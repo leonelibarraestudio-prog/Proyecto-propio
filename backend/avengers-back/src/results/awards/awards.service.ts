@@ -7,18 +7,24 @@ export class AwardsService {
   constructor(private readonly gameApi: GameApiService) {}
 
   async getAwards(teamId: string, attemptId: string) {
-    const [statistics, rewards] = await Promise.all([
-      this.gameApi.get(
-        `/teams/${teamId}/journeys/${attemptId}/statistics`,
-      ),
-      this.gameApi.get(
-        `/teams/${teamId}/journeys/${attemptId}/rewards`,
-      ),
-    ]);
+    const statistics = await this.gameApi.get<{
+      attemptId: string;
+      status: string;
+      completionOutcome?: string;
+      teamStatistics?: unknown;
+      heroStatistics?: unknown;
+      awards?: Array<{
+        code: string;
+        label: string;
+        explanation: string;
+        winner: unknown;
+        winningFacts: unknown;
+        reason: string;
+      }>;
+    }>(
+      `/teams/${encodeURIComponent(teamId)}/journeys/${encodeURIComponent(attemptId)}/statistics`,
+    );
 
-    return {
-      statistics,
-      rewards,
-    };
+    return statistics;
   }
 }
