@@ -1,19 +1,154 @@
-<main class="student-feature-shell">
-  <ng-container
-    *ngIf="estadoDeLaFaseDeGrupos as estadoVisibleDeLaFaseDeGrupos"
+<main class="group-stage-page">
+  <header class="page-heading">
+    <span class="caption-box">{{ i18nService.t('r5.caption') }}</span>
+    <h1 class="page-title">{{ i18nService.t('r5.title') }}</h1>
+    <p class="page-subtitle">{{ i18nService.t('r5.subtitle') }}</p>
+  </header>
+
+  <p *ngIf="estadoDeLaFaseDeGrupos.status === 'loading'" class="state-message" role="status">
+    {{ i18nService.t('loading') }}
+  </p>
+
+  <section
+    *ngIf="estadoDeLaFaseDeGrupos.status === 'error'"
+    class="state-message error-message"
+    role="alert"
   >
-    <p *ngIf="estadoVisibleDeLaFaseDeGrupos.status === 'loading'">
-      Cargando grupos...
-    </p>
+    <p>{{ estadoDeLaFaseDeGrupos.error ?? i18nService.t('error') }}</p>
+    <a *ngIf="esErrorDeJourney" routerLink="/journey/simulate">
+      {{ i18nService.t('r5.simulateLink') }}
+    </a>
+    <button *ngIf="!esErrorDeJourney" type="button" (click)="reintentar()">
+      {{ i18nService.text('Try again', 'Proba de nuevo') }}
+    </button>
+  </section>
 
-    <p *ngIf="estadoVisibleDeLaFaseDeGrupos.status === 'error'">
-      {{ estadoVisibleDeLaFaseDeGrupos.error }}
-    </p>
+  <p *ngIf="estadoDeLaFaseDeGrupos.status === 'empty'" class="state-message">
+    {{ i18nService.text('There are no groups to show.', 'No hay grupos para mostrar.') }}
+  </p>
 
-    <p *ngIf="estadoVisibleDeLaFaseDeGrupos.status === 'empty'">
-      No hay grupos para mostrar.
-    </p>
+  <ng-container
+    *ngIf="estadoDeLaFaseDeGrupos.status === 'data' && estadoDeLaFaseDeGrupos.datosFaseDeGrupos as datosFaseDeGrupos"
+  >
+    <section class="functional-panel group-picker" aria-labelledby="groups-heading">
+      <label id="groups-heading" for="grupo-seleccionado">
+        {{ i18nService.t('r5.groups') }}
+      </label>
+      <select
+        id="grupo-seleccionado"
+        [value]="estadoDeLaFaseDeGrupos.idDelGrupoSeleccionado ?? ''"
+        (change)="cambiarGrupo($event)"
+      >
+        <option *ngFor="let grupo of datosFaseDeGrupos.groupStage.groups" [value]="grupo.groupId">
+          {{ i18nService.t('r5.groupLabel', { group: grupo.groupId }) }}
+        </option>
+      </select>
+      <span *ngIf="esGrupoDelEquipo" class="player-badge">
+        {{ i18nService.t('r5.yourGroup') }}
+      </span>
+    </section>
 
-    <pre *ngIf="estadoVisibleDeLaFaseDeGrupos.status === 'data'">{{ estadoVisibleDeLaFaseDeGrupos.datosFaseDeGrupos | json }}</pre>
+    <ng-container *ngIf="grupoSeleccionado as grupo">
+      <section class="functional-panel standings-panel" aria-labelledby="standings-heading">
+        <div class="panel-heading">
+          <h2 id="standings-heading">
+            {{ i18nService.t('r5.standings', { group: grupo.groupId }) }}
+          </h2>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">{{ i18nService.t('r5.position') }}</th>
+                <th scope="col">{{ i18nService.t('r5.team') }}</th>
+                <th scope="col">{{ i18nService.t('r5.played') }}</th>
+                <th scope="col">{{ i18nService.t('r5.wins') }}</th>
+                <th scope="col">{{ i18nService.t('r5.draws') }}</th>
+                <th scope="col">{{ i18nService.t('r5.losses') }}</th>
+                <th scope="col">{{ i18nService.t('r5.points') }}</th>
+                <th scope="col">{{ i18nService.t('r5.damageFor') }}</th>
+                <th scope="col">{{ i18nService.t('r5.damageAgainst') }}</th>
+                <th scope="col">{{ i18nService.t('r5.damageDiff') }}</th>
+                <th scope="col">{{ i18nService.t('r5.qualified') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let posicion of grupo.standings" [class.player-team-row]="posicion.esMiEquipo">
+                <td>{{ posicion.position }}</td>
+                <th scope="row">
+                  {{ posicion.nombreEquipo }}
+                  <span *ngIf="posicion.esMiEquipo" class="player-badge">
+                    {{ i18nService.t('r5.yourGroup') }}
+                  </span>
+                </th>
+                <td>{{ posicion.played }}</td>
+                <td>{{ posicion.wins }}</td>
+                <td>{{ posicion.draws }}</td>
+                <td>{{ posicion.losses }}</td>
+                <td>{{ posicion.points }}</td>
+                <td>{{ posicion.damageDealt }}</td>
+                <td>{{ posicion.damageReceived }}</td>
+                <td>{{ posicion.damageDifference }}</td>
+                <td>
+                  {{ posicion.qualified ? i18nService.t('r5.qualifiedYes') : i18nService.t('r5.qualifiedNo') }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="functional-panel encounters-panel" aria-labelledby="encounters-heading">
+        <div class="panel-heading">
+          <h2 id="encounters-heading">
+            {{ i18nService.t('r5.encounters', { count: grupo.encounters.length }) }}
+          </h2>
+        </div>
+
+        <p *ngIf="grupo.encounters.length === 0" class="muted-message">
+          {{ i18nService.t('r5.noEncounters') }}
+        </p>
+
+        <div class="encounter-list">
+          <article *ngFor="let encuentro of grupo.encounters" class="encounter-card">
+            <div class="encounter-heading">
+              <span class="encounter-id">{{ encuentro.encounterId }}</span>
+              <span class="encounter-state" [class.played]="encuentro.seJugo">
+                {{ encuentro.seJugo ? i18nService.t('r5.playedState') : i18nService.t('r5.pending') }}
+              </span>
+            </div>
+            <div class="encounter-teams">
+              <strong [class.player-team-name]="encuentro.teamAId === datosFaseDeGrupos.teamId">
+                {{ encuentro.nombreEquipoA }}
+              </strong>
+              <span aria-hidden="true">VS</span>
+              <strong [class.player-team-name]="encuentro.teamBId === datosFaseDeGrupos.teamId">
+                {{ encuentro.nombreEquipoB }}
+              </strong>
+            </div>
+            <p *ngIf="encuentro.winnerTeamId" class="encounter-winner">
+              {{ i18nService.t('r5.winner') }}:
+              {{ encuentro.winnerTeamId === encuentro.teamAId ? encuentro.nombreEquipoA : encuentro.nombreEquipoB }}
+            </p>
+            <div *ngIf="encuentro.seJugo" class="encounter-details">
+              <p *ngFor="let resultado of encuentro.results">
+                <ng-container *ngIf="resultado.resultCode">
+                  {{ resultado.teamId === encuentro.teamAId ? encuentro.nombreEquipoA : encuentro.nombreEquipoB }}:
+                  {{ obtenerResultadoVisible(resultado.resultCode) }}
+                </ng-container>
+              </p>
+              <p *ngFor="let dano of encuentro.damageByTeam">
+                <ng-container *ngIf="dano.damageDealt !== undefined">
+                  {{ i18nService.t('r5.teamDamage', {
+                    team: dano.teamId === encuentro.teamAId ? encuentro.nombreEquipoA : encuentro.nombreEquipoB,
+                    damage: dano.damageDealt
+                  }) }}
+                </ng-container>
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+    </ng-container>
   </ng-container>
 </main>

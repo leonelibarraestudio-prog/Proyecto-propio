@@ -21,6 +21,7 @@ import {
 import { TeamProfileApi } from './model/game-api/team-profile.model';
 import { TeamConfigurationReadApi } from './model/game-api/team-configuration.model';
 import { EtapasDelJourneyApi } from './model/game-api/etapas-del-journey-api.model';
+import { EncuentrosDelJourneyApi } from './model/game-api/encuentros-del-journey-api.model';
 
 @Injectable()
 export class GameFeatureApiService {
@@ -167,6 +168,12 @@ export class GameFeatureApiService {
   obtenerEtapasActuales(equipoId: string) {
     return this.api.get<EtapasDelJourneyApi>(
       `/teams/${equipoId}/journeys/current/stages`,
+    );
+  }
+
+  obtenerEncuentrosActuales(equipoId: string) {
+    return this.api.get<EncuentrosDelJourneyApi>(
+      `/teams/${equipoId}/journeys/current/encounters`,
     );
   }
 
