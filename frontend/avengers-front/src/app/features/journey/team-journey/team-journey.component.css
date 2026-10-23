@@ -10,7 +10,6 @@
   --border: #496c85;
   --muted: #a9bdcf;
   --text: #f4f7fb;
-
   display: block;
   height: 100%;
   min-height: 0;
@@ -119,7 +118,7 @@
   display: grid;
   flex: 1;
   min-height: 0;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(320px, 1fr);
   gap: 8px;
 }
 
@@ -188,7 +187,6 @@
 
 .path-stop {
   --result-color: var(--muted);
-
   display: flex;
   flex: 1 0 86px;
   flex-direction: column;
@@ -444,7 +442,7 @@ button.path-stop {
   display: grid;
   height: 100%;
   min-height: 0;
-  grid-template-columns: 480px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 480px) minmax(0, 1fr);
   gap: 8px;
 }
 
@@ -452,8 +450,8 @@ button.path-stop {
   display: grid;
   min-width: 0;
   min-height: 0;
-  grid-template-rows: max-content max-content max-content;
-  align-content: start;
+  height: 100%;
+  grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
   gap: 4px;
 }
 
@@ -513,9 +511,9 @@ button.path-stop {
 
 .round-stats {
   display: grid;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(48px, auto));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 5px;
   min-height: 0;
   margin: 0;
@@ -742,23 +740,19 @@ button.path-stop {
     border-color: #91afc7;
     box-shadow: 0 0 8px #719db940;
   }
-
   .event:hover .event-number {
     box-shadow: 0 0 8px var(--gold);
   }
-
   .encounter-info .stat:hover {
     background: #0e1c2d;
     border-color: #7397ae;
     box-shadow: 0 0 8px #719db940;
   }
-
   .round-info .stat:hover {
     background: #0e1c2d;
     border-color: #829fb8;
     box-shadow: 0 0 8px #719db940;
   }
-
   .encounter-info .stat:hover .stat-icon,
   .round-info .stat:hover .stat-icon {
     filter: drop-shadow(0 0 5px currentColor);
@@ -794,49 +788,41 @@ button.path-stop {
     height: auto;
     min-height: 100%;
   }
-
   .journey-grid {
     display: flex;
     flex-direction: column;
   }
-
   .teams-row,
   .round-area {
     grid-template-columns: 1fr;
   }
-
   .round-area {
     height: auto;
   }
-
   .round-details {
     display: grid;
+    height: auto;
     grid-template-rows: auto auto auto;
   }
-
   .round-info,
   .encounter-info {
     height: fit-content;
     min-height: 0;
     overflow: visible;
   }
-
   .round-stats {
     flex: none;
     grid-template-rows: repeat(2, minmax(64px, auto));
   }
-
   .stat {
     min-height: 64px;
   }
-
   .events-panel {
     align-self: start;
     width: 100%;
     height: fit-content;
     min-height: 0;
   }
-
   .events-list {
     flex: none;
     height: auto;
@@ -850,30 +836,24 @@ button.path-stop {
   .r7-page {
     padding: 7px;
   }
-
   .r7-header {
     flex-basis: 164px;
     padding: 18px;
   }
-
   .round-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
   .path-stop {
     flex: 0 0 90px;
   }
-
   .heroes {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     row-gap: 12px;
   }
-
   .round-selector {
     justify-content: center;
     overflow-x: auto;
   }
-
   .round-selector button {
     flex: 0 0 60px;
     width: 60px;
