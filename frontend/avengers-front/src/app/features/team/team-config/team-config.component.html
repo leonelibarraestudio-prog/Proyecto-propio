@@ -1,15 +1,134 @@
-<div style="padding: 20px;">
-  <h2>CONFIGURAR EQUIPO</h2>
-  
-  <div *ngIf="teamConfigData; else loadingOrError">
-    <h3>Configuración recibida desde el Backend:</h3>
-    <pre style="background: #1e1e1e; color: #00ffcc; padding: 15px; border-radius: 8px; overflow-x: auto;">
-{{ teamConfigData | json }}
-    </pre>
-  </div>
+<div class="team-config-wrapper">
+  <section class="config-card">
+    <div class="card-body">
+      <h2 class="main-section-title">MI EQUIPO ACTUAL</h2>
 
-  <ng-template #loadingOrError>
-    <p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p>
-    <p *ngIf="!errorMessage">Cargando datos del equipo...</p>
+      <div *ngIf="teamConfigData; else loadingState">
+        <div class="leader-section" *ngIf="teamConfigData.leader">
+          <span class="badge-role">LÍDER DEL EQUIPO</span>
+          <div class="leader-card">
+            <div class="portrait-box leader-portrait">
+              <img 
+                [src]="getHeroImageUrl(teamConfigData.leader.id)" 
+                [alt]="teamConfigData.leader.name"
+                (error)="handleImageError($event)"
+              />
+            </div>
+            <span class="leader-name">{{ teamConfigData.leader.name | uppercase }}</span>
+          </div>
+        </div>
+
+        <div class="strategy-section" *ngIf="teamConfigData.strategies?.length">
+          <span class="strategy-badge" [ngClass]="getStrategyClass()">ESTRATEGIA</span>
+          <select class="strategy-select" [(ngModel)]="teamConfigData.strategy">
+            <option *ngFor="let strat of teamConfigData.strategies" [value]="strat.code">
+              {{ (strat.label || strat.code) | uppercase }}
+            </option>
+          </select>
+        </div>
+
+        <div class="companions-section">
+          <h3 class="sub-section-title">COMPAÑEROS SELECCIONADOS (Haz click para alternar Activo/Inactivo):</h3>
+
+          <div class="companions-grid" *ngIf="teamConfigData.members && teamConfigData.members.length > 0; else noCompanions">
+            <ng-container *ngFor="let member of teamConfigData.members">
+              <div 
+                class="comic-card" 
+                *ngIf="member.id !== teamConfigData.leader?.id"
+                [class.is-active]="member.isActive"
+                [class.is-inactive]="!member.isActive"
+              >
+                <button 
+                  type="button" 
+                  class="btn-remove-comic" 
+                  (click)="removeMember(member.id); $event.stopPropagation()"
+                  title="Quitar héroe del equipo"
+                >✕</button>
+
+                <div class="comic-portrait" (click)="toggleActiveStatus(member)">
+                  <img 
+                    [src]="getHeroImageUrl(member.id)" 
+                    [alt]="member.name || member.id"
+                    (error)="handleImageError($event)"
+                  />
+                  <span class="status-pill">{{ member.isActive ? 'ACTIVO' : 'INACTIVO' }}</span>
+                </div>
+                <span class="comic-name">{{ (member.name || member.id) | uppercase }}</span>
+              </div>
+            </ng-container>
+          </div>
+
+          <ng-template #noCompanions>
+            <p class="empty-text">No hay compañeros seleccionados aún.</p>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="config-card catalog-section-card" *ngIf="teamConfigData">
+    <div class="card-body">
+      <div class="catalog-header-row">
+        <h2 class="main-section-title catalog-title">CATÁLOGO DE HÉROES</h2>
+        
+        <div class="catalog-actions-right">
+          <span class="msg-error" *ngIf="errorMessage">{{ errorMessage }}</span>
+          <span class="msg-success" *ngIf="successMessage">{{ successMessage }}</span>
+          <button type="button" class="btn-save-main" (click)="saveConfiguration()" [disabled]="isSaving">
+            {{ isSaving ? 'GUARDANDO...' : 'GUARDAR CAMBIOS' }}
+          </button>
+        </div>
+      </div>
+
+      <div class="catalog-filters-container" style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Buscar héroe por nombre" 
+          class="form-control catalog-search-input"
+        />
+        
+        <div class="role-filter-buttons" style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button type="button" class="filter-btn" [class.active]="selectedRole === 'ALL'" (click)="setRoleFilter('ALL')" style="padding: 6px 12px; background: #222; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer;">Todos</button>
+          <button type="button" class="filter-btn" [class.active]="selectedRole === 'AGILE'" (click)="setRoleFilter('AGILE')" style="padding: 6px 12px; background: #222; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer;">Ágil</button>
+          <button type="button" class="filter-btn" [class.active]="selectedRole === 'WARRIOR'" (click)="setRoleFilter('WARRIOR')" style="padding: 6px 12px; background: #222; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer;">Guerrero</button>
+          <button type="button" class="filter-btn" [class.active]="selectedRole === 'MYSTIC'" (click)="setRoleFilter('MYSTIC')" style="padding: 6px 12px; background: #222; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer;">Místico</button>
+          <button type="button" class="filter-btn" [class.active]="selectedRole === 'TECH'" (click)="setRoleFilter('TECH')" style="padding: 6px 12px; background: #222; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer;">Tecnología</button>
+          <button type="button" class="filter-btn" [class.active]="selectedRole === 'SUPPORT'" (click)="setRoleFilter('SUPPORT')" style="padding: 6px 12px; background: #222; color: white; border: 1px solid #444; border-radius: 4px; cursor: pointer;">Apoyo</button>
+        </div>
+      </div>
+
+      <div class="catalog-scroll-container">
+        <div class="catalog-horizontal-grid" *ngIf="filteredCatalog && filteredCatalog.length > 0; else emptyCatalog">
+          <div 
+            class="catalog-horizontal-card" 
+            *ngFor="let hero of filteredCatalog" 
+            (click)="addHeroById(hero.id)"
+            title="Hacé click para agregar al equipo"
+          >
+            <div class="catalog-avatar">
+              <img 
+                [src]="getHeroImageUrl(hero.id)" 
+                [alt]="hero.name"
+                (error)="handleImageError($event)"
+              />
+            </div>
+            <div class="catalog-details">
+              <span class="catalog-name">{{ hero.name }}</span>
+              <span class="role-pill">ROL: {{ hero.role | uppercase }}</span>
+            </div>
+          </div>
+        </div>
+        <ng-template #emptyCatalog>
+          <p class="empty-text" style="color: #888; padding: 10px;">No se encontraron héroes con ese criterio de búsqueda.</p>
+        </ng-template>
+      </div>
+    </div>
+  </section>
+
+  <ng-template #loadingState>
+    <div class="loading-state">
+      <p class="info-text">Cargando equipo y héroes...</p>
+    </div>
   </ng-template>
 </div>
