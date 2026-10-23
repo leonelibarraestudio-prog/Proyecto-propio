@@ -1,5 +1,5 @@
 
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AbstractController } from '../../basic/abstract.controller';
 import { HistoryRivalsService } from './history-rivals.service';
@@ -15,9 +15,9 @@ export class HistoryRivalsController extends AbstractController {
 
   @Get()
   @ApiOperation({ summary: 'Get the current team history and rivals.' })
-  async getHistory() {
+  async getHistory(@Query('attemptId') attemptId?: string) {
     return this.createOkResponse(
-      await this.historyRivalsService.getHistory(),
+      await this.historyRivalsService.getHistory(attemptId),
     );
   }
 }

@@ -1,3 +1,4 @@
+
 import { Injectable } from '@nestjs/common';
 import { GameApiService } from './game-api.service';
 import {
@@ -9,10 +10,15 @@ import {
   FinalSimulateJourneyApi,
   FinalTeamConfigurationDataApi,
   FinalHistoryApi,
+  FinalJourneyEncountersApi,
   FinalStageApi,
   FinalStageEventsApi,
+  EtapasDelJourneyApi,
 } from './model/game-api/final-contract.model';
-import { HeroCatalogApi, RelationshipCatalogApi } from './model/game-api/hero-catalog.model';
+import {
+  HeroCatalogApi,
+  RelationshipCatalogApi,
+} from './model/game-api/hero-catalog.model';
 import {
   CurrentJourneyApi,
   JourneySpendingStrategy,
@@ -20,22 +26,31 @@ import {
 } from './model/game-api/journey.model';
 import { TeamProfileApi } from './model/game-api/team-profile.model';
 import { TeamConfigurationReadApi } from './model/game-api/team-configuration.model';
-import { EtapasDelJourneyApi } from './model/game-api/etapas-del-journey-api.model';
 
 @Injectable()
 export class GameFeatureApiService {
   constructor(private readonly api: GameApiService) {}
 
   profile(teamId: string, lang = 'en') {
-    return this.api.get<TeamProfileApi>(`/teams/${teamId}/profile`, { lang });
+    return this.api.get<TeamProfileApi>(
+      `/teams/${teamId}/profile`,
+      { lang },
+    );
   }
 
   async history(teamId: string, lang = 'en') {
-    return this.api.get<FinalHistoryApi>(`/teams/${teamId}/history`, { lang });
+    return this.api.get<FinalHistoryApi>(
+      `/teams/${teamId}/history`,
+      { lang },
+    );
   }
 
   async assignedTeams(lang = 'en') {
-    const catalog = await this.api.get<FinalAssignedTeamCatalogApi>('/teams', { lang });
+    const catalog = await this.api.get<FinalAssignedTeamCatalogApi>(
+      '/teams',
+      { lang },
+    );
+
     return catalog.teams.map((team) => ({
       id: team.id,
       name: team.name,
@@ -44,14 +59,21 @@ export class GameFeatureApiService {
   }
 
   async heroes(lang: string, _ids?: string[]) {
-    const catalog = await this.api.get<FinalHeroCatalogApi>('/heroes', { lang });
+    const catalog = await this.api.get<FinalHeroCatalogApi>(
+      '/heroes',
+      { lang },
+    );
+
     return {
       count: catalog.count,
       heroes: catalog.heroes.map((hero) => ({
         id: hero.id,
         displayName: hero.displayName,
         archetype: hero.roles.primary.code,
-        eligibility: hero.eligibility.code as 'PREFERRED' | 'ELIGIBLE' | 'COMPANION_ONLY',
+        eligibility: hero.eligibility.code as
+          | 'PREFERRED'
+          | 'ELIGIBLE'
+          | 'COMPANION_ONLY',
         stats: hero.stats,
         maxima: {
           energy: hero.resources.maximumEnergy,
@@ -64,7 +86,9 @@ export class GameFeatureApiService {
         abilities: {
           offensive: this.ability(hero.abilities.offensiveSpecial),
           support: this.ability(hero.abilities.supportSpecial),
-          leader: hero.abilities.leaderAbility ? this.ability(hero.abilities.leaderAbility) : null,
+          leader: hero.abilities.leaderAbility
+            ? this.ability(hero.abilities.leaderAbility)
+            : null,
         },
         leaderProfile: hero.leaderProfileCode,
         biography: hero.biography,
@@ -76,7 +100,10 @@ export class GameFeatureApiService {
   }
 
   async relationships(_ids: string[]) {
-    const catalog = await this.api.get<FinalRelationshipCatalogApi>('/heroes/relationships');
+    const catalog = await this.api.get<FinalRelationshipCatalogApi>(
+      '/heroes/relationships',
+    );
+
     return {
       heroIds: catalog.heroIds,
       relationships: catalog.relationships.map((relationship) => ({
@@ -91,6 +118,7 @@ export class GameFeatureApiService {
     const data = await this.api.get<FinalTeamConfigurationDataApi>(
       `/teams/${teamId}/configuration`,
     );
+
     return {
       teamId: data.teamId,
       configuration: data.configuration
@@ -111,7 +139,9 @@ export class GameFeatureApiService {
       `/teams/${teamId}/journeys/current`,
       { lang },
     );
+
     const attempt = current.summary;
+
     return {
       teamId: current.teamId,
       summary: current.summary,
@@ -124,18 +154,27 @@ export class GameFeatureApiService {
             encounterCount: current.attempt.encounterCount,
             spendingStrategy: attempt?.spendingStrategyCode,
             finalistIds: attempt
-              ? [attempt.finalists.playerTeamId, attempt.finalists.opponentTeamId]
+              ? [
+                  attempt.finalists.playerTeamId,
+                  attempt.finalists.opponentTeamId,
+                ]
               : [],
           }
         : null,
     } satisfies CurrentJourneyApi;
   }
 
-  simulate(teamId: string, body: { spendingStrategy: JourneySpendingStrategy }) {
+  simulate(
+    teamId: string,
+    body: { spendingStrategy: JourneySpendingStrategy },
+  ) {
     return this.api
-      .post<FinalSimulateJourneyApi>(`/teams/${teamId}/journeys/simulate`, {
-        spendingStrategy: body.spendingStrategy,
-      })
+      .post<FinalSimulateJourneyApi>(
+        `/teams/${teamId}/journeys/simulate`,
+        {
+          spendingStrategy: body.spendingStrategy,
+        },
+      )
       .then(
         (result) =>
           ({
@@ -150,11 +189,34 @@ export class GameFeatureApiService {
   }
 
   currentTeams(teamId: string) {
-    return this.api.get<FinalJourneyTeamsApi>(`/teams/${teamId}/journeys/current/teams`);
+    return this.api.get<FinalJourneyTeamsApi>(
+      `/teams/${teamId}/journeys/current/teams`,
+    );
+  }
+
+  journeyTeams(teamId: string, attemptId: string) {
+    return this.api.get<FinalJourneyTeamsApi>(
+      `/teams/${teamId}/journeys/${attemptId}/teams`,
+    );
+  }
+
+  currentEncounters(teamId: string) {
+    return this.api.get<FinalJourneyEncountersApi>(
+      `/teams/${teamId}/journeys/current/encounters`,
+    );
+  }
+
+  journeyEncounters(teamId: string, attemptId: string) {
+    return this.api.get<FinalJourneyEncountersApi>(
+      `/teams/${teamId}/journeys/${attemptId}/encounters`,
+    );
   }
 
   finalStage(teamId: string, lang: string) {
-    return this.api.get<FinalStageApi>(`/teams/${teamId}/journeys/current/final-stage`, { lang });
+    return this.api.get<FinalStageApi>(
+      `/teams/${teamId}/journeys/current/final-stage`,
+      { lang },
+    );
   }
 
   finalStageEvents(teamId: string, lang: string) {
@@ -170,7 +232,9 @@ export class GameFeatureApiService {
     );
   }
 
-  private ability(ability: import('./model/game-api/final-contract.model').FinalAbilityApi) {
+  private ability(
+    ability: import('./model/game-api/final-contract.model').FinalAbilityApi,
+  ) {
     return {
       id: ability.id,
       name: ability.name,

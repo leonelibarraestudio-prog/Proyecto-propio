@@ -1,50 +1,398 @@
 
-<main class="student-feature-shell">
-  <h1>Historial y rivales</h1>
-  <p>Consultá las partidas completadas de tu equipo y sus rivales.</p>
+<main class="history-page">
+  <header class="page-header">
+    <div class="header-copy">
+      <span class="eyebrow">ARCHIVO DE MISIONES · R2</span>
+      <h1>HISTORIAL <span>&amp; RIVALES</span></h1>
+      <p>Revisá las batallas registradas y las rivalidades de tu equipo.</p>
+    </div>
 
-  <p *ngIf="viewModel.status === 'loading'">
-    Cargando historial...
-  </p>
+    <div class="team-badge" *ngIf="viewModel.data as data">
+      <span class="team-badge-label">EQUIPO ACTIVO</span>
+      <strong>{{ data.teamId }}</strong>
+    </div>
+  </header>
 
-  <section *ngIf="viewModel.status === 'error'">
-    <h2>No se pudo cargar el historial</h2>
-    <p>{{ viewModel.error }}</p>
-    <p *ngIf="viewModel.errorCode">
-      Código: {{ viewModel.errorCode }}
-    </p>
-    <button type="button" (click)="historyRivalsRetry()">
-      Reintentar
-    </button>
-  </section>
+  <section class="overview-grid" *ngIf="viewModel.data as data">
+    <article class="overview-card">
+      <div class="overview-icon history-icon">H</div>
+      <div>
+        <span class="overview-label">HISTORIAL</span>
+        <strong class="overview-number">{{ data.items.length }}</strong>
+        <span class="overview-caption">Partidas registradas</span>
+      </div>
+    </article>
 
-  <section *ngIf="viewModel.status === 'empty'">
-    <h2>Todavía no hay partidas completadas</h2>
-    <p>Cuando tu equipo complete una partida, aparecerá acá.</p>
-  </section>
-
-  <section *ngIf="viewModel.status === 'data' && viewModel.data">
-    <p>
-      Equipo: <strong>{{ viewModel.data.teamId }}</strong>
-    </p>
-
-    <p>
-      Partidas completadas: {{ viewModel.data.items.length }}
-    </p>
-
-    <article
-      class="history-card"
-      *ngFor="let item of viewModel.data.items"
-    >
-      <h2>{{ item.opponentFinalistName }}</h2>
-
-      <p><strong>Rival ID:</strong> {{ item.opponentFinalistId }}</p>
-      <p><strong>Resultado:</strong> {{ item.outcomeCode }}</p>
-      <p><strong>Final:</strong> {{ item.endingCode }}</p>
-      <p><strong>Estrategia:</strong> {{ item.spendingStrategyCode }}</p>
-      <p><strong>Resumen:</strong> {{ item.endingSummary }}</p>
-      <p><strong>Inicio:</strong> {{ item.createdAt }}</p>
-      <p><strong>Finalización:</strong> {{ item.completedAt }}</p>
+    <article class="overview-card">
+      <div class="overview-icon heroes-icon">R</div>
+      <div>
+        <span class="overview-label">PLANTEL</span>
+        <strong class="overview-number">{{ data.heroes.length }}</strong>
+        <span class="overview-caption">Héroes configurados</span>
+      </div>
     </article>
   </section>
+
+  <!-- Estado de carga -->
+  <section
+    class="feedback-card"
+    *ngIf="viewModel.status === 'loading'">
+    <span class="loading-indicator"></span>
+    <div>
+      <h2>Consultando archivos...</h2>
+      <p>Estamos recuperando la información de la Game API.</p>
+    </div>
+  </section>
+
+  <!-- Estado de error -->
+  <section
+    class="feedback-card error-card"
+    *ngIf="viewModel.status === 'error'">
+    <span class="feedback-symbol">!</span>
+
+    <div class="feedback-content">
+      <h2>No se pudo cargar la información</h2>
+      <p>{{ viewModel.error }}</p>
+
+      <p *ngIf="viewModel.errorCode" class="error-code">
+        Código: {{ viewModel.errorCode }}
+      </p>
+
+      <button
+        class="action-button"
+        type="button"
+        (click)="historyRivalsRetry()">
+        Reintentar consulta
+      </button>
+    </div>
+  </section>
+
+  <ng-container *ngIf="viewModel.data as data">
+
+    <!-- HISTORIAL DE PARTIDAS -->
+    <section class="content-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">REGISTRO DE COMBATES</span>
+          <h2>Historial de partidas</h2>
+        </div>
+
+        <span class="section-count">
+          {{ data.items.length }} registros
+        </span>
+      </div>
+
+      <div class="empty-state" *ngIf="data.items.length === 0">
+        <div class="empty-icon">H</div>
+        <h3>No hay partidas históricas</h3>
+        <p>
+          Todavía no hay partidas finalizadas registradas para este equipo.
+          Cuando la Game API devuelva resultados históricos, aparecerán acá.
+        </p>
+      </div>
+
+      <div class="history-grid" *ngIf="data.items.length > 0">
+        <article class="mission-card" *ngFor="let item of data.items">
+          <div class="mission-topline">
+            <span class="mission-label">REGISTRO DE MISIÓN</span>
+            <span class="mission-status">{{ item.outcomeCode }}</span>
+          </div>
+
+          <h3>{{ item.opponentFinalistName }}</h3>
+          <p class="mission-summary">{{ item.endingSummary }}</p>
+
+          <div class="mission-details">
+            <div>
+              <span>RESULTADO FINAL</span>
+              <strong>{{ item.endingCode || 'No disponible' }}</strong>
+            </div>
+
+            <div>
+              <span>ESTRATEGIA</span>
+              <strong>{{ item.spendingStrategyCode }}</strong>
+            </div>
+
+            <div>
+              <span>INICIO</span>
+              <strong>
+                {{ item.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </strong>
+            </div>
+
+            <div>
+              <span>FINALIZACIÓN</span>
+              <strong>
+                {{
+                  item.completedAt
+                    ? (item.completedAt | date:'dd/MM/yyyy HH:mm')
+                    : 'No disponible'
+                }}
+              </strong>
+            </div>
+          </div>
+
+          <button
+            class="action-button"
+            type="button"
+            [class.selected-button]="selectedAttemptId === item.attemptId"
+            [attr.aria-pressed]="selectedAttemptId === item.attemptId"
+            (click)="selectJourney(item.attemptId)">
+            {{
+              selectedAttemptId === item.attemptId
+                ? 'Partida seleccionada'
+                : 'Consultar encuentros'
+            }}
+            <span aria-hidden="true">→</span>
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- ENCUENTROS ENTRE HÉROES Y RIVALES -->
+    <section class="content-section encounters-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">DETALLE DE BATALLAS</span>
+          <h2>Encuentros entre rivales</h2>
+          <p>
+            Seleccioná un héroe y uno de sus rivales para consultar
+            los enfrentamientos registrados.
+          </p>
+        </div>
+
+        <span class="section-count">
+          {{ filteredEncounters.length }} encuentros
+        </span>
+      </div>
+
+      <!-- Selectores -->
+      <div class="rival-filters" *ngIf="data.heroes.length > 0">
+        <label for="history-hero">Héroe</label>
+        <select
+          id="history-hero"
+          [value]="selectedHeroId ?? ''"
+          (change)="selectHero($any($event.target).value)">
+          <option value="">Seleccioná un héroe</option>
+          <option *ngFor="let hero of data.heroes" [value]="hero.id">
+            {{ hero.name }}
+          </option>
+        </select>
+
+        <label for="history-rival">Rival canónico</label>
+        <select
+          id="history-rival"
+          [value]="selectedRivalId ?? ''"
+          [disabled]="!selectedHeroId || availableRivals.length === 0"
+          (change)="selectRival($any($event.target).value)">
+          <option value="">Seleccioná un rival</option>
+          <option *ngFor="let rival of availableRivals" [value]="rival">
+            {{ rival }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Sin héroes -->
+      <div class="empty-state" *ngIf="data.heroes.length === 0">
+        <h3>No hay héroes configurados</h3>
+        <p>La API no devolvió héroes para el equipo actual.</p>
+      </div>
+
+      <!-- Sin héroe seleccionado -->
+      <div class="empty-state" *ngIf="data.heroes.length > 0 && !selectedHeroId">
+        <h3>Seleccioná un héroe</h3>
+        <p>Primero elegí un héroe para consultar sus rivales registrados.</p>
+      </div>
+
+      <!-- Sin rivales -->
+      <div
+        class="empty-state"
+        *ngIf="selectedHeroId && availableRivals.length === 0">
+        <h3>Sin rivales registrados</h3>
+        <p>
+          {{ selectedHeroName }} no tiene rivales canónicos registrados.
+        </p>
+      </div>
+
+      <!-- Falta seleccionar un rival -->
+      <div
+        class="empty-state"
+        *ngIf="
+          selectedHeroId &&
+          availableRivals.length > 0 &&
+          !selectedRivalId
+        ">
+        <h3>Seleccioná un rival</h3>
+        <p>Elegí uno de los rivales canónicos para buscar encuentros.</p>
+      </div>
+
+      <!-- No existen enfrentamientos registrados -->
+      <div
+        class="empty-state"
+        *ngIf="
+          selectedHeroId &&
+          selectedRivalId &&
+          filteredEncounters.length === 0
+        ">
+        <h3>No se encontraron enfrentamientos</h3>
+        <p>
+          No hay encuentros registrados en los que
+          {{ selectedHeroName }} y {{ selectedRivalId }}
+          hayan participado en equipos opuestos.
+        </p>
+      </div>
+
+      <!-- Lista filtrada de encuentros -->
+      <div class="encounter-grid" *ngIf="filteredEncounters.length > 0">
+        <article
+          class="encounter-card"
+          *ngFor="let encounter of filteredEncounters">
+
+          <div class="encounter-topline">
+            <span class="encounter-id">
+              {{ encounter.encounterId }}
+            </span>
+
+            <span class="encounter-stage">
+              {{
+                encounter.stageCode ||
+                encounter.stageId ||
+                'Etapa no disponible'
+              }}
+            </span>
+          </div>
+
+          <div class="matchup">
+            <div
+              class="matchup-team"
+              [class.winner-team]="
+                encounter.winnerTeamId === encounter.teamAId
+              ">
+              <span class="team-label">EQUIPO A</span>
+              <strong>{{ getTeamName(encounter.teamAId) }}</strong>
+
+              <span
+                class="winner-label"
+                *ngIf="encounter.winnerTeamId === encounter.teamAId">
+                VICTORIA
+              </span>
+            </div>
+
+            <span class="versus">VS</span>
+
+            <div
+              class="matchup-team"
+              [class.winner-team]="
+                encounter.winnerTeamId === encounter.teamBId
+              ">
+              <span class="team-label">EQUIPO B</span>
+              <strong>{{ getTeamName(encounter.teamBId) }}</strong>
+
+              <span
+                class="winner-label"
+                *ngIf="encounter.winnerTeamId === encounter.teamBId">
+                VICTORIA
+              </span>
+            </div>
+          </div>
+
+          <div class="encounter-footer">
+            <span>
+              Resolución:
+              {{ encounter.resolutionCode || 'No disponible' }}
+            </span>
+
+            <span *ngIf="!encounter.winnerTeamId">
+              Ganador no disponible
+            </span>
+
+            <span
+              *ngIf="encounter.rivalEncounter"
+              class="rival-tag">
+              ENCUENTRO DE RIVALES
+            </span>
+          </div>
+
+          <div
+            class="damage-list"
+            *ngIf="encounter.damageByTeam?.length">
+            <div
+              class="damage-row"
+              *ngFor="let damage of encounter.damageByTeam">
+              <span>{{ getTeamName(damage.teamId) }}</span>
+              <strong>{{ damage.damageDealt }} de daño</strong>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- HÉROES Y RIVALES -->
+    <section class="content-section rivals-section">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">RELACIONES DEL EQUIPO</span>
+          <h2>Héroes y rivales</h2>
+          <p>
+            Consultá los héroes configurados y sus rivalidades registradas.
+          </p>
+        </div>
+
+        <span class="section-count">
+          {{ data.heroes.length }} héroes
+        </span>
+      </div>
+
+      <div class="empty-state" *ngIf="data.heroes.length === 0">
+        <h3>No hay héroes configurados</h3>
+        <p>La API no devolvió héroes para el equipo actual.</p>
+      </div>
+
+      <div class="heroes-grid" *ngIf="data.heroes.length > 0">
+        <article class="hero-card" *ngFor="let hero of data.heroes">
+          <div class="hero-card-header">
+            <img
+              class="hero-portrait"
+              [src]="getHeroImage(hero.id)"
+              [alt]="'Retrato de ' + hero.name"
+              loading="lazy"
+              (error)="onHeroImageError($event)"
+            />
+
+            <div class="hero-identity">
+              <h3>{{ hero.name }}</h3>
+              <span>{{ hero.id }}</span>
+            </div>
+
+            <span
+              class="rival-count"
+              [attr.aria-label]="hero.rivals.length + ' rivales registrados'">
+              {{ hero.rivals.length }}
+            </span>
+          </div>
+
+          <div class="hero-divider"></div>
+
+          <div class="rival-list">
+            <span class="rival-heading">RIVALES REGISTRADOS</span>
+
+            <ng-container *ngIf="hero.rivals.length > 0; else noRivals">
+              <span
+                class="rival-chip"
+                *ngFor="let rival of hero.rivals">
+                <span class="rival-dot"></span>
+                {{ rival }}
+              </span>
+            </ng-container>
+
+            <ng-template #noRivals>
+              <p class="no-rivals">
+                Sin rivales registrados para este héroe.
+              </p>
+            </ng-template>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </ng-container>
 </main>

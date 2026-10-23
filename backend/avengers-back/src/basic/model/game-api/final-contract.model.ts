@@ -1,3 +1,4 @@
+
 import { CombatStrategy } from './team-configuration.model';
 
 export interface FinalHeroApi {
@@ -134,7 +135,11 @@ export interface FinalJourneySummaryApi {
   terminalReasonCode?: string | null;
   createdAt: string;
   completedAt: string | null;
-  progress: { stagesCompleted: number; encountersPlayedByPlayer: number; finalStageStatus: string };
+  progress: {
+    stagesCompleted: number;
+    encountersPlayedByPlayer: number;
+    finalStageStatus: string;
+  };
 }
 
 export interface FinalHistoryItemApi {
@@ -237,4 +242,29 @@ export interface FinalStageEventsApi {
   attemptId: string;
   language: string;
   events: FinalStageEventApi[];
+}
+
+export interface FinalEncounterSummaryApi {
+  encounterId: string;
+  stageId: string;
+  stageCode: string;
+  groupId: string | null;
+  teamAId: string;
+  teamBId: string;
+  winnerTeamId: string | null;
+  resolutionCode: string;
+  rivalEncounter: boolean;
+  results: Array<{
+    teamId: string;
+    resultCode: string;
+  }>;
+  damageByTeam: Array<{
+    teamId: string;
+    damageDealt: number;
+  }>;
+}
+
+export interface FinalJourneyEncountersApi {
+  attemptId: string;
+  encounters: FinalEncounterSummaryApi[];
 }
