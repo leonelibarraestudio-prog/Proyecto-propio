@@ -1,7 +1,19 @@
+
 import { Injectable } from '@nestjs/common';
 import { ApplicationContextService } from '../../basic/services/application-context.service';
 import { GameFeatureApiService } from '../../basic/game-feature-api.service';
-import { KnockoutStageModel } from './model/knockout-stage.model';
+import {
+  KnockoutStageFinalists,
+  KnockoutStageModel,
+  KnockoutStageRound,
+} from './model/knockout-stage.model';
+
+interface KnockoutJourneyStages {
+  knockout?: {
+    rounds: KnockoutStageRound[];
+  };
+  finalists?: KnockoutStageFinalists | null;
+}
 
 @Injectable()
 export class KnockoutStageService {
@@ -16,11 +28,28 @@ export class KnockoutStageService {
 
     const current = await this.game.currentJourney(teamId, language);
 
+    if (current.attempt === null) {
+      return {
+        teamId,
+        journeyAvailable: false,
+        stageCount: 0,
+        encounterCount: 0,
+        rounds: [],
+        finalists: null,
+      };
+    }
+
+    const stages = await this.game.obtenerEtapasActuales(teamId);
+
+    const knockout = stages as typeof stages & KnockoutJourneyStages;
+
     return {
       teamId,
-      journeyAvailable: current.attempt !== null,
-      stageCount: current.attempt?.stageCount ?? 0,
-      encounterCount: current.attempt?.encounterCount ?? 0,
+      journeyAvailable: true,
+      stageCount: current.attempt.stageCount,
+      encounterCount: current.attempt.encounterCount,
+      rounds: knockout.knockout?.rounds ?? [],
+      finalists: knockout.finalists ?? null,
     };
   }
 }
