@@ -4,9 +4,13 @@ import { ApplicationContextService } from '../../basic/services/application-cont
 import {
   FinalPreparationModel,
   InventoryApi,
+  PowerUpApi,
   PowerUpCatalogApi,
+  PreparationInventoryItem,
+  PurchaseApi,
   RewardsApi,
 } from './model/store-api.model';
+import { PurchasePowerUpRequest } from './request/purchase-power-up.request';
 
 
 @Injectable()
@@ -24,7 +28,35 @@ constructor(
       this.api.get<InventoryApi>(`/teams/${teamId}/journeys/current/inventory`),
       this.api.get<PowerUpCatalogApi>('/reference/power-ups', { teamId, lang }),
     ]);
-    return { rewards, inventory, powerUps: catalog.powerUps };
+    return {
+      balance: rewards.balance,
+      powerUps: catalog.powerUps,
+      inventory: this.describeInventory(inventory, catalog.powerUps),
+    };
+  }
+
+  async purchase(request: PurchasePowerUpRequest): Promise<FinalPreparationModel> {
+  const teamId = this.context.getCurrentTeamId();
+    await this.api.post<PurchaseApi>(`/teams/${teamId}/journeys/current/purchases`, {
+    itemId: request.itemId,
+    quantity: request.quantity,
+    });
+    return this.getPreparation();
+  }
+  private describeInventory(
+    inventory: InventoryApi,
+    powerUps: PowerUpApi[],
+  ): PreparationInventoryItem[] {
+    return inventory.items.map((item) => {
+      const definition = powerUps.find((powerUp) => powerUp.id === item.itemId);
+      return {
+        itemId: item.itemId,
+        name: definition?.name ?? item.itemId,
+        description: definition?.description ?? '',
+        quantity: item.quantity,
+        targetScope: definition?.targetScope ?? 'HERO',
+      };
+    });
   }
 }  
 
