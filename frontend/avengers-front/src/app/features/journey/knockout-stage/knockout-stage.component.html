@@ -112,18 +112,46 @@
   </div>
 
 </section>
-    <p *ngIf="!knockout.journeyAvailable" class="state-card">
-      Todavía no hay un torneo disponible.
+    <section
+  *ngIf="!knockout.journeyAvailable"
+  class="falcon-waiting-panel"
+  aria-label="Estado de la fase eliminatoria"
+>
+  <div class="falcon-waiting-emblem" aria-hidden="true">
+    <img
+      src="assets/knockout-stage/falcon-emblema.png"
+      alt=""
+    />
+  </div>
+
+  <div class="falcon-waiting-content">
+    <span class="falcon-waiting-eyebrow">
+      OPERACIÓN FALCON · R6
+    </span>
+
+    <h2>MISIÓN EN ESPERA</h2>
+
+    <p>
+      La fase eliminatoria todavía no comenzó.
+      Los enfrentamientos y el camino hacia la Gran Final
+      se mostrarán cuando se completen las simulaciones.
     </p>
 
+    <span class="falcon-waiting-status">
+      <span class="falcon-waiting-dot" aria-hidden="true"></span>
+      ESTADO · SIN SIMULACIÓN
+    </span>
+  </div>
+</section>
+
     <ng-container *ngIf="knockout.journeyAvailable">
-      <p *ngIf="knockout.rounds.length === 0" class="state-card">
+      <p *ngIf="!knockout.rounds?.length" class="state-card">
         Todavía no hay enfrentamientos eliminatorios disponibles.
       </p>
 
       <!-- Llave -->
       <section
-        *ngIf="knockout.rounds.length > 0"
+        *ngIf="(knockout.rounds?.length ?? 0) > 0"
         class="knockout-bracket"
         aria-label="Llave eliminatoria"
       >
@@ -172,7 +200,7 @@
                 class="knockout-team"
                 [class.knockout-winner]="match.winnerTeamId === match.teamAId"
               >
-                <span>{{ match.teamAId }}</span>
+                <span>{{ getTeamName(match.teamAId) }}</span>
                 <strong *ngIf="match.winnerTeamId === match.teamAId">Ganador</strong>
               </div>
 
@@ -180,7 +208,7 @@
                 class="knockout-team"
                 [class.knockout-winner]="match.winnerTeamId === match.teamBId"
               >
-                <span>{{ match.teamBId }}</span>
+                <span>{{ getTeamName(match.teamBId) }}</span>
                 <strong *ngIf="match.winnerTeamId === match.teamBId">Ganador</strong>
               </div>
 
@@ -203,14 +231,14 @@
               <span class="knockout-match-label">F</span>
 
               <div class="knockout-team">
-                <span>{{ finalists.playerTeamId }}</span>
+                <span>{{ getTeamName(finalists.playerTeamId) }}</span>
               </div>
 
               <div class="knockout-team">
-                <span>{{ finalists.opponentTeamId }}</span>
+                <span>{{ getTeamName(finalists.opponentTeamId) }}</span>
               </div>
 
-              <span class="knockout-pending">Resultado pendiente</span>
+              <span class="knockout-pending">{{ getFinalStatus() }}</span>
             </article>
           </div>
         </article>
