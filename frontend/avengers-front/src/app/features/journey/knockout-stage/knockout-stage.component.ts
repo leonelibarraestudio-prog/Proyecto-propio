@@ -41,6 +41,42 @@ export class KnockoutStageComponent
   get loadError(): boolean {
     return this.knockoutStageService.hasLoadError();
   }
+  getTeamName(teamId: string | null | undefined): string {
+    if (!teamId) {
+      return 'Por definir';
+    }
+
+    const journey = this.knockoutStageService.getTeamJourney();
+
+    const team = journey?.teams?.find(
+      (item) => item.teamId === teamId
+    );
+
+    return team?.name || teamId;
+  }
+
+  getFinalStatus(): string {
+    const journey = this.knockoutStageService.getTeamJourney();
+    const final = journey?.final;
+
+    if (!final) {
+      return 'Resultado pendiente';
+    }
+
+    if (final.status === 'READY') {
+      return 'Final lista para disputarse';
+    }
+
+    if (final.outcome) {
+      return 'Resultado: ' + final.outcome;
+    }
+
+    if (final.status === 'COMPLETED') {
+      return 'Final disputada';
+    }
+
+    return 'Resultado pendiente';
+  }
 
   ngAfterViewChecked(): void {
     this.scheduleConnections();
