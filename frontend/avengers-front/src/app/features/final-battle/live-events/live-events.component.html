@@ -20,7 +20,7 @@
     </div>
 
     <div class="live-events-photo" aria-hidden="true">
-      <img src="assets/live-events/falcon-avengers-wallpaper.png" alt="" />
+      <img src="assets/live-events/falcon-sw.png" alt="" />
     </div>
   </header>
 
@@ -182,6 +182,22 @@
 
             <div class="live-event-body">
               <div class="live-event-meta">
+                <span
+                  *ngIf="metaActor(event) as actor"
+                  class="live-avatar live-avatar-small"
+                  [attr.data-side]="sideKey(actor)"
+                >
+                  <img
+                    *ngIf="actor.name"
+                    [src]="portraitPath(actor.id)"
+                    alt=""
+                    loading="lazy"
+                    (error)="imageError($event)"
+                  />
+                  <span *ngIf="!actor.name" class="live-avatar-initial" aria-hidden="true">
+                    {{ initials(actor) }}
+                  </span>
+                </span>
                 <span class="live-event-type">{{ eventTypeLabel(event) }}</span>
                 <span class="live-event-chip" *ngIf="event.turn > 0">
                   {{ translate('r10.turn', pageState.lang, { turn: event.turn }) }}
@@ -190,22 +206,32 @@
               </div>
 
               <div class="live-event-narrative">
-                <p
-                  *ngFor="let line of event.lines; trackBy: trackLine"
-                  class="live-event-line"
-                  [class.live-event-line-dialogue]="isDialogue(line)"
-                >
-                  <strong class="live-event-speaker" *ngIf="line.speaker">{{
-                    heroLabel(line.speaker)
-                  }}</strong>
-                  {{ line.text }}
-                </p>
+                <ng-container *ngFor="let line of event.lines; trackBy: trackLine">
+                  <div
+                    *ngIf="line.speaker as speaker; else narration"
+                    class="live-dialogue"
+                    [attr.data-side]="sideKey(speaker)"
+                  >
+                    <span class="live-avatar" [attr.data-side]="sideKey(speaker)">
+                      <img [src]="portraitPath(speaker.id)" alt="" (error)="imageError($event)" />
+                      <span *ngIf="!speaker.name" class="live-avatar-initial" aria-hidden="true">
+                        {{ initials(speaker) }}
+                      </span>
+                    </span>
+                    <div class="live-dialogue-bubble">
+                      <strong class="live-event-speaker">{{ heroLabel(speaker) }}</strong>
+                      <p class="live-event-line live-event-line-dialogue">{{ line.text }}</p>
+                    </div>
+                  </div>
+                  <ng-template #narration>
+                    <p class="live-event-line">{{ line.text }}</p>
+                  </ng-template>
+                </ng-container>
               </div>
-
               <dl class="live-event-facts" *ngIf="hasFacts(event)">
-                <div *ngIf="event.actor">
+                <div *ngIf="metaActor(event) as actor">
                   <dt>{{ translate('r10.actor', pageState.lang) }}</dt>
-                  <dd>{{ heroLabel(event.actor) }}</dd>
+                  <dd>{{ heroLabel(actor) }}</dd>
                 </div>
                 <div *ngIf="visibleTargets(event).length">
                   <dt>{{ translate('r10.target', pageState.lang) }}</dt>

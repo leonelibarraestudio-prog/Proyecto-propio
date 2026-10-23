@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HeroArtworkResolverService } from '../../../core/services/hero-artwork-resolver.service';
 import { AppCopyKey, AppLanguage, I18nService } from '../../../core/services/i18n.service';
 import {
   LiveEventApi,
@@ -74,6 +75,7 @@ export class LiveEventsComponent implements OnInit {
   constructor(
     private readonly liveEventsService: LiveEventsService,
     private readonly i18nService: I18nService,
+    private readonly artwork: HeroArtworkResolverService,
   ) {}
 
   get pageState(): LiveEventsViewModel {
@@ -165,7 +167,7 @@ export class LiveEventsComponent implements OnInit {
 
   hasFacts(event: LiveEventApi): boolean {
     return (
-      event.actor !== null ||
+      this.metaActor(event) !== null ||
       this.visibleTargets(event).length > 0 ||
       event.targetTeamSide !== null ||
       event.actionName !== null ||
@@ -194,8 +196,32 @@ export class LiveEventsComponent implements OnInit {
     return `${this.signed(percent)}%`;
   }
 
-  isDialogue(line: LiveEventsNarrativeLineApi): boolean {
-    return line.type === 'DIALOGUE';
+  portraitPath(heroId: string): string {
+    return this.artwork.portraitPath(heroId);
+  }
+
+  imageError(event: Event): void {
+    this.artwork.useFallback(event);
+  }
+
+  sideKey(hero: LiveEventsHeroRefApi): string {
+    if (hero.side === 'PLAYER') {
+      return 'player';
+    }
+    return hero.side === 'OPPONENT' ? 'opponent' : 'narrator';
+  }
+
+  initials(hero: LiveEventsHeroRefApi): string {
+    return this.heroLabel(hero)
+      .split(' ')
+      .slice(0, 2)
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  metaActor(event: LiveEventApi): LiveEventsHeroRefApi | null {
+    const hasDialogue = event.lines.some((line) => line.speaker !== null);
+    return hasDialogue ? null : event.actor;
   }
 
   private humanizeId(id: string): string {

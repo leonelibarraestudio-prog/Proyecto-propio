@@ -1,6 +1,7 @@
 export interface LiveEventsHeroRefApi {
   id: string;
   name: string | null;
+  side: string | null;
 }
 
 export interface LiveEventsNarrativeLineApi {
