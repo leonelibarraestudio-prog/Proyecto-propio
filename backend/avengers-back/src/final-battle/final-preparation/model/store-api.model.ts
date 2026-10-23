@@ -31,14 +31,36 @@ export interface RewardsApi {
   balance: number;
 }
 
+export interface InventoryItemApi {
+  itemId: string;
+  quantity: number;
+  legalUseContexts: string[];
+}
+
 export interface InventoryApi {
   attemptId: string;
   teamId: string;
-  items: Record<string, unknown>[];
+  items: InventoryItemApi[];
+}
+
+export interface PurchaseApi {
+  teamId: string;
+  rewardPoints: number;
+  purchasedItemId: string;
+  purchasedQuantity: number;
+  items: InventoryItemApi[];
+}
+
+export interface PreparationInventoryItem {
+  itemId: string;
+  name: string;
+  description: string;
+  quantity: number;
+  targetScope: 'HERO' | 'TEAM';
 }
 
 export interface FinalPreparationModel {
-  rewards: RewardsApi;
-  inventory: InventoryApi;
+  balance: number;
   powerUps: PowerUpApi[];
+  inventory: PreparationInventoryItem[];
 }

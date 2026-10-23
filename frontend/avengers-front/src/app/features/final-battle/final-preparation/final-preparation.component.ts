@@ -14,6 +14,10 @@ export class FinalPreparationComponent implements OnInit {
   return this.finalpreparationService.getViewModel();
 }
 
+  buy(itemId: string): void {
+    this.finalpreparationService.purchase(itemId);
+  }
+
   ngOnInit(): void {
     this.finalpreparationService.initialize();
   }
