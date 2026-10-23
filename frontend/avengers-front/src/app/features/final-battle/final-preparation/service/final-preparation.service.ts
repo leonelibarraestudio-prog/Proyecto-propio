@@ -4,9 +4,11 @@ import { BaseApiService } from '../../../../core/services/base-api.service';
 import { toApiError } from '../../../../core/models/api-error.interface';
 import { PageState } from '../../../../core/models/page-state.interface';
 import { FinalPreparationApi } from '../model/final-preparation-api.interface';
+import { finalize } from 'rxjs';
 
 export interface FinalPreparationViewModel extends PageState {
   data: FinalPreparationApi | null;
+  submitting: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,6 +17,7 @@ export class FinalPreparationService extends BaseApiService {
     status: 'loading',
     error: null,
     data: null,
+    submitting: false,
   };
 
   constructor(api: ApiService) {
@@ -22,6 +25,7 @@ export class FinalPreparationService extends BaseApiService {
   }
 
   initialize(): void {
+    this.pageState.error = null;
     this.pageState.status = 'loading';
     this.getData<FinalPreparationApi>('/final-stage/preparation').subscribe({
       next: (data) => {
@@ -32,6 +36,32 @@ export class FinalPreparationService extends BaseApiService {
         const apiError = toApiError(error);
         this.pageState.status = 'error';
         this.pageState.error = apiError.message;
+      },
+    });
+  }
+  
+  purchase(itemId: string): void {
+    if (this.pageState.submitting) {
+      return;
+    }
+    this.pageState.submitting = true;
+    this.pageState.error = null;
+    this. postData<FinalPreparationApi>('/final-stage/preparation/purchases', {
+      itemId,
+      quantity: 1,
+    })
+    .pipe(
+      finalize(() => {
+        this.pageState.submitting = false;
+      }),
+    )
+    .subscribe({
+      next: (data) => {
+        this.pageState.data = data;
+        this.pageState.status = 'data';
+      },
+      error: (error) => {
+        this.pageState.error = toApiError(error).message;
       },
     });
   }

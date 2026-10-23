@@ -6,8 +6,16 @@ export interface PowerUpApi {
     targetScope: 'HERO' | 'TEAM';
 }
 
+export interface InventoryItemView {
+    itemId: string;
+    name: string;
+    description: string;
+    quantity: number;
+    targetScope: 'HERO' | 'TEAM';
+}
+
 export interface FinalPreparationApi {
-    rewards: { balance: number; earned: number; spent: number};
-    inventory: { items: unknown[] };
+    balance: number;
+    inventory: InventoryItemView[];
     powerUps: PowerUpApi[];
 }
