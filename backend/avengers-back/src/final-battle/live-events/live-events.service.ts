@@ -3,10 +3,15 @@ import { ApplicationContextService } from '../../basic/services/application-cont
 import { ApiErrorMappingRule, ApiErrorStatusMap, ErrorUtils } from '../../basic/error/error.utils';
 import { GameFeatureApiService } from '../../basic/game-feature-api.service';
 import { ErrorCode } from '../../basic/error/error-code.enum';
-import { FinalStageApi, FinalStageEventApi } from '../../basic/model/game-api/final-contract.model';
+import {
+  FinalJourneyTeamApi,
+  FinalStageApi,
+  FinalStageEventApi,
+} from '../../basic/model/game-api/final-contract.model';
 import {
   LiveEventItem,
   LiveEventsHeroRef,
+  LiveEventsHeroSide,
   LiveEventsModel,
   LiveEventsStatus,
 } from './model/live-events.model';
@@ -27,6 +32,11 @@ const LIVE_EVENTS_API_ERROR_FALLBACK: ApiErrorMappingRule = {
   message: 'Unable to load the Final events right now.',
 };
 
+interface HeroLookup {
+  names: Map<string, string>;
+  sides: Map<string, LiveEventsHeroSide>;
+}
+
 @Injectable()
 export class LiveEventsService {
   constructor(
@@ -45,15 +55,13 @@ export class LiveEventsService {
         this.game.heroes(language),
         this.game.currentTeams(teamId),
       ]);
-      const heroNames = new Map<string, string>(
-        heroCatalog.heroes.map((hero): [string, string] => [hero.id, hero.displayName]),
-      );
       const teamNames = new Map<string, string>(
         teamCatalog.teams.map((team): [string, string] => [team.teamId, team.name]),
       );
+      const lookup = this.buildHeroLookup(finalStage, heroCatalog.heroes, teamCatalog.teams);
       const events = [...eventCatalog.events]
         .sort((first, second) => first.sequence - second.sequence)
-        .map((event) => this.toEventItem(event, heroNames));
+        .map((event) => this.toEventItem(event, lookup));
 
       return {
         finalStage: this.toStatus(finalStage, teamNames),
@@ -67,6 +75,30 @@ export class LiveEventsService {
         LIVE_EVENTS_API_ERROR_FALLBACK,
       );
     }
+  }
+
+  private buildHeroLookup(
+    finalStage: FinalStageApi,
+    heroes: Array<{ id: string; displayName: string }>,
+    teams: FinalJourneyTeamApi[],
+  ): HeroLookup {
+    const names = new Map<string, string>(
+      heroes.map((hero): [string, string] => [hero.id, hero.displayName]),
+    );
+    const sides = new Map<string, LiveEventsHeroSide>();
+    const participants: Array<[string, LiveEventsHeroSide]> = [
+      [finalStage.participants.playerTeamId, 'PLAYER'],
+      [finalStage.participants.opponentTeamId, 'OPPONENT'],
+    ];
+
+    for (const [participantId, side] of participants) {
+      const team = teams.find((candidate) => candidate.teamId === participantId);
+      for (const heroId of team?.heroIds ?? []) {
+        sides.set(heroId, side);
+      }
+    }
+
+    return { names, sides };
   }
 
   private toStatus(finalStage: FinalStageApi, teamNames: Map<string, string>): LiveEventsStatus {
@@ -85,7 +117,7 @@ export class LiveEventsService {
     };
   }
 
-  private toEventItem(event: FinalStageEventApi, heroNames: Map<string, string>): LiveEventItem {
+  private toEventItem(event: FinalStageEventApi, lookup: HeroLookup): LiveEventItem {
     const values = event.values;
     const actorId = values.actorHeroId ?? values.actorIdentityId;
     const targetIds = values.targetHeroIds ?? [];
@@ -97,9 +129,10 @@ export class LiveEventsService {
       turn: event.turn,
       phase: event.phase,
       eventCode: event.eventCode,
-      actor: actorId ? this.heroRef(actorId, heroNames) : null,
-      targets: targetIds.map((id) => this.heroRef(id, heroNames)),
+      actor: actorId ? this.heroRef(actorId, lookup) : null,
+      targets: targetIds.map((id) => this.heroRef(id, lookup)),
       targetSideCode: values.targetSideCode ?? null,
+      targetTeamSide,
       actionName: values.actionName ?? null,
       actionCode: values.actionCode ?? null,
       damage: values.damage ?? null,
@@ -108,20 +141,23 @@ export class LiveEventsService {
       abilityPoints: values.abilityPoints ?? null,
       energy: values.energy ?? null,
       strategyCode: values.strategyCode ?? null,
-      targetTeamSide,
       statCode: values.statCode ?? null,
       percent: values.percent ?? null,
       duration: values.duration ?? null,
       lines: event.narrative.lines.map((line) => ({
         lineSequence: line.lineSequence,
         type: line.type,
-        speaker: line.speakerId ? this.heroRef(line.speakerId, heroNames) : null,
+        speaker: line.speakerId ? this.heroRef(line.speakerId, lookup) : null,
         text: line.text,
       })),
     };
   }
 
-  private heroRef(id: string, heroNames: Map<string, string>): LiveEventsHeroRef {
-    return { id, name: heroNames.get(id) ?? null };
+  private heroRef(id: string, lookup: HeroLookup): LiveEventsHeroRef {
+    return {
+      id,
+      name: lookup.names.get(id) ?? null,
+      side: lookup.sides.get(id) ?? null,
+    };
   }
 }

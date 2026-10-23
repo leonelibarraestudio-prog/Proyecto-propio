@@ -1,6 +1,9 @@
+export type LiveEventsHeroSide = 'PLAYER' | 'OPPONENT';
+
 export interface LiveEventsHeroRef {
   id: string;
   name: string | null;
+  side: LiveEventsHeroSide | null;
 }
 
 export interface LiveEventsNarrativeLine {
@@ -18,6 +21,7 @@ export interface LiveEventItem {
   actor: LiveEventsHeroRef | null;
   targets: LiveEventsHeroRef[];
   targetSideCode: string | null;
+  targetTeamSide: string | null;
   actionName: string | null;
   actionCode: string | null;
   damage: number | null;
@@ -26,7 +30,6 @@ export interface LiveEventItem {
   abilityPoints: number | null;
   energy: number | null;
   strategyCode: string | null;
-  targetTeamSide: string | null;
   statCode: string | null;
   percent: number | null;
   duration: number | null;
