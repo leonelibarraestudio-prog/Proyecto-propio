@@ -12,7 +12,7 @@
 .live-events-page {
   height: 100%;
   overflow-y: auto;
-  padding: 24px;
+  padding: -28px;
   color: var(--color-text);
   background:
     radial-gradient(ellipse at 15% 30%, rgba(24, 75, 130, 0.75), transparent 55%),
@@ -404,7 +404,7 @@ img.live-events-emblem {
   padding: 16px 20px 20px;
   background:
     linear-gradient(rgba(5, 12, 24, 0.82), rgba(5, 12, 24, 0.82)),
-    url('/assets/live-events/doom.png') center / cover no-repeat;
+    url('/assets/live-events/doom-phase.png') center / cover no-repeat;
   border: 1px solid #2b4560;
   border-left: 3px solid #ef4052;
 }
@@ -558,10 +558,6 @@ img.live-events-emblem {
   text-transform: uppercase;
 }
 
-.live-event-speaker::after {
-  content: ':';
-}
-
 .live-event-facts {
   display: flex;
   flex-wrap: wrap;
@@ -675,5 +671,141 @@ img.live-events-emblem {
 
   .live-events-header:hover .live-events-photo img {
     transform: none;
+  }
+}
+/* Cards de hablante */
+.live-avatar {
+  --side: #5d7a95;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  overflow: hidden;
+  border: 2px solid var(--side);
+  border-radius: 50%;
+  background: #0a1727;
+}
+
+.live-avatar-small {
+  width: 48px;
+  height: 48px;
+  border-width: 1px;
+}
+
+.live-avatar[data-side='player'],
+.live-dialogue[data-side='player'] {
+  --side: #3aa9b5;
+}
+
+.live-avatar[data-side='opponent'],
+.live-dialogue[data-side='opponent'] {
+  --side: #ef4052;
+}
+
+.live-avatar[data-side='narrator'],
+.live-dialogue[data-side='narrator'] {
+  --side: #d4a75b;
+}
+
+.live-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.live-avatar-initial {
+  color: var(--side);
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.live-dialogue {
+  --side: #5d7a95;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 82%;
+}
+
+.live-dialogue[data-side='opponent'] {
+  flex-direction: row-reverse;
+  margin-left: auto;
+  text-align: right;
+}
+
+.live-dialogue[data-side='narrator'] {
+  margin-inline: auto;
+}
+
+.live-dialogue-bubble {
+  min-width: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--side);
+  border-left-width: 3px;
+  background: rgba(6, 14, 26, 0.7);
+}
+
+.live-dialogue[data-side='opponent'] .live-dialogue-bubble {
+  border-right-width: 3px;
+  border-left-width: 1px;
+}
+
+.live-dialogue-bubble .live-event-speaker {
+  display: block;
+  margin: 0 0 2px;
+  color: var(--side);
+}
+
+@media (max-width: 700px) {
+  .live-dialogue {
+    max-width: 100%;
+  }
+}
+
+/* Panel de estado fijo */
+.live-events-summary {
+  position: sticky;
+  top: -28px;
+  z-index: 5;
+  background-color: #081421;
+  box-shadow:
+    inset 0 1px rgba(255, 255, 255, 0.05),
+    0 12px 24px rgba(0, 0, 0, 0.45);
+}
+
+@media (max-height: 800px) {
+  .live-events-summary {
+    padding: 10px 16px;
+  }
+
+  .live-events-summary-header {
+    margin-bottom: 8px;
+  }
+
+  .live-events-stat {
+    min-height: 52px;
+    padding: 6px 12px;
+  }
+
+  .live-events-stat strong {
+    font-size: 16px;
+  }
+
+  .live-events-stat-team strong {
+    font-size: 18px;
+  }
+
+  img.live-events-emblem {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 700px) {
+  .live-events-summary {
+    position: static;
   }
 }
