@@ -1,6 +1,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { GameApiService } from './game-api.service';
+
 import {
   FinalAssignedTeamCatalogApi,
   FinalCurrentJourneyApi,
@@ -13,17 +14,22 @@ import {
   FinalJourneyEncountersApi,
   FinalStageApi,
   FinalStageEventsApi,
-  EtapasDelJourneyApi,
+  FinalAbilityApi,
 } from './model/game-api/final-contract.model';
+
+import { EtapasDelJourneyApi } from './model/game-api/etapas-del-journey-api.model';
+
 import {
   HeroCatalogApi,
   RelationshipCatalogApi,
 } from './model/game-api/hero-catalog.model';
+
 import {
   CurrentJourneyApi,
   JourneySpendingStrategy,
   SimulateJourneyApi,
 } from './model/game-api/journey.model';
+
 import { TeamProfileApi } from './model/game-api/team-profile.model';
 import { TeamConfigurationReadApi } from './model/game-api/team-configuration.model';
 
@@ -232,9 +238,7 @@ export class GameFeatureApiService {
     );
   }
 
-  private ability(
-    ability: import('./model/game-api/final-contract.model').FinalAbilityApi,
-  ) {
+  private ability(ability: FinalAbilityApi) {
     return {
       id: ability.id,
       name: ability.name,
