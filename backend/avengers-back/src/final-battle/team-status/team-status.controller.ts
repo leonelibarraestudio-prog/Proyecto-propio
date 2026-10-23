@@ -10,8 +10,8 @@ export class TeamStatusController extends AbstractController {
     super();
   }
 
-@Get()
-async getTeamStatus() {
-  return this.createOkResponse(await this.teamstatusService.getTeamStatus())
-};
+  @Get()
+  async getTeamStatus() {
+    return this.createOkResponse(await this.teamstatusService.getTeamStatus());
+  }
 }

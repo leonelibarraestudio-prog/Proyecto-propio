@@ -1,10 +1,196 @@
-<main class="student-feature-shell">
-  <h1>Estado del Equipo</h1>
-  <p *ngIf="pageState.status === 'loading'">
-    Cargando estado de la Final...
+<main class="student-feature-shell" [attr.aria-busy]="pageState.status === 'loading'">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">{{ i18n.t('r11.caption') }}</p>
+      <h1>{{ i18n.t('r11.title') }}</h1>
+      <p class="subtitle">{{ i18n.t('r11.subtitle') }}</p>
+    </div>
+
+    <button type="button" (click)="onRefresh()" [disabled]="pageState.status === 'loading'">
+      {{ i18n.t('r9.refresh') }}
+    </button>
+  </header>
+
+  <p *ngIf="pageState.status === 'loading'" class="notice" role="status">
+    {{ i18n.t('loading') }}
   </p>
-  <p *ngIf="pageState.status === 'error'">
-    {{pageState.error}}
-  </p>
-  <pre *ngIf="pageState.status === 'data'">{{pageState.data | json}}</pre>
+
+  <section *ngIf="pageState.status === 'error'" class="notice error" role="alert">
+    <h2>{{ i18n.t('error') }}</h2>
+    <p>{{ pageState.error }}</p>
+  </section>
+
+  <section *ngIf="pageState.status === 'empty'" class="notice">
+    <h2>{{ i18n.t('noJourney') }}</h2>
+    <p>{{ i18n.t('r5.noJourneyCopy') }}</p>
+    <a routerLink="/journey/simulate">
+      {{ i18n.t('simulateJourney') }}
+    </a>
+  </section>
+
+  <ng-container *ngIf="pageState.data as teamStatus">
+    <section class="battle-summary" aria-labelledby="battle-summary-title">
+      <h2 id="battle-summary-title">
+        {{ teamStatus.finalStage.phaseLabel }}
+      </h2>
+
+      <dl class="facts">
+        <div>
+          <dt>{{ i18n.t('status') }}</dt>
+          <dd>{{ codeLabel(teamStatus.finalStage.status) }}</dd>
+        </div>
+
+        <div>
+          <dt>{{ i18n.t('r11.turn') }}</dt>
+          <dd>{{ teamStatus.finalStage.normalTurn }}</dd>
+        </div>
+
+        <div>
+          <dt>{{ i18n.text('Turn state', 'Estado del turno') }}</dt>
+          <dd>{{ codeLabel(teamStatus.finalStage.turnState) }}</dd>
+        </div>
+      </dl>
+
+      <p *ngIf="teamStatus.finalStage.completion as completion" class="completion" role="status">
+        {{ i18n.t('r9.result') }}:
+        {{ codeLabel(completion.outcomeCode) }}
+        · {{ codeLabel(completion.terminalReasonCode) }}
+      </p>
+    </section>
+
+    <section *ngIf="!teamStatus.teams" class="notice" role="status">
+      <h2>{{ i18n.t('r11.noBattle') }}</h2>
+      <p>
+        {{
+          teamStatus.finalStage.status === 'READY'
+            ? i18n.t('r11.waitingForStart')
+            : i18n.t('r11.noBattleCopy')
+        }}
+      </p>
+    </section>
+
+    <div *ngIf="teamStatus.teams as teams" class="teams-grid">
+      <ng-container
+        *ngTemplateOutlet="
+          teamPanel;
+          context: {
+            $implicit: teams.player,
+            title: i18n.t('r11.playerSide'),
+            panelId: 'player-team',
+          }
+        "
+      >
+      </ng-container>
+
+      <ng-container
+        *ngTemplateOutlet="
+          teamPanel;
+          context: {
+            $implicit: teams.opponent,
+            title: i18n.t('r11.opponentSide'),
+            panelId: 'opponent-team',
+          }
+        "
+      >
+      </ng-container>
+    </div>
+  </ng-container>
+
+  <ng-template #teamPanel let-team let-title="title" let-panelId="panelId">
+    <article class="team-panel" [attr.aria-labelledby]="panelId">
+      <header class="team-header">
+        <h2 [id]="panelId">{{ title }}</h2>
+        <p class="team-id">{{ team.teamId }}</p>
+      </header>
+
+      <dl class="facts team-resources">
+        <div>
+          <dt>{{ i18n.t('r11.strategy') }}</dt>
+          <dd>{{ codeLabel(team.strategyCode) }}</dd>
+        </div>
+
+        <div>
+          <dt>{{ i18n.text('Synergy', 'Sinergia') }}</dt>
+          <dd>{{ codeLabel(team.synergyCode) }}</dd>
+        </div>
+
+        <div>
+          <dt>{{ i18n.t('r11.teamActions') }}</dt>
+          <dd>{{ team.teamActionsRemaining }}</dd>
+        </div>
+
+        <div>
+          <dt>{{ i18n.t('r11.leaderUses') }}</dt>
+          <dd>{{ team.leaderAbilityUsesRemaining }}</dd>
+        </div>
+
+        <div>
+          <dt>
+            {{ i18n.text('Strategy changes remaining', 'Cambios de estrategia restantes') }}
+          </dt>
+          <dd>{{ team.strategyChangesRemaining }}</dd>
+        </div>
+      </dl>
+
+      <section
+        *ngFor="let group of formationGroups(team); trackBy: trackGroup"
+        class="formation"
+        [attr.aria-labelledby]="panelId + '-' + group.code"
+      >
+        <h3 [id]="panelId + '-' + group.code">
+          {{ group.label }}
+        </h3>
+
+        <ul class="heroes-grid">
+          <li
+            *ngFor="let hero of group.heroes; trackBy: trackHero"
+            class="hero-card"
+            [class.knocked-out]="hero.condition === 'KO'"
+          >
+            <h4>
+              {{ hero.displayName }}
+              <span *ngIf="hero.heroId === team.leaderId" class="badge">
+                {{ i18n.t('teamConfig.leader') }}
+              </span>
+            </h4>
+
+            <p class="condition">
+              {{ conditionLabel(hero.condition) }}
+            </p>
+
+            <p *ngIf="group.code === 'OTHER'">
+              {{ hero.status }}
+            </p>
+
+            <dl class="hero-resources">
+              <div>
+                <dt>{{ i18n.t('r11.energy') }}</dt>
+                <dd>{{ hero.currentEnergy }} / {{ hero.maximumEnergy }}</dd>
+              </div>
+
+              <div>
+                <dt>{{ i18n.t('r11.abilityPoints') }}</dt>
+                <dd>
+                  {{ hero.currentAbilityPoints }} /
+                  {{ hero.maximumAbilityPoints }}
+                </dd>
+              </div>
+
+              <div *ngIf="hero.returnAtTurn > 0">
+                <dt>
+                  {{ i18n.text('Return turn', 'Turno de retorno') }}
+                </dt>
+                <dd>{{ hero.returnAtTurn }}</dd>
+              </div>
+            </dl>
+          </li>
+        </ul>
+      </section>
+
+      <p *ngIf="team.vacantActiveHeroIds.length > 0" class="notice">
+        {{ i18n.text('Vacant active positions', 'Posiciones activas vacantes') }}:
+        {{ team.vacantActiveHeroIds.join(', ') }}
+      </p>
+    </article>
+  </ng-template>
 </main>

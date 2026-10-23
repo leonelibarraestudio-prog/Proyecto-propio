@@ -372,4 +372,18 @@ controller → service
 ## Documentación de cambios R11:
 Checkpoint 2 — R11: Se implementó el endpoint GET /gameCore/final-stage/status y su consumo desde el Service de Angular. La solicitud del Frontend no requiere body ni parámetros; el Backend obtiene el equipo y el idioma de su configuración y consulta la Game API enviando lang. Se verificó una respuesta HTTP 200 con el envoltorio estándar y datos reales descritos por FinalStageStateApi, su visualización en pantalla y la ausencia de errores en consola. También se verificó que el Backend informa JOURNEY_REQUIRED cuando no existe un Journey. Angular dispone de un mensaje genérico ante errores de consulta. Ambos proyectos compilan. El alcance actual incluye el estado general de la Final; los equipos y sus recursos quedan pendientes para completar R11.
 
+Checkpoint 3 — R11: Se amplió `GET /gameCore/final-stage/status` para combinar el estado general de la Final, los datos tácticos de ambos equipos y los nombres del catálogo de héroes. La respuesta contiene `finalStage` y `teams`; cuando los equipos todavía no están disponibles, `teams` es `null`.
+
+La pantalla Angular reemplaza el JSON por una vista con HTML semántico y CSS propio adaptable. Muestra ambos equipos, héroes agrupados por formación, líderes, condición, energía, puntos de habilidad, estrategia, sinergia y recursos tácticos publicados por la Game API.
+
+Se incorporaron actualización manual, estados de carga, error y ausencia de Journey, mensajes de espera de inicio y presentación del resultado terminal. Las etiquetas utilizan el servicio de localización del proyecto.
+
+Se verificaron una Final activa, una Final completada por abandono,
+una Final pendiente de inicio y la recuperación ante una interrupción
+de conexión. Ambos proyectos compilan y las 15 pruebas existentes de
+Angular pasan. Los checks de lint del Frontend y del Backend finalizaron sin errores. El script de test del Backend ejecuta su compilación.
+
+R11 conserva un alcance de consulta: las reglas, acciones legales y
+resultados permanecen bajo la autoridad de la Game API.
+
 *Programación III — UTN — 2026*
