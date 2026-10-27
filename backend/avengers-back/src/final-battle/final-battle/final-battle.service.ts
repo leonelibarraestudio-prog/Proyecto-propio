@@ -153,7 +153,7 @@ export class FinalBattleService {
 
       // Handle errors when loading the final battle.
     } catch (error) {
-      throw ErrorUtils.mapGameApiError(
+      ErrorUtils.mapGameApiError(
         error,
         {},
         {
@@ -164,6 +164,7 @@ export class FinalBattleService {
     }
   }
 
+  // Validate and prepare the player's battle command.
   async play(request: PlayFinalBattleRequest): Promise<BattleReceipt> {
     let command: BattleCommand;
     if (request.type === 'CHOOSE_ACTION') {
@@ -178,6 +179,23 @@ export class FinalBattleService {
       command = { type: request.type };
     }
 
-    //To do
+    // Send the battle command to the Game API and handle errors.
+    const teamId = this.context.getCurrentTeamId();
+    try {
+      return await this.game.post<BattleReceipt>(
+        `/teams/${teamId}/journeys/current/final-stage/play`,
+        command,
+        { lang: this.context.language },
+      );
+    } catch (error) {
+      ErrorUtils.mapGameApiError(
+        error,
+        {},
+        {
+          messageCode: 'FINAL_BATTLE_COMMAND_FAILED',
+          message: 'Unable to confirm the battle command.',
+        },
+      );
+    }
   }
 }
