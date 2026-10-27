@@ -8,7 +8,7 @@ import {
 } from './final-battle.model';
 
 // Final battle state returned by the Game API, including optional Doom data.
-export interface FinalStageApi extends BattleState {
+export interface FinalStateApi extends BattleState {
   doom?: BattleSpecialState;
   opponentAlignmentCode?: string;
   revealEventSequence?: number;
@@ -20,12 +20,22 @@ export interface FinalTeamApi extends Omit<BattleTeam, 'name' | 'strategyLabel' 
   heroes: Omit<BattleHero, 'name'>[];
 }
 
+// Player and opponent teams received from the Game API.
+export interface FinalTeamsApi {
+  variant: string;
+  attemptId: string;
+  player: FinalTeamApi;
+  opponent: FinalTeamApi;
+  doom?: BattleSpecialState;
+}
+
 // Available battle actions and current turn data received from the Game API.
 export interface FinalActionsApi {
   attemptId: string;
   phase: string;
   normalTurn: number;
   language: string;
+
   // Use BattleAction without targetLabel or formationLabel.
   actions: Omit<BattleAction, 'targetLabel' | 'formationLabel'>[];
 }
