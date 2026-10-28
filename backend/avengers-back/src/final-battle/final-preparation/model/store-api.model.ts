@@ -69,5 +69,37 @@ export interface UsedItemApi {
 export interface FinalPreparationModel {
   balance: number;
   powerUps: PowerUpApi[];
-  inventory: PreparationInventoryItem[];
+  inventory: PreparationInventoryItem[]
+  heroes: PreparationHero[];
+}
+
+export interface JourneyHeroApi {
+  heroId: string;
+  currentEnergy: number;
+  currentAbilityPoints: number;
+  status: string;
+  knockedOut: boolean;
+}
+
+export interface JourneyTeamApi {
+  teamId: string;
+  heroes: JourneyHeroApi[];
+}
+
+export interface JourneyTeamsApi {
+  teams: JourneyTeamApi[];
+  finalists: { playerTeamId: string; opponentTeamId: string };
+}
+
+export interface HeroIdentityCatalogApi {
+  heroes: { id: string; displayName: string }[];
+}
+
+export interface PreparationHero {
+  heroId: string;
+  name: string;
+  status: string;
+  knockedOut: boolean;
+  energy: number;
+  abilityPoints: number;
 }

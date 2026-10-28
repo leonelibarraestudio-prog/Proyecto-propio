@@ -3,9 +3,12 @@ import { GameApiService } from '../../basic/game-api.service';
 import { ApplicationContextService } from '../../basic/services/application-context.service';
 import {
   FinalPreparationModel,
+  HeroIdentityCatalogApi,
   InventoryApi,
+  JourneyTeamsApi,
   PowerUpApi,
   PowerUpCatalogApi,
+  PreparationHero,
   PreparationInventoryItem,
   PurchaseApi,
   RewardsApi,
@@ -26,15 +29,18 @@ constructor(
   async getPreparation(): Promise<FinalPreparationModel> {
     const teamId = this.context.getCurrentTeamId();
     const lang = this.context.language;
-    const [rewards, inventory, catalog] = await Promise.all([
+    const [rewards, inventory, catalog, journeyTeams, heroCatalog] = await Promise.all([
       this.api.get<RewardsApi>(`/teams/${teamId}/journeys/current/rewards`),
       this.api.get<InventoryApi>(`/teams/${teamId}/journeys/current/inventory`),
       this.api.get<PowerUpCatalogApi>('/reference/power-ups', { teamId, lang }),
+      this.api.get<JourneyTeamsApi>(`/teams/${teamId}/journeys/current/teams`),
+      this.api.get<HeroIdentityCatalogApi>('/heroes', { lang }),
     ]);
     return {
       balance: rewards.balance,
       powerUps: catalog.powerUps,
       inventory: this.describeInventory(inventory, catalog.powerUps),
+      heroes: this.describeHeroes(journeyTeams, heroCatalog),
     };
   }
 
@@ -72,7 +78,27 @@ constructor(
         targetScope: definition?.targetScope ?? 'HERO',
       };
     });
-
   }
+
+  private describeHeroes(
+    journeyTeams: JourneyTeamsApi,
+    heroCatalog: HeroIdentityCatalogApi,
+  ): PreparationHero[] {
+      const playerTeam = journeyTeams.teams.find(
+        (team) => team.teamId === journeyTeams.finalists.playerTeamId,
+      );
+    if (!playerTeam) {
+    return [];
+  }
+    return playerTeam.heroes.map((hero) => ({
+      heroId: hero.heroId,
+      name: heroCatalog.heroes.find((identity) => identity.id === hero.heroId)?.displayName ?? hero.heroId,
+      status: hero.status,
+      knockedOut: hero.knockedOut,
+      energy: hero.currentEnergy,
+      abilityPoints: hero.currentAbilityPoints,
+    }));
+}
+
 }  
 
