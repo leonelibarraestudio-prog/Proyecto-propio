@@ -603,7 +603,7 @@ button.path-stop {
 
 .stat dt {
   color: #c6d3df;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1.08;
   letter-spacing: 0.15px;
@@ -612,7 +612,7 @@ button.path-stop {
 
 .stat dd {
   margin: 1px 0 0;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   line-height: 1.08;
   overflow-wrap: anywhere;
@@ -878,4 +878,22 @@ button.path-stop {
     flex: 0 0 60px;
     width: 60px;
   }
+}
+
+/* Show the final result with the same visual emphasis as other battles. */
+.path-list:has(.path-stop.selected) .final-stop.win,
+.path-list:has(.path-stop.selected) .final-stop.loss {
+  opacity: 1;
+  filter: none;
+}
+
+.final-stop.win .path-face,
+.final-stop.loss .path-face {
+  border-color: var(--result-color);
+  box-shadow: 0 0 9px var(--result-color);
+}
+
+.final-stop.win .path-name,
+.final-stop.loss .path-name {
+  color: var(--result-color);
 }
