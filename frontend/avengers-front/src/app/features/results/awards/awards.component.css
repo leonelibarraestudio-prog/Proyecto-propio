@@ -1,91 +1,55 @@
 .awards-page {
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 32px 24px;
-  color: #f5f5f5;
+  padding: 32px 24px 56px;
+  color: #f5f5f7;
 }
-
-.awards-header {
-  margin-bottom: 32px;
-}
-
-.awards-header h1 {
-  margin: 0 0 10px;
-  font-size: 2rem;
-  font-weight: 700;
-}
-
-.awards-header p {
-  margin: 0;
-  color: #b8b8c2;
-  line-height: 1.6;
-}
-
-.awards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
-
-.award-card {
-  padding: 24px;
-  border: 1px solid #383846;
-  border-radius: 14px;
-  background: #191922;
-}
-
-.award-icon {
-  display: block;
-  margin-bottom: 16px;
-  font-size: 2rem;
-}
-
-.award-card h2 {
-  margin: 0 0 12px;
-  font-size: 1.2rem;
-}
-
-.award-description,
-.award-reason {
-  color: #c5c5cf;
-  line-height: 1.6;
-}
-
-.award-winner {
-  margin-top: 20px;
-  padding-top: 16px;
-  border-top: 1px solid #383846;
-}
-
-.award-winner h3 {
-  font-size: 1rem;
-}
-
-.award-winner pre {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  color: #e8e8f0;
-  font-family: inherit;
-}
-
-.awards-message,
-.awards-error {
-  padding: 20px;
-  border-radius: 10px;
-  background: #191922;
-  line-height: 1.6;
-}
-
-.awards-error {
-  color: #ff9c9c;
-}
-
-@media (max-width: 600px) {
-  .awards-page {
-    padding: 24px 16px;
-  }
-
-  .awards-header h1 {
-    font-size: 1.6rem;
-  }
+.awards-header { margin-bottom: 28px; }
+.awards-header h1 { margin: 4px 0 10px; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; }
+.awards-header > p:last-child, .section-heading p, .muted { color: #b9bac7; line-height: 1.55; }
+.eyebrow { margin: 0 0 6px; color: #a7a8bc; font-size: .72rem; font-weight: 800; letter-spacing: .12em; }
+.journey-summary { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px; margin-bottom: 28px; border: 1px solid #454557; border-radius: 16px; background: linear-gradient(125deg, #202034, #171720); }
+.journey-summary h2 { margin: 0 0 6px; font-size: 1.7rem; }
+.journey-summary p { margin: 0; }
+.summary-meta { display: grid; gap: 8px; font-size: .9rem; overflow-wrap: anywhere; }
+.statistics-section, .awards-section { margin: 32px 0; }
+.section-heading { margin-bottom: 16px; }
+.section-heading h2 { margin: 0 0 6px; font-size: 1.45rem; }
+.section-heading p { margin: 0; }
+.statistics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.stat-card { display: flex; flex-direction: column; justify-content: space-between; min-height: 88px; gap: 14px; padding: 17px; border: 1px solid #383846; border-radius: 12px; background: #191922; }
+.stat-card span { color: #b9bac7; font-size: .86rem; }
+.stat-card strong { font-size: 1.55rem; overflow-wrap: anywhere; }
+.awards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; }
+.award-card { min-width: 0; padding: 22px; border: 1px solid #3d3d4e; border-radius: 16px; background: #191922; }
+.award-title-row { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 14px; }
+.award-icon { font-size: 1.8rem; }
+.award-title-row h3 { margin: 0; font-size: 1.15rem; }
+.award-description, .award-reason { color: #c7c7d1; line-height: 1.55; }
+.award-winner { display: flex; align-items: center; gap: 14px; margin-top: 18px; padding: 14px; border-radius: 12px; background: #242432; }
+.award-winner img, .hero-stat-row img { width: 68px; height: 68px; flex: 0 0 68px; object-fit: cover; border-radius: 12px; background: #30303d; }
+.winner-label { color: #a7a8bc; font-size: .68rem; font-weight: 800; letter-spacing: .1em; }
+.award-winner h4 { margin: 4px 0; font-size: 1.05rem; }
+.award-winner p { margin: 0; font-size: .82rem; }
+.award-metric { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+.award-metric span { padding: 6px 9px; border-radius: 7px; background: #292938; color: #d6d6e0; font-size: .82rem; }
+.award-metric strong { padding: 6px 10px; border-radius: 7px; background: #3a3150; color: #f0e6ff; font-size: 1rem; }
+.no-winner { margin-top: 18px; padding: 12px; border: 1px dashed #555568; border-radius: 10px; color: #c7c7d1; line-height: 1.5; }
+.award-reason { margin-bottom: 0; }
+.awards-message { padding: 20px; border: 1px solid #383846; border-radius: 12px; background: #191922; line-height: 1.6; }
+.awards-message h2, .awards-message h3 { margin-top: 0; }
+.awards-error { border-color: #82464b; color: #ffc4c4; }
+.awards-unavailable { border-color: #76613a; color: #f1d9a2; }
+.retry-button { margin-top: 10px; padding: 10px 14px; border: 1px solid #65657a; border-radius: 8px; background: #2a2a3a; color: #fff; cursor: pointer; }
+.hero-stats-list { display: grid; gap: 12px; }
+.hero-stat-row { display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #383846; border-radius: 12px; background: #191922; }
+.hero-stat-content { min-width: 0; }
+.hero-stat-content h3 { margin: 0 0 5px; }
+.hero-stat-content p { margin: 0 0 8px; color: #b9bac7; font-size: .88rem; }
+.hero-stat-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.hero-stat-chips span { padding: 5px 8px; border-radius: 7px; background: #292938; color: #d6d6e0; font-size: .8rem; }
+@media (max-width: 640px) {
+  .awards-page { padding: 24px 15px 40px; }
+  .journey-summary { align-items: flex-start; flex-direction: column; padding: 18px; }
+  .summary-meta { font-size: .82rem; }
 }
