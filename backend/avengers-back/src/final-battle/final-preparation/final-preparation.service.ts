@@ -9,8 +9,11 @@ import {
   PreparationInventoryItem,
   PurchaseApi,
   RewardsApi,
+  UsedItemApi
 } from './model/store-api.model';
-import { PurchasePowerUpRequest } from './request/purchase-power-up.request';
+import { PurchasePowerUpRequest,  } from './request/purchase-power-up.request';
+import { UsePowerUpRequest } from './request/use-power-up.request';
+import { request } from 'node_modules/axios/index.cjs';
 
 
 @Injectable()
@@ -35,6 +38,18 @@ constructor(
     };
   }
 
+  async useItem(request: UsePowerUpRequest): Promise<FinalPreparationModel> {
+    const teamId = this.context.getCurrentTeamId();
+    const body = request.targetHeroId
+    ? { itemId: request.itemId, targetHeroId: request.targetHeroId }
+    : { itemId: request.itemId };
+    await this.api.post<UsedItemApi>(
+      `/teams/${teamId}/journeys/current/preparation/items`,
+      body,
+    );
+    return this.getPreparation();
+  }
+
   async purchase(request: PurchasePowerUpRequest): Promise<FinalPreparationModel> {
   const teamId = this.context.getCurrentTeamId();
     await this.api.post<PurchaseApi>(`/teams/${teamId}/journeys/current/purchases`, {
@@ -57,6 +72,7 @@ constructor(
         targetScope: definition?.targetScope ?? 'HERO',
       };
     });
+
   }
 }  
 

@@ -5,6 +5,8 @@ import { ResponseObject } from '../../basic/response-object.interface';
 import { FinalPreparationModel } from './model/store-api.model';
 import { FinalPreparationService } from './final-preparation.service';
 import { PurchasePowerUpRequest } from './request/purchase-power-up.request';
+import { request } from 'node_modules/axios/index.cjs';
+import { UsePowerUpRequest } from './request/use-power-up.request';
 
 @ApiTags('final-preparation')
 @Controller('final-stage/preparation')
@@ -25,5 +27,13 @@ export class FinalPreparationController extends AbstractController {
     @Body() request: PurchasePowerUpRequest,
   ): Promise<ResponseObject<FinalPreparationModel>> {
     return this.createOkResponse(await this.finalPreparationService.purchase(request));
+  }
+
+  @Post('items')
+  @ApiOperation({ summary: 'use one owned power-up, with a Hero target when it requires one.' })
+  async useItem(
+    @Body() request: UsePowerUpRequest,
+  ): Promise<ResponseObject<FinalPreparationModel>> {
+    return this.createOkResponse(await this.finalPreparationService.useItem(request));
   }
 }

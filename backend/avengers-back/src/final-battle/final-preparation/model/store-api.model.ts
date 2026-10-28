@@ -59,6 +59,13 @@ export interface PreparationInventoryItem {
   targetScope: 'HERO' | 'TEAM';
 }
 
+export interface UsedItemApi {
+  teamId: string;
+  items: InventoryItemApi[];
+  usedItemId: string;
+  targetHeroId: string | null;
+}
+
 export interface FinalPreparationModel {
   balance: number;
   powerUps: PowerUpApi[];
