@@ -1,6 +1,8 @@
 
 export interface KnockoutStageMatch {
   slot: number;
+  damageByTeam?: Array<{ teamId: string; damageDealt: number }>;
+  resolutionCode?: string | null;
   encounterId: string;
   teamAId: string;
   teamBId: string;

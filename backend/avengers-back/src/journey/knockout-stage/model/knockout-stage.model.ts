@@ -1,3 +1,7 @@
+import type {
+  DanoDeEquipoApi,
+  ResultadoDeEncuentroApi,
+} from '../../../basic/model/game-api/encuentros-del-journey-api.model';
 
 export interface KnockoutStageMatch {
   slot: number;
@@ -7,6 +11,11 @@ export interface KnockoutStageMatch {
   winnerTeamId: string | null;
   nextStageCode: string | null;
   nextSlot: number | null;
+
+  // Detalles oficiales del encuentro, si están publicados por Game API.
+  resolutionCode?: string | null;
+  results?: ResultadoDeEncuentroApi[];
+  damageByTeam?: DanoDeEquipoApi[];
 }
 
 export interface KnockoutStageRound {
