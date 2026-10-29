@@ -242,6 +242,7 @@ export class FinalBattleService {
   // Group legal actions by hero and tab to display similar options together.
   private buildGroups(): void {
     const groups: BattleActionGroup[] = [];
+    const groupsByKey = new Map<string, BattleActionGroup>();
 
     // Check each action and skip those from another tab or hero.
     for (const action of this.data?.actions ?? []) {
@@ -271,7 +272,7 @@ export class FinalBattleService {
       ]);
 
       // Find the matching group, or create a new one.
-      let group = groups.find((entry) => entry.key === key);
+      let group = groupsByKey.get(key);
 
       if (!group) {
         group = {
@@ -281,6 +282,7 @@ export class FinalBattleService {
           options: [],
         };
         groups.push(group);
+        groupsByKey.set(key, group);
       }
 
       // Add each action to its group, then save all groups for the screen.
