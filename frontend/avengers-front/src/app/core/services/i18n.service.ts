@@ -461,7 +461,41 @@ export type AppCopyKey =
   | 'r13.noDetails'
   | 'r13.notRecorded'
   | 'r13.strategy'
-  | 'r13.backToHistory';
+  | 'r13.backToHistory'
+  | 'r13.totalAttempts'
+  | 'r13.victories'
+  | 'r13.defeats'
+  | 'r13.abandoned'
+  | 'r13.outcomeVictory'
+  | 'r13.outcomeDefeat'
+  | 'r13.outcomeAbandon'
+  | 'r13.strategySave'
+  | 'r13.strategyBalanced'
+  | 'r13.strategyAggressive'
+  | 'r13.stagesCompleted'
+  | 'r13.encountersPlayed'
+  | 'r13.leader'
+  | 'r13.heroes'
+  | 'r13.active'
+  | 'r13.inactive'
+  | 'r13.knockedOut'
+  | 'r13.eliminated'
+  | 'r13.statistics'
+  | 'r13.statisticsUnavailable'
+  | 'r13.tournamentEncounters'
+  | 'r13.encounters'
+  | 'r13.wins'
+  | 'r13.draws'
+  | 'r13.losses'
+  | 'r13.damageDealt'
+  | 'r13.damageReceived'
+  | 'r13.kosCaused'
+  | 'r13.kosSuffered'
+  | 'r13.winner'
+  | 'r13.noWinner'
+  | 'r13.events'
+  | 'r13.noEvents'
+  | 'r13.showMore';
 
 const DICTIONARY: Record<AppLanguage, Record<AppCopyKey, string>> = {
   en: {
@@ -923,6 +957,40 @@ const DICTIONARY: Record<AppLanguage, Record<AppCopyKey, string>> = {
     'r13.notRecorded': 'Not recorded',
     'r13.strategy': 'SPENDING STRATEGY',
     'r13.backToHistory': 'BACK TO HISTORY',
+        'r13.totalAttempts': 'JOURNEYS',
+    'r13.victories': 'VICTORIES',
+    'r13.defeats': 'DEFEATS',
+    'r13.abandoned': 'ABANDONED',
+    'r13.outcomeVictory': 'Victory',
+    'r13.outcomeDefeat': 'Defeat',
+    'r13.outcomeAbandon': 'Abandoned',
+    'r13.strategySave': 'Save',
+    'r13.strategyBalanced': 'Balanced',
+    'r13.strategyAggressive': 'Aggressive',
+    'r13.stagesCompleted': 'STAGES COMPLETED',
+    'r13.encountersPlayed': 'ENCOUNTERS PLAYED',
+    'r13.leader': 'LEADER',
+    'r13.heroes': 'HEROES',
+    'r13.active': 'Active',
+    'r13.inactive': 'Inactive',
+    'r13.knockedOut': 'Knocked out',
+    'r13.eliminated': 'Eliminated',
+    'r13.statistics': 'STATISTICS',
+    'r13.statisticsUnavailable': 'Statistics are not available for this Journey.',
+    'r13.tournamentEncounters': 'TOURNAMENT ENCOUNTERS',
+    'r13.encounters': 'ENCOUNTERS',
+    'r13.wins': 'WINS',
+    'r13.draws': 'DRAWS',
+    'r13.losses': 'LOSSES',
+    'r13.damageDealt': 'DAMAGE DEALT',
+    'r13.damageReceived': 'DAMAGE RECEIVED',
+    'r13.kosCaused': 'KOs CAUSED',
+    'r13.kosSuffered': 'KOs SUFFERED',
+    'r13.winner': 'WINNER',
+    'r13.noWinner': 'No eligible winner',
+    'r13.events': 'EVENT LOG',
+    'r13.noEvents': 'No events recorded.',
+    'r13.showMore': 'SHOW MORE ({count} remaining)',
   },
   es: {
     loading: 'Cargando…',
@@ -1386,6 +1454,40 @@ const DICTIONARY: Record<AppLanguage, Record<AppCopyKey, string>> = {
     'r13.notRecorded': 'Sin registro',
     'r13.strategy': 'ESTRATEGIA DE GASTO',
     'r13.backToHistory': 'VOLVER AL HISTORIAL',
+    'r13.totalAttempts': 'CAMINOS',
+    'r13.victories': 'VICTORIAS',
+    'r13.defeats': 'DERROTAS',
+    'r13.abandoned': 'ABANDONADOS',
+    'r13.outcomeVictory': 'Victoria',
+    'r13.outcomeDefeat': 'Derrota',
+    'r13.outcomeAbandon': 'Abandono',
+    'r13.strategySave': 'Ahorrar',
+    'r13.strategyBalanced': 'Equilibrada',
+    'r13.strategyAggressive': 'Agresiva',
+    'r13.stagesCompleted': 'ETAPAS COMPLETADAS',
+    'r13.encountersPlayed': 'ENCUENTROS JUGADOS',
+    'r13.leader': 'LÍDER',
+    'r13.heroes': 'HÉROES',
+    'r13.active': 'Activo',
+    'r13.inactive': 'Inactivo',
+    'r13.knockedOut': 'Fuera de combate',
+    'r13.eliminated': 'Eliminado',
+    'r13.statistics': 'ESTADÍSTICAS',
+    'r13.statisticsUnavailable': 'Las estadísticas no están disponibles para este Camino.',
+    'r13.tournamentEncounters': 'ENCUENTROS DEL TORNEO',
+    'r13.encounters': 'ENCUENTROS',
+    'r13.wins': 'VICTORIAS',
+    'r13.draws': 'EMPATES',
+    'r13.losses': 'DERROTAS',
+    'r13.damageDealt': 'DAÑO CAUSADO',
+    'r13.damageReceived': 'DAÑO RECIBIDO',
+    'r13.kosCaused': 'KO CAUSADOS',
+    'r13.kosSuffered': 'KO RECIBIDOS',
+    'r13.winner': 'GANADOR',
+    'r13.noWinner': 'Sin ganador elegible',
+    'r13.events': 'REGISTRO DE EVENTOS',
+    'r13.noEvents': 'No hay eventos registrados.',
+    'r13.showMore': 'VER MÁS ({count} restantes)',
   },
 };
 
