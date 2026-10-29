@@ -25,6 +25,7 @@ export interface HistoryRivalsHero {
   id: string;
   name: string;
   rivals: string[];
+  rivalNames?: Record<string, string>;
 }
 
 export interface HistoryRivalsRelationship {
@@ -81,6 +82,8 @@ export interface HistoryRivalsViewModel {
 export class HistoryRivalsService extends BaseApiService {
   selectedAttemptId: string | null = null;
 
+  private requestVersion = 0;
+
   private readonly pageState: HistoryRivalsViewModel = {
     status: 'loading',
     error: null,
@@ -96,20 +99,58 @@ export class HistoryRivalsService extends BaseApiService {
     return this.pageState;
   }
 
+  private clearEncounterResults(): void {
+    if (!this.pageState.data) {
+      return;
+    }
+
+    this.pageState.data = {
+      ...this.pageState.data,
+      teams: [],
+      encounters: [],
+    };
+  }
+
+  private updateStatus(data: HistoryRivalsApi): void {
+    const hasData =
+      (data.items?.length ?? 0) > 0 ||
+      (data.heroes?.length ?? 0) > 0 ||
+      (data.relationships?.length ?? 0) > 0 ||
+      (data.teams?.length ?? 0) > 0 ||
+      (data.encounters?.length ?? 0) > 0;
+
+    this.pageState.status = hasData ? 'data' : 'empty';
+  }
+
   initialize(): void {
+    const requestVersion = ++this.requestVersion;
+
+    this.selectedAttemptId = null;
     this.pageState.status = 'loading';
     this.pageState.error = null;
     this.pageState.errorCode = null;
-    this.selectedAttemptId = null;
+    this.clearEncounterResults();
 
-    this.getData<HistoryRivalsApi>('/my-team/history-rivals').subscribe({
+    this.getData<HistoryRivalsApi>(
+      '/my-team/history-rivals',
+    ).subscribe({
       next: (data) => {
+        if (requestVersion !== this.requestVersion) {
+          return;
+        }
+
         this.pageState.data = data;
-        this.pageState.status =
-          data.items.length > 0 ? 'data' : 'empty';
+        this.pageState.error = null;
+        this.pageState.errorCode = null;
+        this.updateStatus(data);
       },
       error: (error: unknown) => {
+        if (requestVersion !== this.requestVersion) {
+          return;
+        }
+
         const apiError: ApiError = toApiError(error);
+
         this.pageState.status = 'error';
         this.pageState.error = apiError.message;
         this.pageState.errorCode = apiError.messageCode;
@@ -118,22 +159,34 @@ export class HistoryRivalsService extends BaseApiService {
   }
 
   selectJourney(attemptId: string): void {
+    const requestVersion = ++this.requestVersion;
+
     this.selectedAttemptId = attemptId;
     this.pageState.status = 'loading';
     this.pageState.error = null;
     this.pageState.errorCode = null;
+    this.clearEncounterResults();
 
     this.getData<HistoryRivalsApi>(
       `/my-team/history-rivals?attemptId=${encodeURIComponent(attemptId)}`,
     ).subscribe({
       next: (data) => {
+        if (requestVersion !== this.requestVersion) {
+          return;
+        }
+
         this.pageState.data = data;
-        this.pageState.status = 'data';
         this.pageState.error = null;
         this.pageState.errorCode = null;
+        this.updateStatus(data);
       },
       error: (error: unknown) => {
+        if (requestVersion !== this.requestVersion) {
+          return;
+        }
+
         const apiError: ApiError = toApiError(error);
+
         this.pageState.status = 'error';
         this.pageState.error = apiError.message;
         this.pageState.errorCode = apiError.messageCode;

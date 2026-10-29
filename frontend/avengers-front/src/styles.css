@@ -276,7 +276,8 @@ input::placeholder {
 
 /* R4 - Scroll exclusivo para Simular Batallas */
 @media (min-width: 701px) {
-  .application-content:has(.simulate-page) {
+  .application-content:has(.simulate-page),
+  .application-content:has(.history-page) {
     overflow-y: auto;
     overflow-x: hidden;
   }

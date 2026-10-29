@@ -41,6 +41,14 @@ export class HistoryRivalsService {
         configuredHeroIds.includes(relationship.heroBId),
     );
 
+    // Catálogo de nombres legibles usando los identificadores canónicos.
+    const heroNames = new Map<string, string>(
+      heroCatalog.heroes.map((hero) => [
+        hero.id,
+        hero.displayName ?? hero.id,
+      ]),
+    );
+
     const heroes = configuredHeroIds.map((heroId) => {
       const hero = heroCatalog.heroes.find(
         (item) => item.id === heroId,
@@ -52,18 +60,31 @@ export class HistoryRivalsService {
           relationship.heroBId === heroId,
       );
 
+      const rivals = [
+        ...new Set(
+          heroRelationships
+            .filter(
+              (relationship) => relationship.relationship === 'RIVAL',
+            )
+            .map((relationship) =>
+              relationship.heroAId === heroId
+                ? relationship.heroBId
+                : relationship.heroAId,
+            ),
+        ),
+      ];
+
+      const rivalNames: Record<string, string> = {};
+
+      for (const rivalId of rivals) {
+        rivalNames[rivalId] = heroNames.get(rivalId) ?? rivalId;
+      }
+
       return {
         id: heroId,
         name: hero?.displayName ?? heroId,
-        rivals: heroRelationships
-          .filter(
-            (relationship) => relationship.relationship === 'RIVAL',
-          )
-          .map((relationship) =>
-            relationship.heroAId === heroId
-              ? relationship.heroBId
-              : relationship.heroAId,
-          ),
+        rivals,
+        rivalNames,
       };
     });
 
