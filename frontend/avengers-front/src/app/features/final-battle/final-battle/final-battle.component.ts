@@ -7,7 +7,7 @@ import { BattleEvent, BattleHero, BattleTeam } from './model/final-battle-api.in
 @Component({
   selector: 'app-final-battle',
   templateUrl: './final-battle.component.html',
-  styleUrls: ['./final-battle.component.css'],
+  styleUrls: ['./final-battle.component.css', './scene.css'],
   standalone: false,
 })
 export class FinalBattleComponent implements OnInit, OnDestroy {
