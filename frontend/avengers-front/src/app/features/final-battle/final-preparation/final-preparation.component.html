@@ -1,13 +1,13 @@
 <main class="student-feature-shell">
-  <p *ngIf="pageState.status === 'loading'">Cargando...</p>
+  <p *ngIf="pageState.status === 'loading'">{{ i18n.t('loading') }}</p>
   <p *ngIf="pageState.error">{{ pageState.error }}</p>
 
   <section *ngIf="pageState.status === 'data' && pageState.data as preparation">
-    <h2>Puntos disponibles: {{ preparation.balance }}</h2>
+    <h2>{{ i18n.t('r8.rewardPoints') }}: {{ preparation.balance }}</h2>
 
-    <h2>Inventario</h2>
+    <h2>{{ i18n.t('r8.inventory') }}</h2>
     <p *ngIf="preparation.inventory.length === 0">
-      Todavía no tenes ítems en el inventario.
+      {{ i18n.t('r8.emptyInventory') }}
     </p>
     <ul *ngIf="preparation.inventory.length > 0">
       <li *ngFor="let owned of preparation.inventory">
@@ -15,13 +15,13 @@
         <span class="tag">{{ owned.targetScope === 'HERO' ? 'Héroe' : 'Equipo' }}</span>
         <p>{{ owned.description }}</p>
         <button type="button" class="button" [disabled]="pageState.submitting" (click)="startUse(owned)">
-        Usar
+        {{ i18n.t('r8.useItem') }}
         </button>
       </li>
     </ul>
 
     <section *ngIf="selectedItem">
-  <h3>¿Sobre qué Héroe querés usar "{{ selectedItem.name }}"?</h3>
+  <h3>{{ i18n.t('r8.chooseTarget') }} "{{ selectedItem.name }}"?</h3>
   <ul>
     <li *ngFor="let hero of preparation.heroes">
       <button type="button" class="button" [disabled]="pageState.submitting" (click)="useOn(hero.heroId)">
@@ -32,15 +32,42 @@
   <button type="button" class="button-secondary" (click)="cancelUse()">Cancelar</button>
 </section>
 
-<h2>Equipo</h2>
+<h2>{{ i18n.t('r8.teamPreparation') }}</h2>
 <ul>
-  <li *ngFor="let hero of preparation.heroes">
+  <li *ngFor="let hero of preparation.heroes" [class.hero-active]="isActive(hero)">
     <h3>{{ hero.name }}</h3>
-    <span class="tag">{{ hero.status === 'ACTIVE' ? 'En combate' : 'Reserva' }}</span>
+    <span class="tag" *ngIf="hero.heroId === preparation.leaderId">Líder</span>
+    <span class="tag">{{ isActive(hero) ? 'En combate' : 'Reserva' }}</span>
     <p>Energía: {{ hero.energy }} · AP: {{ hero.abilityPoints }}</p>
+    <label>
+      <input
+        type="checkbox"
+        [checked]="isActive(hero)"
+        [disabled]="pageState.submitting"
+        (change)="toggleActive(hero, preparation.heroes)"
+      />
+      En combate
+    </label>
   </li>
 </ul>
-    <h2>Tienda</h2>
+
+<h2>{{ i18n.t('r8.strategy') }}</h2>
+<label for="strategy">Estrategia</label>
+<select id="strategy" [disabled]="pageState.submitting" (change)="selectStrategy($event)">
+  <option
+    *ngFor="let option of preparation.strategies"
+    [value]="option.code"
+    [selected]="option.code === (draftStrategy ?? preparation.strategyCode)"
+  >
+    {{ option.label }}
+  </option>
+</select>
+
+<button type="button" class="button" [disabled]="pageState.submitting" (click)="saveFormation(preparation)">
+  {{ i18n.t('r8.savePreparation') }}
+</button>
+
+    <h2>{{ i18n.t('r8.powerUpStore') }}</h2>
     <ul>
       <li *ngFor="let item of preparation.powerUps">
         <h3>{{ item.name }}</h3>
@@ -48,7 +75,7 @@
         <p>{{ item.description }}</p>
         <p>Precio: {{ item.price }}</p>
         <button type="button" class="button" [disabled]="pageState.submitting" (click)="buy(item.id)">
-          Comprar
+          {{ i18n.t('r8.purchase') }}
         </button>
       </li>
     </ul>

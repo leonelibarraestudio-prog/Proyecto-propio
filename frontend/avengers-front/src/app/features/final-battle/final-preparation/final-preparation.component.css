@@ -2,6 +2,20 @@
   display: block;
 }
 
+.button {
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 ul {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -22,7 +36,22 @@ li {
   padding: 1rem;
 }
 
+li {
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+
+li:hover {
+  border-color: var(--color-action);
+  transform: translateY(-2px);
+}
+
 pre {
   max-height: 95vh;
   overflow: auto;
 }
+
+.hero-active {
+  border-color: var(--color-action);
+  background: var(--color-action-soft);
+}
+

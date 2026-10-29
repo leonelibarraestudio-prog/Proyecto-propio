@@ -4,7 +4,7 @@ import { BaseApiService } from '../../../../core/services/base-api.service';
 import { toApiError } from '../../../../core/models/api-error.interface';
 import { PageState } from '../../../../core/models/page-state.interface';
 import { FinalPreparationApi } from '../model/final-preparation-api.interface';
-import { finalize } from 'rxjs';
+import { finalize, Observable } from 'rxjs';
 
 export interface FinalPreparationViewModel extends PageState {
   data: FinalPreparationApi | null;
@@ -41,23 +41,37 @@ export class FinalPreparationService extends BaseApiService {
   }
   
   purchase(itemId: string): void {
-  this.submit('/final-stage/preparation/purchases', { itemId, quantity: 1 });
+  this.submit(
+    this.postData<FinalPreparationApi>('/final-stage/preparation/purchases', {
+      itemId,
+      quantity: 1,
+    }),
+  );
 }
 
 useItem(itemId: string, targetHeroId?: string): void {
   this.submit(
-    '/final-stage/preparation/items',
-    targetHeroId ? { itemId, targetHeroId } : { itemId },
+    this.postData<FinalPreparationApi>(
+      '/final-stage/preparation/items',
+      targetHeroId ? { itemId, targetHeroId } : { itemId },
+    ),
   );
 }
 
-private submit(path: string, body: object): void {
+savePreparation(activeHeroIds: string[], strategy: string, onSaved?: () => void): void {
+  this.submit(
+    this.putData<FinalPreparationApi>('/final-stage/preparation', { activeHeroIds, strategy }),
+    onSaved,
+  );
+}
+
+private submit(request$: Observable<FinalPreparationApi>, onSuccess?: () => void): void {
   if (this.pageState.submitting) {
     return;
   }
   this.pageState.submitting = true;
   this.pageState.error = null;
-  this.postData<FinalPreparationApi>(path, body)
+  request$
     .pipe(
       finalize(() => {
         this.pageState.submitting = false;
@@ -67,13 +81,14 @@ private submit(path: string, body: object): void {
       next: (data) => {
         this.pageState.data = data;
         this.pageState.status = 'data';
+        onSuccess?.();
       },
       error: (error) => {
         this.pageState.error = toApiError(error).message;
       },
     });
 }
-
+  
   getViewModel(): FinalPreparationViewModel {
     return this.pageState;
   }

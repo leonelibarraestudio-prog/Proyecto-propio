@@ -23,9 +23,18 @@ export interface PreparationHero {
   abilityPoints: number;
 }
 
+export interface StrategyOption {
+    code: string;
+    label: string;
+    description: string;
+}
+
 export interface FinalPreparationApi {
     balance: number;
     inventory: InventoryItemView[];
     powerUps: PowerUpApi[]
-    heroes: PreparationHero[];
+    heroes: PreparationHero[]
+    leaderId: string
+    strategyCode: string;
+    strategies: StrategyOption[];
 }
