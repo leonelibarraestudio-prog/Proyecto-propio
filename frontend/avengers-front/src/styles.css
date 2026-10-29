@@ -273,3 +273,18 @@ input::placeholder {
     height: auto;
   }
 }
+
+/* R4 - Scroll exclusivo para Simular Batallas */
+@media (min-width: 701px) {
+  .application-content:has(.simulate-page) {
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+}
+
+/* Cursor Falcon global: todas las pantallas */
+html,
+body,
+body * {
+  cursor: url('/assets/final-battle/falcon_cursor_opaco_64.png') 5 5, auto !important;
+}
