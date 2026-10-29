@@ -14,8 +14,18 @@ export interface InventoryItemView {
     targetScope: 'HERO' | 'TEAM';
 }
 
+export interface PreparationHero {
+  heroId: string;
+  name: string;
+  status: string;
+  knockedOut: boolean;
+  energy: number;
+  abilityPoints: number;
+}
+
 export interface FinalPreparationApi {
     balance: number;
     inventory: InventoryItemView[];
-    powerUps: PowerUpApi[];
+    powerUps: PowerUpApi[]
+    heroes: PreparationHero[];
 }

@@ -41,15 +41,23 @@ export class FinalPreparationService extends BaseApiService {
   }
   
   purchase(itemId: string): void {
-    if (this.pageState.submitting) {
-      return;
-    }
-    this.pageState.submitting = true;
-    this.pageState.error = null;
-    this. postData<FinalPreparationApi>('/final-stage/preparation/purchases', {
-      itemId,
-      quantity: 1,
-    })
+  this.submit('/final-stage/preparation/purchases', { itemId, quantity: 1 });
+}
+
+useItem(itemId: string, targetHeroId?: string): void {
+  this.submit(
+    '/final-stage/preparation/items',
+    targetHeroId ? { itemId, targetHeroId } : { itemId },
+  );
+}
+
+private submit(path: string, body: object): void {
+  if (this.pageState.submitting) {
+    return;
+  }
+  this.pageState.submitting = true;
+  this.pageState.error = null;
+  this.postData<FinalPreparationApi>(path, body)
     .pipe(
       finalize(() => {
         this.pageState.submitting = false;
@@ -64,7 +72,7 @@ export class FinalPreparationService extends BaseApiService {
         this.pageState.error = toApiError(error).message;
       },
     });
-  }
+}
 
   getViewModel(): FinalPreparationViewModel {
     return this.pageState;
