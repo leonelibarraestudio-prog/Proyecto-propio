@@ -79,7 +79,11 @@
           <article
             *ngIf="journey.final as final"
             class="path-stop final-stop"
-            [class.pending]="final.status === 'READY'"
+            [class.pending]="final.status !== 'COMPLETED'"
+            [class.win]="final.outcome === 'VICTORY' || final.outcome === 'WIN'"
+            [class.loss]="
+              final.outcome === 'DEFEAT' || final.outcome === 'LOSS' || final.outcome === 'ABANDON'
+            "
           >
             <ng-container *ngIf="teamById(final.opponentTeamId) as opponent">
               <span class="path-face">
