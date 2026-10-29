@@ -71,6 +71,9 @@ export interface FinalPreparationModel {
   powerUps: PowerUpApi[];
   inventory: PreparationInventoryItem[]
   heroes: PreparationHero[];
+  leaderId: string;
+  strategyCode: string;
+  strategies: StrategyApi[];
 }
 
 export interface JourneyHeroApi {
@@ -83,7 +86,25 @@ export interface JourneyHeroApi {
 
 export interface JourneyTeamApi {
   teamId: string;
+  leaderId: string;
+  strategyCode: string;
   heroes: JourneyHeroApi[];
+}
+
+export interface StrategyApi {
+  code: string;
+  label: string;
+  description: string;
+}
+
+export interface StrategyCatalogApi {
+  language: string;
+  strategies: StrategyApi[];
+}
+
+export interface SavedPreparationApi {
+  strategyCode: string;
+  activeHeroIds: string[];
 }
 
 export interface JourneyTeamsApi {

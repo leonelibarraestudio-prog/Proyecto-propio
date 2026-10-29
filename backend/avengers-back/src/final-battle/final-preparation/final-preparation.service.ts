@@ -5,6 +5,7 @@ import {
   FinalPreparationModel,
   HeroIdentityCatalogApi,
   InventoryApi,
+  JourneyTeamApi,
   JourneyTeamsApi,
   PowerUpApi,
   PowerUpCatalogApi,
@@ -12,11 +13,13 @@ import {
   PreparationInventoryItem,
   PurchaseApi,
   RewardsApi,
+  SavedPreparationApi,
+  StrategyCatalogApi,
   UsedItemApi
 } from './model/store-api.model';
 import { PurchasePowerUpRequest,  } from './request/purchase-power-up.request';
 import { UsePowerUpRequest } from './request/use-power-up.request';
-import { request } from 'node_modules/axios/index.cjs';
+import { SavePreparationRequest } from './request/save-preparation.request';
 
 
 @Injectable()
@@ -27,20 +30,28 @@ constructor(
   ) {}
 
   async getPreparation(): Promise<FinalPreparationModel> {
-    const teamId = this.context.getCurrentTeamId();
-    const lang = this.context.language;
-    const [rewards, inventory, catalog, journeyTeams, heroCatalog] = await Promise.all([
+  const teamId = this.context.getCurrentTeamId();
+  const lang = this.context.language;
+  const [rewards, inventory, catalog, journeyTeams, heroCatalog, strategyCatalog] =
+    await Promise.all([
       this.api.get<RewardsApi>(`/teams/${teamId}/journeys/current/rewards`),
       this.api.get<InventoryApi>(`/teams/${teamId}/journeys/current/inventory`),
       this.api.get<PowerUpCatalogApi>('/reference/power-ups', { teamId, lang }),
       this.api.get<JourneyTeamsApi>(`/teams/${teamId}/journeys/current/teams`),
       this.api.get<HeroIdentityCatalogApi>('/heroes', { lang }),
+      this.api.get<StrategyCatalogApi>('/reference/strategies', { teamId, lang }),
     ]);
+  const playerTeam = journeyTeams.teams.find(
+    (team) => team.teamId === journeyTeams.finalists.playerTeamId,
+    );
     return {
       balance: rewards.balance,
       powerUps: catalog.powerUps,
       inventory: this.describeInventory(inventory, catalog.powerUps),
-      heroes: this.describeHeroes(journeyTeams, heroCatalog),
+      heroes: this.describeHeroes(playerTeam, heroCatalog),
+      leaderId: playerTeam?.leaderId ?? '',
+      strategyCode: playerTeam?.strategyCode ?? '',
+      strategies: strategyCatalog.strategies,
     };
   }
 
@@ -81,23 +92,31 @@ constructor(
   }
 
   private describeHeroes(
-    journeyTeams: JourneyTeamsApi,
-    heroCatalog: HeroIdentityCatalogApi,
-  ): PreparationHero[] {
-      const playerTeam = journeyTeams.teams.find(
-        (team) => team.teamId === journeyTeams.finalists.playerTeamId,
-      );
-    if (!playerTeam) {
+  playerTeam: JourneyTeamApi | undefined,
+  heroCatalog: HeroIdentityCatalogApi,
+): PreparationHero[] {
+  if (!playerTeam) {
     return [];
   }
-    return playerTeam.heroes.map((hero) => ({
-      heroId: hero.heroId,
-      name: heroCatalog.heroes.find((identity) => identity.id === hero.heroId)?.displayName ?? hero.heroId,
-      status: hero.status,
-      knockedOut: hero.knockedOut,
-      energy: hero.currentEnergy,
-      abilityPoints: hero.currentAbilityPoints,
-    }));
+  return playerTeam.heroes.map((hero) => ({
+    heroId: hero.heroId,
+    name:
+      heroCatalog.heroes.find((identity) => identity.id === hero.heroId)?.displayName ??
+      hero.heroId,
+    status: hero.status,
+    knockedOut: hero.knockedOut,
+    energy: hero.currentEnergy,
+    abilityPoints: hero.currentAbilityPoints,
+  }));
+}
+
+async savePreparation(request: SavePreparationRequest): Promise<FinalPreparationModel> {
+  const teamId = this.context.getCurrentTeamId();
+  await this.api.put<SavedPreparationApi>(
+    `/teams/${teamId}/journeys/current/preparation`,
+    { activeHeroIds: request.activeHeroIds, strategy: request.strategy },
+  );
+  return this.getPreparation();
 }
 
 }  
