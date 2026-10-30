@@ -8,6 +8,6 @@
   </a>
   <div class="context-identity" *ngIf="context.context$ | async as current">
     <span>{{ current.profile.name }}</span>
-    <small>{{ current.currentJourney?.status || i18n.t('noJourney') }}</small>
+    <small>{{ journeyStatusLabel(current.currentJourney?.status) }}</small>
   </div>
 </header>

@@ -15,6 +15,7 @@ export interface TeamStatusHeroModel extends FinalStageHeroApi {
 }
 
 export interface TeamStatusTeamModel extends Omit<FinalStageTeamApi, 'heroes'> {
+  displayName: string;
   heroes: TeamStatusHeroModel[];
 }
 

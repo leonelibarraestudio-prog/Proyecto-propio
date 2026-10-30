@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { TeamStatusService } from './service/team-status.service';
 import { I18nService } from '../../../core/services/i18n.service';
-import { TeamStatusHeroModel, TeamStatusTeamModel } from './model/team-status-api.model';
+import {
+  TeamStatusHeroModel,
+  TeamStatusTeamModel,
+} from './model/team-status-api.model';
 
 @Component({
   selector: 'app-team-status',
@@ -31,17 +34,17 @@ export class TeamStatusComponent implements OnInit {
     return [
       {
         code: 'ACTIVE',
-        label: this.i18n.t('r11.active'),
+        label: 'En combate',
         heroes: team.heroes.filter((hero) => hero.status === 'ACTIVE'),
       },
       {
         code: 'INACTIVE',
-        label: this.i18n.t('r11.reserve'),
+        label: 'Reserva',
         heroes: team.heroes.filter((hero) => hero.status === 'INACTIVE'),
       },
       {
         code: 'OTHER',
-        label: this.i18n.t('status'),
+        label: 'Otros estados de formación',
         heroes: team.heroes.filter(
           (hero) => hero.status !== 'ACTIVE' && hero.status !== 'INACTIVE',
         ),
@@ -50,13 +53,15 @@ export class TeamStatusComponent implements OnInit {
   }
 
   conditionLabel(code: string): string {
-    if (code === 'AVAILABLE') {
-      return this.i18n.t('r11.available');
+    switch (code) {
+      case 'AVAILABLE':
+        return 'Disponible';
+      case 'KO':
+      case 'KNOCKED_OUT':
+        return 'Fuera de combate';
+      default:
+        return 'Condición sin descripción disponible';
     }
-    if (code === 'KO') {
-      return this.i18n.t('r11.knockedOut');
-    }
-    return code;
   }
 
   trackHero(_index: number, hero: TeamStatusHeroModel): string {
@@ -67,40 +72,64 @@ export class TeamStatusComponent implements OnInit {
     return group.code;
   }
 
-  codeLabel(code: string): string {
+  codeLabel(code: string | null | undefined): string {
     switch (code) {
       case 'READY':
-        return this.i18n.text('Ready', 'Lista para iniciar');
+        return 'Lista para iniciar';
       case 'ACTIVE':
-        return this.i18n.text('Active', 'En curso');
+        return 'En curso';
       case 'COMPLETED':
-        return this.i18n.text('Completed', 'Completada');
+        return 'Completada';
       case 'AWAITING_START':
-        return this.i18n.text('Awaiting start', 'Esperando inicio');
+        return 'Esperando inicio';
       case 'AWAITING_PLAYER_ACTION':
-        return this.i18n.text('Awaiting player action', 'Esperando acción del jugador');
+        return 'Esperando acción del jugador';
       case 'BALANCED':
-        return this.i18n.text('Balanced', 'Equilibrada');
+        return 'Equilibrada';
       case 'AGGRESSIVE':
-        return this.i18n.text('Aggressive', 'Agresiva');
+        return 'Agresiva';
       case 'DEFENSIVE':
-        return this.i18n.text('Defensive', 'Defensiva');
+        return 'Defensiva';
+      case 'PRAGMATIC':
+        return 'Pragmática';
       case 'HIGH':
-        return this.i18n.text('High', 'Alta');
+        return 'Alta';
       case 'MEDIUM':
-        return this.i18n.text('Medium', 'Media');
+        return 'Media';
       case 'LOW':
-        return this.i18n.text('Low', 'Baja');
+        return 'Baja';
       case 'VICTORY':
-        return this.i18n.text('Victory', 'Victoria');
+        return 'Victoria';
       case 'DEFEAT':
-        return this.i18n.text('Defeat', 'Derrota');
+        return 'Derrota';
       case 'ABANDON':
-        return this.i18n.text('Abandonment', 'Abandono');
+        return 'Abandono';
       case 'PLAYER_ABANDONED':
-        return this.i18n.text('Player abandoned', 'El jugador abandonó');
+        return 'El jugador decidió abandonar la batalla.';
+      case 'FINAL_RESPONSE_FAILED':
+        return 'La respuesta final del equipo no logró superar el desafío.';
+      case 'FINAL_RESPONSE_SUCCEEDED':
+        return 'La respuesta final del equipo superó el desafío.';
+      case 'DOOM_DEFEATED':
+        return 'Doctor Doom fue derrotado.';
+      case 'SUE_STORM_APPEAL':
+        return 'La intervención de Sue Storm resolvió la batalla.';
+      case 'PLAYER_NO_LEGAL_PROGRESS':
+        return 'El equipo ya no disponía de acciones permitidas para continuar.';
       default:
-        return code;
+        return 'Información sin descripción disponible';
     }
   }
+
+  teamNameLabel(name: string): string {
+  const readableName = name.trim();
+
+  if (!readableName) {
+    return 'Nombre del equipo no disponible';
+  }
+
+  return readableName.endsWith(' Team')
+    ? `Equipo ${readableName.slice(0, -5)}`
+    : readableName;
+}
 }
