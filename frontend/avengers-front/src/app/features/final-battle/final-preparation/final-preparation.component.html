@@ -1,33 +1,171 @@
 <main class="student-feature-shell">
-  <p *ngIf="pageState.status === 'loading'">Cargando...</p>
-  <p *ngIf="pageState.error">{{ pageState.error }}</p>
+  <header class="prep-header">
+    <span class="caption-box">{{ i18n.t('r8.caption') }}</span>
+    <h1 class="page-title">{{ i18n.t('r8.title') }}</h1>
+    <p class="page-subtitle">{{ i18n.t('r8.subtitle') }}</p>
+  </header>
 
-  <section *ngIf="pageState.status === 'data' && pageState.data as preparation">
-    <h2>Puntos disponibles: {{ preparation.balance }}</h2>
+  <p class="state-card" *ngIf="pageState.status === 'loading'">{{ i18n.t('loading') }}</p>
 
-    <h2>Inventario</h2>
-    <p *ngIf="preparation.inventory.length === 0">
-      Todavía no tenes ítems en el inventario.
-    </p>
-    <ul *ngIf="preparation.inventory.length > 0">
-      <li *ngFor="let owned of preparation.inventory">
-        <h3>{{ owned.name }} x{{ owned.quantity }}</h3>
-        <span class="tag">{{ owned.targetScope === 'HERO' ? 'Héroe' : 'Equipo' }}</span>
-        <p>{{ owned.description }}</p>
-      </li>
-    </ul>
-
-    <h2>Tienda</h2>
-    <ul>
-      <li *ngFor="let item of preparation.powerUps">
-        <h3>{{ item.name }}</h3>
-        <span class="tag">{{ item.targetScope === 'HERO' ? 'Héroe' : 'Equipo' }}</span>
-        <p>{{ item.description }}</p>
-        <p>Precio: {{ item.price }}</p>
-        <button type="button" class="button" [disabled]="pageState.submitting" (click)="buy(item.id)">
-          Comprar
-        </button>
-      </li>
-    </ul>
+  <section class="state-card" *ngIf="pageState.status === 'empty'">
+    <h2 class="panel-title">{{ i18n.t('r8.noJourney') }}</h2>
+    <p>{{ i18n.t('r8.noJourneyCopy') }}</p>
+    <a class="button" routerLink="/journey/simulate">{{ i18n.t('simulateJourney') }}</a>
   </section>
+
+  <p class="state-card error" role="alert" *ngIf="pageState.error">{{ pageState.error }}</p>
+  <p class="state-card" role="status" *ngIf="notice">{{ notice }}</p>
+
+  <ng-container *ngIf="pageState.status === 'data' && pageState.data as preparation">
+    <section class="panel-surface prep-section" aria-labelledby="matchup-title">
+      <h2 id="matchup-title" class="panel-title">{{ i18n.t('r8.matchup') }}</h2>
+      <p>
+        <span class="tag">{{ i18n.t('r8.playerTeam') }}</span>
+        {{ preparation.playerTeamName }}
+      </p>
+      <p>
+        <span class="tag">{{ i18n.t('r8.opponent') }}</span>
+        {{ preparation.opponentName ?? i18n.t('r8.noOpponent') }}
+      </p>
+      <p class="prep-balance">
+        {{ i18n.t('r8.rewardPoints') }}: <strong>{{ preparation.balance }}</strong>
+        {{ i18n.t('r8.available') }}
+      </p>
+
+      <ng-container [ngSwitch]="preparation.finalAction">
+        <a *ngSwitchCase="'START'" class="button" routerLink="/final-stage/play">
+          {{ i18n.t('r8.startFinal') }}
+        </a>
+        <a *ngSwitchCase="'CONTINUE'" class="button" routerLink="/final-stage/play">
+          {{ i18n.t('r8.continueFinal') }}
+        </a>
+        <a *ngSwitchCase="'VIEW'" class="button" routerLink="/final-stage/play">
+          {{ i18n.t('r8.viewFinal') }}
+        </a>
+        <p *ngSwitchDefault class="state-card">{{ i18n.t('r8.notReady') }}</p>
+      </ng-container>
+    </section>
+
+    <section class="prep-section" aria-labelledby="team-title">
+      <h2 id="team-title" class="panel-title">{{ i18n.t('r8.teamPreparation') }}</h2>
+      <ul class="card-grid">
+        <li
+          class="card"
+          *ngFor="let hero of preparation.heroes; trackBy: trackByHero"
+          [class.card--active]="isActive(hero)"
+        >
+          <h3>{{ hero.name }}</h3>
+          <p>
+            <span class="tag" *ngIf="hero.heroId === preparation.leaderId">
+              {{ i18n.t('r8.leader') }}
+            </span>
+            <span class="tag">
+              {{ isActive(hero) ? i18n.t('r8.inCombat') : i18n.t('r8.reserve') }}
+            </span>
+            <span class="tag tag--danger" *ngIf="hero.knockedOut">KO</span>
+          </p>
+          <p>
+            {{ i18n.t('r8.energy') }}: {{ hero.energy }} · {{ i18n.t('r8.ap') }}:
+            {{ hero.abilityPoints }}
+          </p>
+          <label class="prep-check">
+            <input
+              type="checkbox"
+              [checked]="isActive(hero)"
+              [disabled]="pageState.submitting || hero.heroId === preparation.leaderId"
+              (change)="toggleActive(hero, preparation.heroes)"
+            />
+            {{ i18n.t('r8.inCombat') }}
+          </label>
+        </li>
+      </ul>
+
+      <div class="prep-strategy">
+        <label for="strategy">{{ i18n.t('r8.strategy') }}</label>
+        <select id="strategy" [disabled]="pageState.submitting" (change)="selectStrategy($event)">
+          <option
+            *ngFor="let option of preparation.strategies; trackBy: trackByStrategy"
+            [value]="option.code"
+            [selected]="isStrategySelected(option, preparation)"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+        <button
+          type="button"
+          class="button"
+          [disabled]="pageState.submitting"
+          (click)="saveFormation(preparation)"
+        >
+          {{ i18n.t('r8.savePreparation') }}
+        </button>
+      </div>
+    </section>
+
+    <section class="prep-section" aria-labelledby="inventory-title">
+      <h2 id="inventory-title" class="panel-title">{{ i18n.t('r8.inventory') }}</h2>
+      <p class="state-card" *ngIf="preparation.inventory.length === 0">
+        {{ i18n.t('r8.emptyInventory') }}
+      </p>
+      <ul class="card-grid" *ngIf="preparation.inventory.length > 0">
+        <li class="card" *ngFor="let owned of preparation.inventory; trackBy: trackByInventoryItem">
+          <h3>{{ owned.name }} x{{ owned.quantity }}</h3>
+          <p>
+            <span class="tag">{{ scopeLabel(owned.targetScope) }}</span>
+          </p>
+          <p>{{ owned.description }}</p>
+          <button
+            type="button"
+            class="button"
+            [disabled]="pageState.submitting"
+            (click)="startUse(owned)"
+          >
+            {{ i18n.t('r8.useItem') }}
+          </button>
+        </li>
+      </ul>
+
+      <section class="panel-surface" *ngIf="selectedItem" aria-labelledby="target-title">
+        <h3 id="target-title">{{ i18n.t('r8.selectedItem') }}: {{ selectedItem.name }}</h3>
+        <p>{{ i18n.t('r8.chooseTarget') }}</p>
+        <ul class="card-grid">
+          <li class="card" *ngFor="let hero of preparation.heroes; trackBy: trackByHero">
+            <button
+              type="button"
+              class="button"
+              [disabled]="pageState.submitting"
+              (click)="useOn(hero.heroId)"
+            >
+              {{ hero.name }}
+            </button>
+          </li>
+        </ul>
+        <button type="button" class="button button-secondary" (click)="cancelUse()">
+          {{ i18n.text('Cancel', 'Cancelar') }}
+        </button>
+      </section>
+    </section>
+
+    <section class="prep-section" aria-labelledby="store-title">
+      <h2 id="store-title" class="panel-title">{{ i18n.t('r8.powerUpStore') }}</h2>
+      <ul class="card-grid">
+        <li class="card" *ngFor="let item of preparation.powerUps; trackBy: trackByPowerUp">
+          <h3>{{ item.name }}</h3>
+          <p>
+            <span class="tag">{{ scopeLabel(item.targetScope) }}</span>
+          </p>
+          <p>{{ item.description }}</p>
+          <p class="prep-price">{{ i18n.text('Price', 'Precio') }}: {{ item.price }}</p>
+          <button
+            type="button"
+            class="button"
+            [disabled]="pageState.submitting"
+            (click)="buy(item.id)"
+          >
+            {{ i18n.t('r8.purchase') }}
+          </button>
+        </li>
+      </ul>
+    </section>
+  </ng-container>
 </main>

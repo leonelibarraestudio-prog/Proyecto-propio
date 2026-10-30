@@ -2,27 +2,143 @@
   display: block;
 }
 
-ul {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  list-style: none;
-  padding: 0;
+.student-feature-shell {
+  height: 100%;
+  overflow-y: auto;
+  padding: 12px 20px 32px;
+  background:
+    radial-gradient(circle at 12% 0%, var(--color-action-soft), transparent 45%),
+    radial-gradient(circle at 92% 8%, rgba(26, 48, 88, 0.55), transparent 50%),
+    linear-gradient(180deg, var(--color-panel) 0%, var(--color-background) 70%);
+}
+
+.prep-header {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-action);
 }
 
 .student-feature-shell {
   height: 100%;
   overflow-y: auto;
-  padding: 12px 20px;
+  padding: 12px 20px 32px;
 }
 
-li {
+.prep-header {
+  margin-bottom: 12px;
+}
+
+.prep-header .page-title {
+  margin: 4px 0;
+}
+
+.prep-section {
+  margin-top: 20px;
+}
+
+.prep-section > .panel-title {
+  margin: 0 0 8px;
+}
+
+.panel-surface {
+  padding: 12px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  padding: 12px;
+  border: 2px solid var(--color-panel-border);
   background: var(--color-panel-raised);
-  border: 5px solid var(--color-panel-border);
-  padding: 1rem;
+  transition:
+    border-color 120ms ease,
+    transform 120ms ease;
 }
 
-pre {
-  max-height: 95vh;
-  overflow: auto;
+.card:hover {
+  border-color: var(--color-action);
+  transform: translateY(-2px);
+}
+
+.card--active {
+  border-color: var(--color-action);
+  background: var(--color-action-soft);
+}
+
+.card h3 {
+  margin: 0 0 6px;
+}
+
+.card p {
+  margin: 6px 0;
+}
+
+.tag {
+  margin-right: 6px;
+}
+
+.tag--danger {
+  color: var(--color-danger);
+}
+
+.prep-balance strong,
+.prep-price {
+  color: var(--color-gold);
+}
+
+.prep-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.prep-strategy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.prep-strategy select {
+  padding: 6px 8px;
+  border: 1px solid var(--color-panel-border);
+  background: var(--color-panel);
+  color: var(--color-text);
+}
+
+.button {
+  display: inline-block;
+  text-decoration: none;
+  transition:
+    transform 120ms ease,
+    filter 120ms ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.15);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.state-card {
+  margin: 12px 0;
+}
+
+@media (max-width: 700px) {
+  .student-feature-shell {
+    height: auto;
+    overflow: visible;
+  }
 }
