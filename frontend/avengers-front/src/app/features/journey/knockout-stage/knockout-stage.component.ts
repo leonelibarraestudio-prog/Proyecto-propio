@@ -7,7 +7,7 @@ import {
   OnInit,
 } from '@angular/core';
 
-import { KnockoutStageApi } from './model/knockout-stage-api.interface';
+import { KnockoutStageMatch, KnockoutStageApi } from './model/knockout-stage-api.interface';
 import { KnockoutStageService } from './service/knockout-stage.service';
 
 @Component({
@@ -18,6 +18,41 @@ import { KnockoutStageService } from './service/knockout-stage.service';
 })
 export class KnockoutStageComponent
   implements OnInit, AfterViewChecked, OnDestroy {
+
+
+  readonly stageOptions = [
+    { value: -1, label: 'TODAS' }, { value: 0, label: 'OCTAVOS' },
+    { value: 1, label: 'CUARTOS' }, { value: 2, label: 'SEMIFINALES' },
+    { value: 3, label: 'FINAL' }
+  ];
+  selectedStage = -1;
+  readonly particles = Array.from({ length: 16 }, (_, i) => ({
+    x: `${(i * 37 + 11) % 97}%`, size: `${2.3 + (i % 5) * 0.57}px`,
+    duration: `${2.6 + (i % 7) * 0.31}s`, delay: `${-((i * 13) % 40) / 10}s`
+  }));
+  selectStage(stage: number): void { this.selectedStage = stage; this.lastGeometry = ''; this.scheduleConnections(); }
+  get selectedMatches(): KnockoutStageMatch[] {
+    if (this.selectedStage < 0 || this.selectedStage > 2) return [];
+    const code = ['ROUND_OF_16', 'QUARTERFINAL', 'SEMIFINAL'][this.selectedStage];
+    return this.data?.rounds?.find(round => round.stageCode === code)?.matches ?? [];
+  }
+  get finalStatus(): string | null { return this.knockoutStageService.getTeamJourney()?.final?.status ?? null; }
+  get finalOutcome(): string | null { return this.knockoutStageService.getTeamJourney()?.final?.outcome ?? null; }
+  isFalconMatch(match: KnockoutStageMatch): boolean {
+    const playerId = this.data?.teamId;
+    return !!playerId && (match.teamAId === playerId || match.teamBId === playerId);
+  }
+  isPlayerTeam(teamId: string): boolean { return !!this.data?.teamId && teamId === this.data.teamId; }
+  getMatchStatus(match: KnockoutStageMatch): string { return match.winnerTeamId ? 'COMPLETADO' : 'PENDIENTE'; }
+  resolutionLabel(code: string | null | undefined): string { return code?.replace(/_/g, ' ') || 'PENDIENTE'; }
+  getDamage(match: KnockoutStageMatch, teamId: string): number | null {
+    const value = match.damageByTeam?.find(item => item.teamId === teamId)?.damageDealt;
+    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  }
+  getDamagePercent(match: KnockoutStageMatch, teamId: string): number {
+    const max = Math.max(1, ...(match.damageByTeam ?? []).map(item => item.damageDealt));
+    return Math.min(100, Math.max(0, ((this.getDamage(match, teamId) ?? 0) / max) * 100));
+  }
 
   connectionPaths: string[] = [];
   connectionWidth = 1;
@@ -55,28 +90,6 @@ export class KnockoutStageComponent
     return team?.name || teamId;
   }
 
-  getFinalStatus(): string {
-    const journey = this.knockoutStageService.getTeamJourney();
-    const final = journey?.final;
-
-    if (!final) {
-      return 'Resultado pendiente';
-    }
-
-    if (final.status === 'READY') {
-      return 'Final lista para disputarse';
-    }
-
-    if (final.outcome) {
-      return 'Resultado: ' + final.outcome;
-    }
-
-    if (final.status === 'COMPLETED') {
-      return 'Final disputada';
-    }
-
-    return 'Resultado pendiente';
-  }
 
   ngAfterViewChecked(): void {
     this.scheduleConnections();
@@ -105,96 +118,47 @@ export class KnockoutStageComponent
   }
 
   private updateConnections(): void {
-    const bracket = document.querySelector<HTMLElement>(
-      'app-knockout-stage .knockout-bracket'
-    );
-
-    if (!bracket) {
-      return;
-    }
-
-    const rounds = Array.from(
-      bracket.querySelectorAll<HTMLElement>('.knockout-round')
-    );
+    const bracket = document.querySelector<HTMLElement>('app-knockout-stage .knockout-bracket');
+    if (!bracket || this.selectedStage !== -1 || bracket.clientWidth === 0) return;
 
     const width = bracket.clientWidth;
     const height = bracket.clientHeight;
-
-    const paths: string[] = [];
-    const geometry: number[] = [width, height];
-
     const bracketRect = bracket.getBoundingClientRect();
+    const geometry: number[] = [width, height];
+    const paths: string[] = [];
+    const positions = new Map<string, { left: number; right: number; centerY: number }>();
 
-    const getPosition = (element: HTMLElement) => {
+    // La correspondencia entre cruces se obtiene de los códigos y slots de la API,
+    // nunca del índice visual de la tarjeta.
+    bracket.querySelectorAll<HTMLElement>('.knockout-match[data-stage-code][data-slot]').forEach(element => {
       const rect = element.getBoundingClientRect();
-
+      const stage = element.dataset['stageCode'];
+      const slot = element.dataset['slot'];
+      if (!stage || !slot) return;
       const position = {
         left: rect.left - bracketRect.left + bracket.scrollLeft,
         right: rect.right - bracketRect.left + bracket.scrollLeft,
-        centerY: rect.top - bracketRect.top +
-          bracket.scrollTop + rect.height / 2,
+        centerY: rect.top - bracketRect.top + bracket.scrollTop + rect.height / 2,
       };
+      positions.set(`${stage}:${slot}`, position);
+      geometry.push(position.left, position.right, position.centerY);
+    });
 
-      geometry.push(
-        position.left,
-        position.right,
-        position.centerY
-      );
-
-      return position;
-    };
-
-    const positions = rounds.map(round =>
-      Array.from(
-        round.querySelectorAll<HTMLElement>('.knockout-match')
-      ).map(getPosition)
-    );
-
-    if (rounds.length >= 2 && width > 700) {
-      for (let roundIndex = 0; roundIndex < positions.length - 1; roundIndex++) {
-        const current = positions[roundIndex];
-        const next = positions[roundIndex + 1];
-
-        for (let index = 0; index < next.length; index++) {
-          const first = current[index * 2];
-          const second = current[index * 2 + 1];
-          const target = next[index];
-
-          if (!first || !second || !target) {
-            continue;
-          }
-
-          const startX = Math.max(first.right, second.right);
-          const endX = target.left;
-
-          if (endX <= startX) {
-            continue;
-          }
-
-          const middleX = (startX + endX) / 2;
-
-          paths.push(
-            `M ${first.right} ${first.centerY}
-             H ${middleX}
-             V ${second.centerY}
-             H ${second.right}
-             M ${middleX} ${(first.centerY + second.centerY) / 2}
-             V ${target.centerY}
-             H ${endX}`
-          );
+    if (width > 700) {
+      for (const round of this.data?.rounds ?? []) {
+        for (const match of round.matches) {
+          if (!match.nextStageCode || match.nextSlot == null) continue;
+          const source = positions.get(`${round.stageCode}:${match.slot}`);
+          const target = positions.get(`${match.nextStageCode}:${match.nextSlot}`);
+          if (!source || !target || target.left <= source.right) continue;
+          const middleX = (source.right + target.left) / 2;
+          paths.push(`M ${source.right} ${source.centerY} H ${middleX} V ${target.centerY} H ${target.left}`);
         }
       }
     }
 
-    const signature = JSON.stringify([
-      geometry,
-      paths,
-    ]);
-
-    if (signature === this.lastGeometry) {
-      return;
-    }
-
+    const signature = JSON.stringify([geometry, paths]);
+    if (signature === this.lastGeometry) return;
     this.lastGeometry = signature;
     this.connectionWidth = width;
     this.connectionHeight = height;

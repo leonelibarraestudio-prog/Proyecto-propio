@@ -20,7 +20,7 @@ export class TeamStatusService {
     private readonly context: ApplicationContextService,
     private readonly gameApi: GameApiService,
     private readonly gameFeatureApi: GameFeatureApiService,
-  ) {}
+  ) { }
 
   async getTeamStatus(): Promise<TeamStatusModel> {
     const teamId = this.context.getCurrentTeamId();
@@ -35,10 +35,17 @@ export class TeamStatusService {
       const apiTeams = await this.gameApi.get<FinalStageTeamsApi>(
         `/teams/${teamId}/journeys/current/final-stage/teams`,
       );
-      const catalog = await this.gameFeatureApi.heroes(language);
+      const [catalog, journeyTeams] = await Promise.all([
+        this.gameFeatureApi.heroes(language),
+        this.gameFeatureApi.currentTeams(teamId),
+      ]);
       const enrichTeam = (team: FinalStageTeamApi): TeamStatusTeamModel => {
+        const identity = journeyTeams.teams.find(
+          (candidate) => candidate.teamId === team.teamId,
+        );
         return {
           ...team,
+          displayName: identity?.name?.trim() || 'Equipo sin nombre disponible',
           heroes: team.heroes.map((tacticalHero) => {
             const identity = catalog.heroes.find((hero) => hero.id === tacticalHero.heroId);
 

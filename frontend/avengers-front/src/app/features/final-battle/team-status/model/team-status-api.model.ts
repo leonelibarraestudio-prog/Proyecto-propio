@@ -30,6 +30,7 @@ export interface TeamStatusHeroModel {
 }
 
 export interface TeamStatusTeamModel {
+  displaytName: string;
   teamId: string;
   leaderId: string;
   strategyCode: string;

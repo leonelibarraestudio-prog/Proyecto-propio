@@ -30,8 +30,6 @@ export class KnockoutStageService extends BaseApiService {
     this.data = null;
     this.journeyData = null;
     this.loadError = false;
-
-    // Datos principales de R6: enfrentamientos y ganadores.
     this.getData<KnockoutStageApi>('/journey/knockout-stage').subscribe({
       next: (data) => {
         this.data = data;
@@ -40,9 +38,6 @@ export class KnockoutStageService extends BaseApiService {
         this.loadError = true;
       },
     });
-
-    // Datos complementarios: nombres de equipos y estado de la final.
-    // Si esta consulta falla, R6 sigue funcionando.
     this.getData<TeamJourneyModel>('/journey/team').subscribe({
       next: (data) => {
         this.journeyData = data;

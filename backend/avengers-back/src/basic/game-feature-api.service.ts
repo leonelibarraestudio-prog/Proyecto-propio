@@ -14,6 +14,9 @@ import {
   FinalStageApi,
   FinalStageEventsApi,
   FinalAbilityApi,
+  FinalJourneySummaryApi,
+  FinalJourneyEventsApi,
+  FinalJourneyStatisticsApi,
 } from './model/game-api/final-contract.model';
 
 import { EtapasDelJourneyApi } from './model/game-api/etapas-del-journey-api.model';
@@ -198,6 +201,25 @@ export class GameFeatureApiService {
 
   obtenerEncuentrosActuales(equipoId: string) {
     return this.api.get<EncuentrosDelJourneyApi>(`/teams/${equipoId}/journeys/current/encounters`);
+  }
+  
+  journeySummary(teamId: string, attemptId: string, lang: string) {
+    return this.api.get<FinalJourneySummaryApi>(`/teams/${teamId}/journeys/${attemptId}`, {
+      lang,
+    });
+  }
+
+  journeyEvents(teamId: string, attemptId: string, lang: string) {
+    return this.api.get<FinalJourneyEventsApi>(`/teams/${teamId}/journeys/${attemptId}/events`, {
+      lang,
+    });
+  }
+
+  journeyStatistics(teamId: string, attemptId: string, lang: string) {
+    return this.api.get<FinalJourneyStatisticsApi>(
+      `/teams/${teamId}/journeys/${attemptId}/statistics`,
+      { lang },
+    );
   }
 
   private ability(ability: FinalAbilityApi) {

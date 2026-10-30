@@ -1,0 +1,25 @@
+/* R9: efectos cinematográficos complementarios.
+   Los estilos de layout y controles permanecen en final-battle.component.css.
+   Selectores limitados a R9 para no afectar otras pantallas. */
+.battle-page.r9-integrated::before {
+  animation: r9-battle-camera 14s ease-in-out infinite alternate;
+  transform-origin: center center;
+}
+@keyframes r9-battle-camera {
+  from { transform: scale(1) translate(0, 0); }
+  to { transform: scale(1.06) translate(8px, -6px); }
+}
+.battle-page.r9-integrated .battle-debris {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .35;
+  background-image: radial-gradient(circle, rgba(236,218,190,.65) 1px, transparent 2px),
+                    radial-gradient(circle, rgba(218,190,160,.45) 1px, transparent 2px);
+  background-size: 137px 169px, 193px 223px;
+  background-position: 12px 28px, 80px 110px;
+  animation: r9-battle-debris-drift 19s linear infinite;
+}
+@keyframes r9-battle-debris-drift {
+  to { background-position: 32px -141px, 100px -113px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .battle-page.r9-integrated::before, .battle-page.r9-integrated .battle-debris { animation: none; }
+}

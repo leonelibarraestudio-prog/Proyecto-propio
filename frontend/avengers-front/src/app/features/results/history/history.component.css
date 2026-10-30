@@ -1,10 +1,75 @@
 .history-page {
+  position: relative;
+  box-sizing: border-box;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
   padding: 24px;
   color: var(--text-primary, #f7faf8);
 }
 
+.history-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+.history-page::before {
+  content: '';
+  position: sticky;
+  top: -24px;
+  z-index: 0;
+  display: block;
+  width: calc(100% + 368px);
+  height: 100vh;
+  margin: -24px -24px -100vh -184px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-image:
+    radial-gradient(ellipse 20% 30% at 3% 22%, rgba(165, 180, 195, 0.2), transparent 72%),
+    radial-gradient(ellipse 22% 34% at 2% 64%, rgba(165, 180, 195, 0.24), transparent 72%),
+    radial-gradient(ellipse 20% 30% at 97% 16%, rgba(165, 180, 195, 0.2), transparent 72%),
+    radial-gradient(ellipse 22% 34% at 98% 56%, rgba(165, 180, 195, 0.24), transparent 72%),
+    linear-gradient(to top, rgba(165, 180, 195, 0.32) 0%, rgba(165, 180, 195, 0.12) 9%, transparent 22%),
+    linear-gradient(to right, rgba(165, 180, 195, 0.2) 0%, transparent 13%),
+    linear-gradient(to left, rgba(165, 180, 195, 0.2) 0%, transparent 13%);
+  will-change: transform;
+  animation: history-fog-drift 9s ease-in-out infinite alternate;
+}
+
+@keyframes history-fog-drift {
+  from {
+    transform: translateX(-140px);
+  }
+
+  to {
+    transform: translateX(140px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-page::before {
+    animation: none;
+  }
+}
+
+.history-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 190px;
+  margin-bottom: 24px;
+  padding: 24px;
+  background-image:
+    linear-gradient(90deg, rgba(8, 11, 9, 0.92) 0%, rgba(8, 11, 9, 0.6) 45%, rgba(8, 11, 9, 0.1) 100%),
+    url('/assets/team-journey/falcon_header.png');
+  background-size: cover;
+  background-position: center;
+  border-bottom: 2px solid var(--team-primary, #e23636);
+}
+
 .history-caption {
   display: inline-block;
+  align-self: flex-start;
   padding: 4px 10px;
   border-left: 3px solid var(--team-primary, #e23636);
   font-size: 0.75rem;
@@ -20,7 +85,7 @@
 }
 
 .history-subtitle {
-  margin: 0 0 24px;
+  margin: 0;
   color: var(--text-secondary, #c9d4cc);
 }
 
@@ -120,8 +185,120 @@
   border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
-.history-retry {
+.history-retry,
+.history-action {
   margin-top: 16px;
   padding: 8px 18px;
   cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-primary, #f7faf8);
+  background: transparent;
+  border: 1px solid var(--team-primary, #e23636);
+}
+
+.history-retry:hover,
+.history-retry:focus-visible,
+.history-action:hover,
+.history-action:focus-visible {
+  background: var(--team-primary, #e23636);
+  color: var(--surface-primary, #080b09);
+}
+
+.history-journey {
+  display: grid;
+  gap: 16px;
+}
+
+.history-journey > .history-action {
+  justify-self: start;
+  margin-top: 0;
+}
+
+.history-journey-header {
+  margin-bottom: 0;
+}
+
+.history-panel {
+  padding: 18px 20px;
+  background: var(--surface-secondary, #151b17);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--team-primary, #e23636);
+}
+
+.history-panel h3 {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.history-teams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.history-team {
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.history-team h4 {
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.history-team h5 {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-secondary, #c9d4cc);
+}
+
+.history-eliminated {
+  margin: 0 0 10px;
+  color: var(--text-secondary, #c9d4cc);
+}
+
+.history-heroes,
+.history-awards {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-heroes li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.history-hero-status {
+  color: var(--text-secondary, #c9d4cc);
+}
+
+.history-awards li {
+  display: grid;
+  gap: 2px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.history-events {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.history-event-sequence {
+  margin-right: 8px;
+  font-weight: 700;
+  color: var(--text-secondary, #c9d4cc);
 }

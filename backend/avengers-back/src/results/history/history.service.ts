@@ -1,7 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ApplicationContextService } from '../../basic/services/application-context.service';
 import { GameFeatureApiService } from '../../basic/game-feature-api.service';
-import { FinalHistoryItemApi } from '../../basic/model/game-api/final-contract.model';
+import {
+  FinalHistoryItemApi,
+  FinalJourneyAwardApi,
+  FinalJourneyCompetitionApi,
+  FinalJourneyEventApi,
+  FinalJourneySummaryApi,
+  FinalJourneyTeamApi,
+  FinalJourneyTeamStatisticsApi,
+} from '../../basic/model/game-api/final-contract.model';
 
 export interface HistorySummary {
   total: number;
@@ -15,6 +23,20 @@ export interface HistoryModel {
   language: string;
   summary: HistorySummary;
   items: FinalHistoryItemApi[];
+}
+
+export interface HistoryStatisticsModel {
+  competition: FinalJourneyCompetitionApi;
+  teamStatistics: FinalJourneyTeamStatisticsApi[];
+  awards: FinalJourneyAwardApi[];
+}
+
+export interface HistoryDetailModel {
+  summary: FinalJourneySummaryApi;
+  teams: FinalJourneyTeamApi[];
+  teamNames: Record<string, string>;
+  events: FinalJourneyEventApi[];
+  statistics: HistoryStatisticsModel | null;
 }
 
 @Injectable()
@@ -43,6 +65,36 @@ export class HistoryService {
         abandoned: items.filter((item) => item.outcomeCode === 'ABANDON').length,
       },
       items,
+    };
+  }
+
+  async getHistoryDetail(attemptId: string): Promise<HistoryDetailModel> {
+    const teamId = this.context.getCurrentTeamId();
+    const language = this.context.language;
+
+    const [summary, journeyTeams, journeyEvents, statistics] = await Promise.all([
+      this.game.journeySummary(teamId, attemptId, language),
+      this.game.journeyTeams(teamId, attemptId),
+      this.game.journeyEvents(teamId, attemptId, language),
+      this.game.journeyStatistics(teamId, attemptId, language).catch(() => null),
+    ]);
+
+    const finalistIds = [summary.finalists.playerTeamId, summary.finalists.opponentTeamId];
+
+    return {
+      summary,
+      teamNames: Object.fromEntries(journeyTeams.teams.map((team) => [team.teamId, team.name])),
+      teams: journeyTeams.teams.filter((team) => finalistIds.includes(team.teamId)),
+      events: journeyEvents.events,
+      statistics: statistics
+        ? {
+            competition: statistics.competition,
+            teamStatistics: statistics.teamStatistics.filter((stats) =>
+              finalistIds.includes(stats.teamId),
+            ),
+            awards: statistics.awards,
+          }
+        : null,
     };
   }
 }

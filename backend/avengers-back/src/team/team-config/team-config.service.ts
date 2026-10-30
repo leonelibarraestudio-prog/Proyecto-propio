@@ -26,7 +26,7 @@ export class TeamConfigService {
 
     const leaderId = config.leaderId || 'falcon';
     const companionIds: string[] = config.companionIds || [];
-    const activeIds: string[] = config.activeHerolds || [leaderId];
+    const activeIds: string[] = config.activeHeroIds || [leaderId];
 
     
     const catalog = Array.isArray(rawHeroes)

@@ -1,7 +1,10 @@
 <div class="team-config-wrapper">
   <section class="config-card">
     <div class="card-body">
-      <h2 class="main-section-title">MI EQUIPO ACTUAL</h2>
+      <h2 class="main-section-title">
+          <span class="title-top">MI EQUIPO</span> 
+          <span class="title-bottom">ACTUAL</span>
+      </h2>
 
       <div *ngIf="teamConfigData; else loadingState">
         <div class="leader-section" *ngIf="teamConfigData.leader">

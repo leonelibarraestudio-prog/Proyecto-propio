@@ -386,4 +386,18 @@ Angular pasan. Los checks de lint del Frontend y del Backend finalizaron sin err
 R11 conserva un alcance de consulta: las reglas, acciones legales y
 resultados permanecen bajo la autoridad de la Game API.
 
+## Documentación de cambios R13:
+Checkpoint 3 — R13: Armé el historial de Caminos en `Resultados → Historial de Batallas`. La pantalla tiene una lista y, al elegir un Camino, una vista con todo su detalle. El Frontend le habla solo a mi Backend, y el Backend le pregunta a la Game API pasándole `lang`. El equipo y el idioma los saca de su configuración, así que no mando nada en el body.
+
+Hice dos endpoints en el Backend, los dos de lectura:
+
+- `GET /gameCore/results/history`: devuelve la lista de Caminos completados, del más nuevo al más viejo. Trae `summary` (cuántos Caminos hubo y cuántas victorias, derrotas y abandonos) e `items`, con las fechas, la estrategia de gasto, el rival final, el resultado y el texto del desenlace, tal cual los manda la Game API.
+- `GET /gameCore/results/history/:attemptId`: devuelve el detalle de un Camino. Pide en paralelo el resumen, los equipos, los eventos y las estadísticas, y responde con `summary`, `teams`, `teamNames`, `events` y `statistics`. Dejé solo a los dos equipos finalistas. Si las estadísticas no están disponibles, `statistics` viene en `null` y el detalle se muestra igual.
+
+En Angular, la lista muestra los totales arriba y un botón en cada Camino para ver su detalle. El detalle muestra el resumen del Camino, la batalla final con los dos equipos y sus héroes, las estadísticas, los premios y el registro de eventos. Los eventos se muestran de a 50 con el botón "Ver más". Los devuelve todos juntos la Game API, que no pagina, así que el corte lo hago yo en el Frontend. El botón "Volver al historial" regresa a la lista.
+
+Las dos vistas tienen estado de carga, de error (con botón para reintentar) y de datos, y la lista tiene además el estado vacío. Los errores los muestro según `messageCode`, nunca según el texto de `message`. Todos los textos salen del servicio de localización del proyecto, con las claves `r13.*` en español e inglés. Los resultados (victoria, derrota o abandono) los informa la Game API y no los calculo yo.
+
+Probé la lista y el detalle de un Camino abandonado contra la Game API real, y también los botones "Ver más" y "Volver al historial". Los archivos de R13 del Frontend y del Backend pasan el lint sin errores y los dos proyectos compilan.
+
 *Programación III — UTN — 2026*

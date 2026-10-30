@@ -1,4 +1,3 @@
-
 import { CombatStrategy } from './team-configuration.model';
 
 export interface FinalHeroApi {
@@ -174,6 +173,8 @@ export interface FinalJourneyTeamApi {
   leaderId: string;
   heroIds: string[];
   strategyCode: string;
+  rewardPoints?: number;
+  eliminated?: boolean;
   heroes?: Array<{
     heroId: string;
     currentEnergy: number;
@@ -267,4 +268,78 @@ export interface FinalEncounterSummaryApi {
 export interface FinalJourneyEncountersApi {
   attemptId: string;
   encounters: FinalEncounterSummaryApi[];
+}
+
+export interface FinalJourneyEventValuesApi {
+  actorHeroId?: string;
+  targetTeamId?: string;
+  actionCode?: string;
+  itemId?: string;
+  amount?: number;
+  energy?: number;
+  statCode?: string;
+}
+
+export interface FinalJourneyEventApi {
+  sequence: number;
+  eventCode: string;
+  stageCode: string | null;
+  encounterId: string | null;
+  round: number | null;
+  teamId?: string;
+  actorHeroId?: string;
+  targetHeroIds?: string[];
+  messageCode: string;
+  values: FinalJourneyEventValuesApi;
+  narrative: { lines: FinalStageNarrativeLineApi[] };
+}
+
+export interface FinalJourneyEventsApi {
+  attemptId: string;
+  language: string;
+  events: FinalJourneyEventApi[];
+}
+
+export interface FinalJourneyTeamStatisticsApi {
+  teamId: string;
+  encounters: number;
+  wins: number;
+  draws: number;
+  losses: number;
+  damageDealt: number;
+  damageReceived: number;
+  healing: number;
+  kosCaused: number;
+  kosSuffered: number;
+  specialsUsed: number;
+  teamActionsUsed: number;
+  leaderAbilitiesUsed: number;
+  rewardPointsEarned: number;
+  rewardPointsSpent: number;
+  powerUpsUsed: number;
+  statGains: number;
+}
+
+export interface FinalJourneyAwardApi {
+  code: string;
+  label: string;
+  explanation: string;
+  winner: { teamId: string; heroId: string } | null;
+  winningFacts: { metricCode: string; value: number };
+  reason: string;
+}
+
+export interface FinalJourneyCompetitionApi {
+  journeyEncounters: number;
+  finalStagePlayed: boolean;
+  finalStageNormalTurnsPlayed: number;
+}
+
+export interface FinalJourneyStatisticsApi {
+  attemptId: string;
+  status: string;
+  completionOutcome: string | null;
+  competition: FinalJourneyCompetitionApi;
+  teamStatistics: FinalJourneyTeamStatisticsApi[];
+  awards: FinalJourneyAwardApi[];
 }

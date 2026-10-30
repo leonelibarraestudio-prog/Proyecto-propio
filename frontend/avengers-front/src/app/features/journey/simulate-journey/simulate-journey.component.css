@@ -139,7 +139,7 @@
   padding: 3px 2px 4px;
   overflow: hidden;
   color: #cbd3df;
-  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-family: Impact, "Arial Narrow", sans-serif;
   font-size: calc(9px * var(--ui-font-scale));
   letter-spacing: 0.025em;
   line-height: 1.15;
@@ -235,4 +235,540 @@
   .strategy-options {
     grid-template-columns: 1fr;
   }
+}
+
+
+/* Checkpoint visual aprobado 28/10/2026: adaptado a estilos encapsulados Angular */
+/* PÁGINA */
+    :host .simulate-page {
+      background: linear-gradient(160deg, #07101d, #160a18) !important;
+    }
+
+    /* ENCABEZADO CON NUEVA IMAGEN */
+    :host .page-heading {
+      padding: 25px 28px !important;
+      border: 1px solid rgba(166, 40, 63, .55) !important;
+      border-radius: 12px !important;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(3, 12, 26, .64),
+          rgba(14, 7, 22, .54),
+          rgba(35, 5, 17, .62)
+        ),
+        url("/assets/final-battle/encabezado.png")
+        center / cover no-repeat !important;
+    }
+
+    /* TÍTULO CINEMATOGRÁFICO */
+    :host .page-title {
+      font-family: Arial, Helvetica, sans-serif !important;
+      font-size: clamp(28px, 3vw, 38px) !important;
+      font-weight: 800 !important;
+      letter-spacing: 1.8px !important;
+      line-height: 1.2 !important;
+      text-transform: uppercase !important;
+      text-shadow: none !important;
+      opacity: 1 !important;
+      filter: none !important;
+    }
+
+    :host .page-title .simular-metal {
+      color: #e9edf5 !important;
+      -webkit-text-fill-color: #e9edf5 !important;
+      text-shadow: 0 2px 5px rgba(0,0,0,.45) !important;
+    }
+
+    :host .page-title .batallas-red {
+      color: #ff5264 !important;
+      -webkit-text-fill-color: #ff5264 !important;
+      text-shadow: 0 2px 7px rgba(0,0,0,.5) !important;
+    }
+
+    /* ESTRATEGIAS */
+    :host .strategy-options {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 12px !important;
+    }
+
+    :host .strategy-options > * {
+      padding: 14px !important;
+      border: 1px solid #34506d !important;
+      border-radius: 9px !important;
+      background: linear-gradient(145deg, #0c1d31, #0a1425) !important;
+    }
+
+    :host .strategy-options > *.selected {
+      border: 2px solid #63e346 !important;
+      background: linear-gradient(145deg, #102c29, #0b1b25) !important;
+    }
+
+    /* ARENA CON LA PRIMERA IMAGEN */
+    :host .final-panel {
+      position: relative !important;
+      overflow: hidden !important;
+      padding: 22px !important;
+      border: 1px solid rgba(190, 38, 60, .65) !important;
+      border-radius: 14px !important;
+      background:
+        linear-gradient(
+          90deg,
+          rgba(4, 14, 30, .58),
+          rgba(8, 9, 20, .48),
+          rgba(25, 5, 13, .60)
+        ),
+        url("/assets/final-battle/Simular%20batalla.png")
+        center / cover no-repeat !important;
+    }
+
+    /* EQUIPOS */
+    :host .versus-layout {
+      display: grid !important;
+      grid-template-columns: minmax(0,1fr) 68px minmax(0,1fr) !important;
+      gap: 14px !important;
+      align-items: center !important;
+      min-height: 0 !important;
+      margin: 24px 0 28px !important;
+      padding: 0 !important;
+    }
+
+    :host .team-side {
+      width: 100% !important;
+      min-width: 0 !important;
+    }
+
+    :host .hero-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+      gap: 9px !important;
+      width: 100% !important;
+    }
+
+    :host .hero-grid > * {
+      min-width: 0 !important;
+      box-sizing: border-box !important;
+      padding: 7px !important;
+      border: 1px solid rgba(62,127,180,.55) !important;
+      border-radius: 8px !important;
+      background: rgba(7,20,35,.85) !important;
+    }
+
+    :host .hero-grid img {
+      display: block !important;
+      max-width: 100% !important;
+      max-height: 105px !important;
+      object-fit: contain !important;
+    }
+
+    :host .opponent-side .hero-grid > * {
+      border: 1px solid rgba(205,45,70,.65) !important;
+      background: rgba(22,8,20,.85) !important;
+    }
+
+    /* VS */
+    :host .versus-mark {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: 64px !important;
+      height: 64px !important;
+      margin: auto !important;
+      border: 2px solid #d52b43 !important;
+      border-radius: 50% !important;
+      background: radial-gradient(circle, #75182b, #180b18) !important;
+      color: white !important;
+      font-size: 23px !important;
+      font-weight: 900 !important;
+      box-shadow: 0 0 24px rgba(210,30,60,.3) !important;
+    }
+
+    /* BOTÓN */
+    :host .journey-actions {
+      position: relative !important;
+      display: flex !important;
+      justify-content: center !important;
+      margin: 20px 0 0 !important;
+      padding: 12px 0 4px !important;
+    }
+
+    :host .journey-actions .button.primary {
+      min-width: 220px !important;
+      padding: 13px 22px !important;
+      border-radius: 8px !important;
+      border: 1px solid #f34d62 !important;
+      background: linear-gradient(135deg, #e42e47, #94172e) !important;
+      color: white !important;
+      box-shadow: 0 7px 24px rgba(180,20,45,.3) !important;
+    }
+
+    @media (max-width:700px) {
+      :host .versus-layout {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+:host .page-title {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 0 !important;
+      margin: 0 !important;
+      font-family: "Arial Black", "Segoe UI", Arial, sans-serif !important;
+      font-weight: 950 !important;
+      text-transform: uppercase !important;
+      opacity: 1 !important;
+      filter: none !important;
+    }
+
+    :host .page-title .simular-metal,
+    :host .page-title .batallas-red {
+      display: block !important;
+      width: fit-content !important;
+      font-family: "Arial Black", "Segoe UI", Arial, sans-serif !important;
+      font-size: clamp(32px, 4vw, 50.7px) !important;
+      font-weight: 950 !important;
+      line-height: 1.03 !important;
+      text-transform: uppercase !important;
+      background-clip: text !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      text-shadow: none !important;
+      filter:
+        drop-shadow(2px 3px 0px #05070d)
+        drop-shadow(3px 5px 3px rgba(0,0,0,.7)) !important;
+      opacity: 1 !important;
+    }
+
+    /* PLATEADO ORIGINAL R6 */
+    :host .page-title .simular-metal {
+      letter-spacing: -2.28px !important;
+      background:
+        linear-gradient(
+          180deg,
+          #ffffff 0%,
+          #f0f3f8 22%,
+          #aab3c2 56%,
+          #505d70 100%
+        ) !important;
+      background-clip: text !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+    }
+
+    /* ROJO ORIGINAL R6 */
+    :host .page-title .batallas-red {
+      letter-spacing: -2.64px !important;
+      background:
+        linear-gradient(
+          180deg,
+          #ff838c 0%,
+          #f04757 28%,
+          #ae2339 65%,
+          #530e20 100%
+        ) !important;
+      background-clip: text !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+    }
+
+/* ESTRATEGIAS: TARJETAS DE VIDEOJUEGO */
+    :host .strategy-options {
+      gap: 16px !important;
+    }
+
+    :host .strategy-options > * {
+      position: relative !important;
+      min-height: 100px !important;
+      padding: 20px 18px 18px 75px !important;
+      border: 1px solid rgba(112, 147, 184, .55) !important;
+      border-radius: 11px !important;
+      background: linear-gradient(135deg, #10243b, #071423) !important;
+      box-shadow: inset 0 1px rgba(255,255,255,.08),
+                  0 8px 22px rgba(0,0,0,.28) !important;
+      transition: transform .2s, box-shadow .2s !important;
+    }
+
+    :host .strategy-options > *:nth-child(1)::before,
+    :host .strategy-options > *:nth-child(2)::before,
+    :host .strategy-options > *:nth-child(3)::before {
+      position: absolute !important;
+      left: 20px !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      font-size: 34px !important;
+      line-height: 1 !important;
+    }
+
+    :host .strategy-options > *:nth-child(1)::before {
+      content: "▤" !important;
+      color: #d6e5f6 !important;
+    }
+
+    :host .strategy-options > *:nth-child(2)::before {
+      content: "⚖" !important;
+      color: #4cff78 !important;
+    }
+
+    :host .strategy-options > *:nth-child(3)::before {
+      content: "⚔" !important;
+      color: #ff536a !important;
+    }
+
+    :host .strategy-options > *.selected {
+      border: 2px solid #36ff68 !important;
+      background: linear-gradient(135deg, #092d23, #071a20) !important;
+      box-shadow: 0 0 20px rgba(30,255,90,.3),
+                  inset 0 0 18px rgba(20,190,70,.12) !important;
+    }
+
+    /* ARENA: MÁS PRESENCIA VISUAL */
+    :host .final-panel {
+      padding: 26px !important;
+    }
+
+    :host .versus-layout {
+      grid-template-columns: minmax(0,1fr) 110px minmax(0,1fr) !important;
+      gap: 22px !important;
+      margin: 28px 0 30px !important;
+    }
+
+    /* ENCABEZADOS DE EQUIPO */
+    :host .team-side > :first-child {
+      padding: 0 0 12px 12px !important;
+      margin-bottom: 16px !important;
+      border-bottom: 4px solid #139fff !important;
+      border-left: 4px solid #139fff !important;
+      font-family: "Arial Black", Arial, sans-serif !important;
+      font-size: 19px !important;
+      font-weight: 900 !important;
+      text-transform: uppercase !important;
+      text-shadow: 0 3px 5px #000 !important;
+    }
+
+    :host .opponent-side > :first-child {
+      border-color: #ff3156 !important;
+      text-align: right !important;
+      padding: 0 12px 12px 0 !important;
+      border-left: 0 !important;
+      border-right: 4px solid #ff3156 !important;
+    }
+
+    /* TARJETAS DE HÉROES */
+    :host .hero-grid {
+      gap: 14px !important;
+    }
+
+    :host .hero-grid > * {
+      padding: 5px !important;
+      border: 2px solid #168ff0 !important;
+      border-radius: 9px !important;
+      background: linear-gradient(145deg, #12344d, #06121e) !important;
+      box-shadow: 0 9px 20px rgba(0,0,0,.55),
+                  inset 0 0 14px rgba(23,143,240,.12) !important;
+    }
+
+    :host .hero-grid img {
+      max-height: 145px !important;
+      width: 100% !important;
+      object-fit: contain !important;
+    }
+
+    :host .opponent-side .hero-grid > * {
+      min-height: 130px !important;
+      border: 2px solid #e52d4c !important;
+      background:
+        radial-gradient(circle at 50% 30%, rgba(117,22,49,.42), transparent 65%),
+        linear-gradient(145deg, #260c1a, #0c0812) !important;
+      box-shadow: 0 9px 20px rgba(0,0,0,.5),
+                  inset 0 0 15px rgba(255,45,80,.12) !important;
+    }
+
+    /* VS: DOBLE ANILLO LUMINOSO */
+    :host .versus-mark {
+      position: relative !important;
+      isolation: isolate !important;
+      width: 88px !important;
+      height: 88px !important;
+      border: 3px solid #ff6a7d !important;
+      border-radius: 50% !important;
+      background: radial-gradient(circle, #e51f42 0%, #8d1028 55%, #280712 100%) !important;
+      font-family: "Arial Black", Arial, sans-serif !important;
+      font-size: 34px !important;
+      font-weight: 900 !important;
+      color: #fff !important;
+      text-shadow: 0 0 15px #fff, 0 0 25px #ff405c !important;
+      box-shadow:
+        0 0 0 6px rgba(122,12,37,.85),
+        0 0 0 9px rgba(255,58,89,.55),
+        0 0 25px 10px rgba(255,30,65,.55),
+        inset 0 0 22px rgba(255,155,170,.4) !important;
+      animation: simularVsPulso 3s ease-in-out infinite !important;
+    }
+
+    @keyframes simularVsPulso {
+      0%, 100% {
+        box-shadow:
+          0 0 0 6px rgba(122,12,37,.85),
+          0 0 0 9px rgba(255,58,89,.45),
+          0 0 20px 7px rgba(255,30,65,.4);
+      }
+      50% {
+        box-shadow:
+          0 0 0 6px rgba(122,12,37,.95),
+          0 0 0 10px rgba(255,58,89,.7),
+          0 0 35px 14px rgba(255,30,65,.7);
+      }
+    }
+
+    /* BOTÓN PRINCIPAL */
+    :host .journey-actions .button.primary {
+      min-width: 330px !important;
+      padding: 19px 35px !important;
+      border: 2px solid #ff6577 !important;
+      border-radius: 10px !important;
+      background: linear-gradient(180deg, #ff334d, #c70d30 60%, #760b20) !important;
+      font-family: "Arial Black", Arial, sans-serif !important;
+      font-size: 18px !important;
+      font-weight: 900 !important;
+      letter-spacing: .3px !important;
+      box-shadow:
+        0 0 0 4px rgba(125,10,35,.35),
+        0 0 32px rgba(255,30,65,.65),
+        inset 0 2px rgba(255,255,255,.35) !important;
+    }
+
+    @media (max-width: 800px) {
+      :host .versus-layout {
+        grid-template-columns: minmax(0,1fr) 80px minmax(0,1fr) !important;
+        gap: 10px !important;
+      }
+
+      :host .versus-mark {
+        width: 66px !important;
+        height: 66px !important;
+        font-size: 25px !important;
+      }
+
+      :host .hero-grid {
+        gap: 7px !important;
+      }
+
+      :host .team-side > :first-child {
+        font-size: 13px !important;
+      }
+    }
+
+    @media (max-width: 600px) {
+      :host .versus-layout {
+        grid-template-columns: 1fr !important;
+      }
+
+      :host .strategy-options {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      :host .versus-mark {
+        animation: none !important;
+      }
+    }
+
+:host .final-panel {
+      padding: 26px !important;
+    }
+
+    :host .versus-layout {
+      display: grid !important;
+      grid-template-columns: minmax(0,1fr) 90px minmax(0,1fr) !important;
+      gap: 18px !important;
+      align-items: center !important;
+      margin: 30px 0 20px !important;
+    }
+
+    :host .hero-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+      gap: 10px !important;
+    }
+
+    :host .hero-grid > * {
+      min-height: 0 !important;
+    }
+
+    :host .hero-grid img {
+      max-height: 115px !important;
+    }
+
+    :host .opponent-side .hero-grid > * {
+      min-height: 100px !important;
+    }
+
+    :host .versus-mark {
+      width: 76px !important;
+      height: 76px !important;
+      font-size: 29px !important;
+    }
+
+    :host .journey-actions {
+      position: relative !important;
+      z-index: 1 !important;
+      clear: both !important;
+      display: flex !important;
+      justify-content: center !important;
+      margin: 26px 0 0 !important;
+      padding: 12px 0 0 !important;
+    }
+
+    :host .journey-actions .button.primary {
+      min-width: 280px !important;
+      padding: 15px 28px !important;
+      font-size: 15px !important;
+    }
+
+    @media (max-width: 700px) {
+      :host .versus-layout {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+:host .page-heading {
+  background: linear-gradient(90deg, rgba(2,8,20,.45), rgba(2,8,20,.05)), url("/assets/final-battle/encabezado.png") center / cover no-repeat !important;
+}
+
+/* R4 — Ajuste de altura validado en Chrome al 100 %.
+   Mantener el contenido visible y compactar espacios verticales. */
+:host {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+}
+
+.simulate-page {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow: visible !important;
+  gap: 6px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+.final-panel {
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+}
+
+.spending-panel {
+  padding-top: 7px !important;
+  padding-bottom: 7px !important;
+}
+
+.panel-heading {
+  margin-bottom: 4px !important;
+}
+
+.journey-actions {
+  padding-top: 2px !important;
 }

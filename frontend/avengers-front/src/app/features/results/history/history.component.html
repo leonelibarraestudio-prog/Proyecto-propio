@@ -5,80 +5,289 @@
     <p class="history-subtitle">{{ translate('r13.subtitle', pageState.lang) }}</p>
   </header>
 
-  <section class="history-summary" *ngIf="pageState.status === 'data' && pageState.data as history">
-    <dl class="history-stat">
-      <dt>Caminos</dt>
-      <dd>{{ history.summary.total }}</dd>
-    </dl>
-    <dl class="history-stat">
-      <dt>Victorias</dt>
-      <dd>{{ history.summary.victories }}</dd>
-    </dl>
-    <dl class="history-stat">
-      <dt>Derrotas</dt>
-      <dd>{{ history.summary.defeats }}</dd>
-    </dl>
-    <dl class="history-stat">
-      <dt>Abandonados</dt>
-      <dd>{{ history.summary.abandoned }}</dd>
-    </dl>
-  </section>
-
-  <section class="history-list" *ngIf="pageState.status === 'data' && pageState.data as history">
-    <article
-      class="history-card"
-      *ngFor="let item of history.items; let i = index; trackBy: trackItem"
+  <ng-container *ngIf="!pageState.detail">
+    <section
+      class="history-summary"
+      *ngIf="pageState.status === 'data' && pageState.data as history"
     >
-      <header class="history-card-header">
-        <h2>{{ translate('r13.attempt', pageState.lang) }} {{ history.items.length - i }}</h2>
-        <span class="history-outcome">{{ outcomeLabel(item.outcomeCode) }}</span>
-      </header>
-
-      <dl class="history-details">
-        <div>
-          <dt>{{ translate('r13.createdAt', pageState.lang) }}</dt>
-          <dd>{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
-        </div>
-        <div>
-          <dt>{{ translate('r13.completedAt', pageState.lang) }}</dt>
-          <dd>{{ item.completedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
-        </div>
-        <div>
-          <dt>{{ translate('r13.opponent', pageState.lang) }}</dt>
-          <dd>{{ item.opponentFinalistName }}</dd>
-        </div>
-        <div>
-          <dt>{{ translate('r13.strategy', pageState.lang) }}</dt>
-          <dd>{{ strategyLabel(item.spendingStrategyCode) }}</dd>
-        </div>
+      <dl class="history-stat">
+        <dt>{{ translate('r13.totalAttempts', pageState.lang) }}</dt>
+        <dd>{{ history.summary.total }}</dd>
       </dl>
+      <dl class="history-stat">
+        <dt>{{ translate('r13.victories', pageState.lang) }}</dt>
+        <dd>{{ history.summary.victories }}</dd>
+      </dl>
+      <dl class="history-stat">
+        <dt>{{ translate('r13.defeats', pageState.lang) }}</dt>
+        <dd>{{ history.summary.defeats }}</dd>
+      </dl>
+      <dl class="history-stat">
+        <dt>{{ translate('r13.abandoned', pageState.lang) }}</dt>
+        <dd>{{ history.summary.abandoned }}</dd>
+      </dl>
+    </section>
 
-      <p class="history-ending">
-        <strong>{{ translate('r13.ending', pageState.lang) }}:</strong>
-        {{ item.endingSummary }}
-      </p>
-    </article>
-  </section>
+    <section
+      class="history-list"
+      *ngIf="pageState.status === 'data' && pageState.data as history"
+    >
+      <article
+        class="history-card"
+        *ngFor="let item of history.items; let i = index; trackBy: trackItem"
+      >
+        <header class="history-card-header">
+          <h2>{{ translate('r13.attempt', pageState.lang) }} {{ history.items.length - i }}</h2>
+          <span class="history-outcome">{{ outcomeLabel(item.outcomeCode, pageState.lang) }}</span>
+        </header>
 
-  <app-loading-state *ngIf="pageState.status === 'loading'" message="Cargando..."></app-loading-state>
+        <dl class="history-details">
+          <div>
+            <dt>{{ translate('r13.createdAt', pageState.lang) }}</dt>
+            <dd>{{ item.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+          <div>
+            <dt>{{ translate('r13.completedAt', pageState.lang) }}</dt>
+            <dd>{{ item.completedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+          <div>
+            <dt>{{ translate('r13.opponent', pageState.lang) }}</dt>
+            <dd>{{ item.opponentFinalistName }}</dd>
+          </div>
+          <div>
+            <dt>{{ translate('r13.strategy', pageState.lang) }}</dt>
+            <dd>{{ strategyLabel(item.spendingStrategyCode, pageState.lang) }}</dd>
+          </div>
+        </dl>
 
-  <app-error-state
-    *ngIf="pageState.status === 'error'"
-    [message]="pageState.error ?? translate('error', pageState.lang)"
-    [messageCode]="pageState.errorCode ?? null"
-  ></app-error-state>
+        <p class="history-ending">
+          <strong>{{ translate('r13.ending', pageState.lang) }}:</strong>
+          {{ item.endingSummary }}
+        </p>
 
-  <section class="history-empty" *ngIf="pageState.status === 'empty'">
-    <h2>{{ translate('r13.noHistory', pageState.lang) }}</h2>
-    <p>{{ translate('r13.noHistoryCopy', pageState.lang) }}</p>
-  </section>
+        <button
+          type="button"
+          class="history-action"
+          (click)="openDetail(item, history.items.length - i)"
+        >
+          {{ translate('r13.viewDetails', pageState.lang) }}
+        </button>
+      </article>
+    </section>
 
-  <button
-    *ngIf="pageState.status === 'error'"
-    type="button"
-    class="history-retry"
-    (click)="retry()"
-  >
-    {{ translate('retry', pageState.lang) }}
-  </button>
+    <app-loading-state
+      *ngIf="pageState.status === 'loading'"
+      [message]="translate('loading', pageState.lang)"
+    ></app-loading-state>
+
+    <app-error-state
+      *ngIf="pageState.status === 'error'"
+      [message]="pageState.error ?? translate('error', pageState.lang)"
+      [messageCode]="pageState.errorCode ?? null"
+    ></app-error-state>
+
+    <section class="history-empty" *ngIf="pageState.status === 'empty'">
+      <h2>{{ translate('r13.noHistory', pageState.lang) }}</h2>
+      <p>{{ translate('r13.noHistoryCopy', pageState.lang) }}</p>
+    </section>
+
+    <button
+      *ngIf="pageState.status === 'error'"
+      type="button"
+      class="history-retry"
+      (click)="retry()"
+    >
+      {{ translate('retry', pageState.lang) }}
+    </button>
+  </ng-container>
+
+  <ng-container *ngIf="pageState.detail as detail">
+    <section class="history-journey">
+      <button type="button" class="history-action" (click)="closeDetail()">
+        {{ translate('r13.backToHistory', pageState.lang) }}
+      </button>
+
+      <app-loading-state
+        *ngIf="detail.status === 'loading'"
+        [message]="translate('loading', pageState.lang)"
+      ></app-loading-state>
+
+      <ng-container *ngIf="detail.status === 'error'">
+        <app-error-state
+          [message]="detail.error ?? translate('error', pageState.lang)"
+          [messageCode]="detail.errorCode ?? null"
+        ></app-error-state>
+        <button type="button" class="history-retry" (click)="retryDetail()">
+          {{ translate('retry', pageState.lang) }}
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="detail.status === 'data' && detail.data as journey">
+        <header class="history-card-header history-journey-header">
+          <h2>{{ translate('r13.attempt', pageState.lang) }} {{ detail.attemptNumber }}</h2>
+          <span class="history-outcome">
+            {{ outcomeLabel(journey.summary.completionOutcome, pageState.lang) }}
+          </span>
+        </header>
+
+        <dl class="history-details history-panel">
+          <div>
+            <dt>{{ translate('r13.createdAt', pageState.lang) }}</dt>
+            <dd>{{ journey.summary.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+          <div>
+            <dt>{{ translate('r13.completedAt', pageState.lang) }}</dt>
+            <dd>{{ journey.summary.completedAt | date: 'dd/MM/yyyy HH:mm' }}</dd>
+          </div>
+          <div>
+            <dt>{{ translate('r13.strategy', pageState.lang) }}</dt>
+            <dd>{{ strategyLabel(journey.summary.spendingStrategyCode, pageState.lang) }}</dd>
+          </div>
+          <div>
+            <dt>{{ translate('r13.opponent', pageState.lang) }}</dt>
+            <dd>{{ teamLabel(journey.teamNames, journey.summary.finalists.opponentTeamId) }}</dd>
+          </div>
+          <div>
+            <dt>{{ translate('r13.stagesCompleted', pageState.lang) }}</dt>
+            <dd>{{ journey.summary.progress.stagesCompleted }}</dd>
+          </div>
+          <div>
+            <dt>{{ translate('r13.encountersPlayed', pageState.lang) }}</dt>
+            <dd>{{ journey.summary.progress.encountersPlayedByPlayer }}</dd>
+          </div>
+        </dl>
+
+        <section class="history-panel">
+          <h3>{{ translate('r13.finalBattle', pageState.lang) }}</h3>
+          <div class="history-teams">
+            <article class="history-team" *ngFor="let team of journey.teams; trackBy: trackTeam">
+              <h4>{{ team.name }}</h4>
+              <dl class="history-details">
+                <div>
+                  <dt>{{ translate('r13.leader', pageState.lang) }}</dt>
+                  <dd>{{ heroLabel(team.leaderId) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ translate('r13.strategy', pageState.lang) }}</dt>
+                  <dd>{{ strategyLabel(team.strategyCode, pageState.lang) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ translate('r13.rewardPoints', pageState.lang) }}</dt>
+                  <dd>{{ team.rewardPoints ?? translate('r13.notRecorded', pageState.lang) }}</dd>
+                </div>
+              </dl>
+              <p class="history-eliminated" *ngIf="team.eliminated">
+                {{ translate('r13.eliminated', pageState.lang) }}
+              </p>
+              <h5>{{ translate('r13.heroes', pageState.lang) }}</h5>
+              <ul class="history-heroes">
+                <li *ngFor="let hero of team.heroes ?? []; trackBy: trackHero">
+                  <span>{{ heroLabel(hero.heroId) }}</span>
+                  <span class="history-hero-status">{{ heroStatusLabel(hero, pageState.lang) }}</span>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="history-panel">
+          <h3>{{ translate('r13.statistics', pageState.lang) }}</h3>
+          <p *ngIf="!journey.statistics">
+            {{ translate('r13.statisticsUnavailable', pageState.lang) }}
+          </p>
+          <ng-container *ngIf="journey.statistics as statistics">
+            <p class="history-ending">
+              <strong>{{ translate('r13.tournamentEncounters', pageState.lang) }}:</strong>
+              {{ statistics.competition.journeyEncounters }}
+            </p>
+            <div class="history-teams">
+              <article
+                class="history-team"
+                *ngFor="let stats of statistics.teamStatistics; trackBy: trackTeamStatistics"
+              >
+                <h4>{{ teamLabel(journey.teamNames, stats.teamId) }}</h4>
+                <dl class="history-details">
+                  <div>
+                    <dt>{{ translate('r13.encounters', pageState.lang) }}</dt>
+                    <dd>{{ stats.encounters }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translate('r13.wins', pageState.lang) }}</dt>
+                    <dd>{{ stats.wins }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translate('r13.draws', pageState.lang) }}</dt>
+                    <dd>{{ stats.draws }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translate('r13.losses', pageState.lang) }}</dt>
+                    <dd>{{ stats.losses }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translate('r13.damageDealt', pageState.lang) }}</dt>
+                    <dd>{{ stats.damageDealt }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translate('r13.damageReceived', pageState.lang) }}</dt>
+                    <dd>{{ stats.damageReceived }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translate('r13.kosCaused', pageState.lang) }}</dt>
+                    <dd>{{ stats.kosCaused }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ translate('r13.kosSuffered', pageState.lang) }}</dt>
+                    <dd>{{ stats.kosSuffered }}</dd>
+                  </div>
+                </dl>
+              </article>
+            </div>
+          </ng-container>
+        </section>
+
+        <section class="history-panel" *ngIf="journey.statistics as statistics">
+          <h3>{{ translate('r13.awards', pageState.lang) }}</h3>
+          <ul class="history-awards">
+            <li *ngFor="let award of statistics.awards; trackBy: trackAward">
+              <strong>{{ award.label }}</strong>
+              <span *ngIf="award.winner as winner">
+                {{ translate('r13.winner', pageState.lang) }}:
+                {{ heroLabel(winner.heroId) }} ({{ teamLabel(journey.teamNames, winner.teamId) }})
+              </span>
+              <span *ngIf="!award.winner">{{ translate('r13.noWinner', pageState.lang) }}</span>
+              <span class="history-ending">{{ award.reason }}</span>
+            </li>
+          </ul>
+        </section>
+
+        <section class="history-panel">
+          <h3>{{ translate('r13.events', pageState.lang) }}</h3>
+          <p *ngIf="!journey.events.length">{{ translate('r13.noEvents', pageState.lang) }}</p>
+          <ol class="history-events" *ngIf="journey.events.length">
+            <li
+              *ngFor="
+                let event of eventsToShow(journey.events, detail.visibleEvents);
+                trackBy: trackEvent
+              "
+            >
+              <span class="history-event-sequence">#{{ event.sequence }}</span>
+              {{ eventText(event) }}
+            </li>
+          </ol>
+          <button
+            type="button"
+            class="history-action"
+            *ngIf="remainingEvents(journey.events.length, detail.visibleEvents) > 0"
+            (click)="showMoreEvents()"
+          >
+            {{
+              translate('r13.showMore', pageState.lang, {
+                count: remainingEvents(journey.events.length, detail.visibleEvents)
+              })
+            }}
+          </button>
+        </section>
+      </ng-container>
+    </section>
+  </ng-container>
 </main>

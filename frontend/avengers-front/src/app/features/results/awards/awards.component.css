@@ -1,55 +1,480 @@
-.awards-page {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 32px 24px 56px;
-  color: #f5f5f7;
+:host {
+  display: block;
+  min-height: 100%;
+  color: #eef2ff;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(35, 83, 151, .22), transparent 42%),
+    radial-gradient(ellipse at 92% 12%, rgba(191, 145, 54, .10), transparent 34%),
+    #0b1020;
 }
-.awards-header { margin-bottom: 28px; }
-.awards-header h1 { margin: 4px 0 10px; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; }
-.awards-header > p:last-child, .section-heading p, .muted { color: #b9bac7; line-height: 1.55; }
-.eyebrow { margin: 0 0 6px; color: #a7a8bc; font-size: .72rem; font-weight: 800; letter-spacing: .12em; }
-.journey-summary { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px; margin-bottom: 28px; border: 1px solid #454557; border-radius: 16px; background: linear-gradient(125deg, #202034, #171720); }
-.journey-summary h2 { margin: 0 0 6px; font-size: 1.7rem; }
-.journey-summary p { margin: 0; }
-.summary-meta { display: grid; gap: 8px; font-size: .9rem; overflow-wrap: anywhere; }
-.statistics-section, .awards-section { margin: 32px 0; }
-.section-heading { margin-bottom: 16px; }
-.section-heading h2 { margin: 0 0 6px; font-size: 1.45rem; }
-.section-heading p { margin: 0; }
-.statistics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.stat-card { display: flex; flex-direction: column; justify-content: space-between; min-height: 88px; gap: 14px; padding: 17px; border: 1px solid #383846; border-radius: 12px; background: #191922; }
-.stat-card span { color: #b9bac7; font-size: .86rem; }
-.stat-card strong { font-size: 1.55rem; overflow-wrap: anywhere; }
-.awards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; }
-.award-card { min-width: 0; padding: 22px; border: 1px solid #3d3d4e; border-radius: 16px; background: #191922; }
-.award-title-row { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 14px; }
-.award-icon { font-size: 1.8rem; }
-.award-title-row h3 { margin: 0; font-size: 1.15rem; }
-.award-description, .award-reason { color: #c7c7d1; line-height: 1.55; }
-.award-winner { display: flex; align-items: center; gap: 14px; margin-top: 18px; padding: 14px; border-radius: 12px; background: #242432; }
-.award-winner img, .hero-stat-row img { width: 68px; height: 68px; flex: 0 0 68px; object-fit: cover; border-radius: 12px; background: #30303d; }
-.winner-label { color: #a7a8bc; font-size: .68rem; font-weight: 800; letter-spacing: .1em; }
-.award-winner h4 { margin: 4px 0; font-size: 1.05rem; }
-.award-winner p { margin: 0; font-size: .82rem; }
-.award-metric { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
-.award-metric span { padding: 6px 9px; border-radius: 7px; background: #292938; color: #d6d6e0; font-size: .82rem; }
-.award-metric strong { padding: 6px 10px; border-radius: 7px; background: #3a3150; color: #f0e6ff; font-size: 1rem; }
-.no-winner { margin-top: 18px; padding: 12px; border: 1px dashed #555568; border-radius: 10px; color: #c7c7d1; line-height: 1.5; }
-.award-reason { margin-bottom: 0; }
-.awards-message { padding: 20px; border: 1px solid #383846; border-radius: 12px; background: #191922; line-height: 1.6; }
-.awards-message h2, .awards-message h3 { margin-top: 0; }
-.awards-error { border-color: #82464b; color: #ffc4c4; }
-.awards-unavailable { border-color: #76613a; color: #f1d9a2; }
-.retry-button { margin-top: 10px; padding: 10px 14px; border: 1px solid #65657a; border-radius: 8px; background: #2a2a3a; color: #fff; cursor: pointer; }
-.hero-stats-list { display: grid; gap: 12px; }
-.hero-stat-row { display: flex; align-items: center; gap: 15px; padding: 15px; border: 1px solid #383846; border-radius: 12px; background: #191922; }
-.hero-stat-content { min-width: 0; }
-.hero-stat-content h3 { margin: 0 0 5px; }
-.hero-stat-content p { margin: 0 0 8px; color: #b9bac7; font-size: .88rem; }
-.hero-stat-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-.hero-stat-chips span { padding: 5px 8px; border-radius: 7px; background: #292938; color: #d6d6e0; font-size: .8rem; }
-@media (max-width: 640px) {
-  .awards-page { padding: 24px 15px 40px; }
-  .journey-summary { align-items: flex-start; flex-direction: column; padding: 18px; }
-  .summary-meta { font-size: .82rem; }
+
+.awards-page {
+  box-sizing: border-box;
+  width: min(100%, 1280px);
+  margin: 0 auto;
+  padding: clamp(22px, 4vw, 44px) clamp(16px, 3vw, 32px) 64px;
+  color: #eef2ff;
+}
+
+.awards-page *,
+.awards-page *::before,
+.awards-page *::after {
+  box-sizing: border-box;
+}
+
+.awards-header {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 28px;
+  padding: clamp(24px, 4vw, 40px);
+  border: 1px solid rgba(148, 169, 211, .22);
+  border-radius: 22px;
+  background: linear-gradient(115deg, rgba(24, 42, 76, .96), rgba(17, 25, 45, .96));
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .24);
+}
+
+.awards-header::after {
+  content: "";
+  position: absolute;
+  top: -90px;
+  right: -55px;
+  width: 260px;
+  height: 260px;
+  border: 1px solid rgba(232, 190, 100, .16);
+  border-radius: 50%;
+  box-shadow: 0 0 0 24px rgba(232, 190, 100, .025),
+              0 0 0 50px rgba(232, 190, 100, .02);
+  pointer-events: none;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #e7bd69;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+}
+
+.awards-header h1 {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 12px;
+  color: #fff;
+  font-size: clamp(2rem, 5vw, 3.15rem);
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+
+.awards-header > p:last-child,
+.section-heading p,
+.muted {
+  max-width: 760px;
+  margin-top: 0;
+  color: #b9c5dc;
+  font-size: .97rem;
+  line-height: 1.65;
+}
+
+.journey-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 34px;
+  padding: clamp(22px, 3vw, 30px);
+  border: 1px solid rgba(231, 189, 105, .30);
+  border-radius: 18px;
+  background: linear-gradient(120deg, rgba(39, 48, 67, .98), rgba(25, 33, 50, .98));
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .18);
+}
+
+.journey-summary h2 {
+  margin: 0 0 8px;
+  color: #f5d58f;
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.journey-summary p {
+  margin: 0;
+  color: #c5cee0;
+  line-height: 1.55;
+}
+
+.summary-meta {
+  display: grid;
+  gap: 8px;
+  min-width: 190px;
+  color: #dce4f4;
+  font-size: .9rem;
+  overflow-wrap: anywhere;
+}
+
+.statistics-section,
+.awards-section {
+  margin: 38px 0;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-heading h2 {
+  margin: 0 0 7px;
+  color: #f4f6fc;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+
+.section-heading p {
+  margin-bottom: 0;
+}
+
+.statistics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 175px), 1fr));
+  gap: 14px;
+}
+
+.stat-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  min-height: 112px;
+  gap: 16px;
+  padding: 19px;
+  overflow: hidden;
+  border: 1px solid rgba(135, 157, 199, .18);
+  border-radius: 15px;
+  background: linear-gradient(145deg, #18243b, #121b2e);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .16);
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(231, 189, 105, .42);
+  background: linear-gradient(145deg, #1d2d49, #142039);
+}
+
+.stat-card span {
+  color: #aebbd2;
+  font-size: .86rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.stat-card strong {
+  color: #fff;
+  font-size: clamp(1.55rem, 3vw, 1.9rem);
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: -.035em;
+  overflow-wrap: anywhere;
+}
+
+.awards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 18px;
+}
+
+.award-card {
+  min-width: 0;
+  padding: clamp(18px, 3vw, 24px);
+  border: 1px solid rgba(135, 157, 199, .20);
+  border-radius: 18px;
+  background: linear-gradient(155deg, #19253c, #111a2c 78%);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
+  transition: transform .18s ease, border-color .18s ease;
+}
+
+.award-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(231, 189, 105, .38);
+}
+
+.award-title-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.award-icon {
+  display: grid;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid rgba(231, 189, 105, .25);
+  border-radius: 13px;
+  background: rgba(231, 189, 105, .10);
+  font-size: 1.55rem;
+}
+
+.award-title-row h3 {
+  margin: 2px 0 0;
+  color: #f5d58f;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.award-description,
+.award-reason {
+  color: #bdc9dd;
+  font-size: .92rem;
+  line-height: 1.65;
+}
+
+.award-winner {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid rgba(231, 189, 105, .18);
+  border-radius: 14px;
+  background: rgba(231, 189, 105, .07);
+}
+
+.award-winner img,
+.hero-stat-row img {
+  display: block;
+  width: 68px;
+  height: 68px;
+  flex: 0 0 68px;
+  object-fit: cover;
+  border: 2px solid rgba(231, 189, 105, .55);
+  border-radius: 13px;
+  background: #202c43;
+}
+
+.winner-label {
+  color: #e7bd69;
+  font-size: .68rem;
+  font-weight: 850;
+  letter-spacing: .13em;
+}
+
+.award-winner h4 {
+  margin: 5px 0;
+  color: #fff;
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.award-winner p {
+  margin: 0;
+  color: #aebbd2;
+  font-size: .82rem;
+  overflow-wrap: anywhere;
+}
+
+.award-metric {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.award-metric span,
+.hero-stat-chips span {
+  padding: 7px 10px;
+  border: 1px solid rgba(135, 157, 199, .16);
+  border-radius: 8px;
+  background: rgba(113, 137, 180, .10);
+  color: #cbd6e9;
+  font-size: .82rem;
+}
+
+.award-metric strong {
+  padding: 7px 11px;
+  border: 1px solid rgba(231, 189, 105, .22);
+  border-radius: 8px;
+  background: rgba(231, 189, 105, .12);
+  color: #f5d58f;
+  font-size: .95rem;
+}
+
+.no-winner {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px dashed rgba(169, 185, 215, .35);
+  border-radius: 12px;
+  background: rgba(113, 137, 180, .06);
+  color: #bdc9dd;
+  line-height: 1.55;
+}
+
+.award-reason {
+  margin-bottom: 0;
+}
+
+.awards-message {
+  padding: 22px;
+  border: 1px solid rgba(135, 157, 199, .20);
+  border-radius: 15px;
+  background: linear-gradient(145deg, #18243b, #121b2e);
+  color: #cbd6e9;
+  line-height: 1.65;
+}
+
+.awards-message h2,
+.awards-message h3 {
+  margin-top: 0;
+  color: #f4f6fc;
+}
+
+.awards-error {
+  border-color: rgba(239, 112, 122, .5);
+  background: rgba(100, 35, 47, .24);
+  color: #ffc5cb;
+}
+
+.awards-unavailable {
+  border-color: rgba(231, 189, 105, .42);
+  background: rgba(105, 77, 29, .18);
+  color: #f5dca8;
+}
+
+.retry-button {
+  margin-top: 12px;
+  padding: 11px 17px;
+  border: 1px solid rgba(231, 189, 105, .48);
+  border-radius: 9px;
+  background: #d4a94f;
+  color: #172033;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background .18s ease, transform .18s ease;
+}
+
+.retry-button:hover {
+  transform: translateY(-1px);
+  background: #edc66f;
+}
+
+.retry-button:focus-visible {
+  outline: 3px solid rgba(237, 198, 111, .45);
+  outline-offset: 3px;
+}
+
+.hero-stats-list {
+  display: grid;
+  gap: 13px;
+}
+
+.hero-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(135, 157, 199, .18);
+  border-radius: 15px;
+  background: linear-gradient(110deg, #18243b, #121b2e);
+}
+
+.hero-stat-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.hero-stat-content h3 {
+  margin: 0 0 6px;
+  color: #f4f6fc;
+  font-size: 1.03rem;
+  font-weight: 800;
+}
+
+.hero-stat-content p {
+  margin: 0 0 10px;
+  color: #aebbd2;
+  font-size: .88rem;
+  line-height: 1.5;
+}
+
+.hero-stat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.hero-stat-chips span {
+  padding: 5px 9px;
+  font-size: .78rem;
+}
+
+@media (max-width: 680px) {
+  .awards-page {
+    padding: 20px 14px 42px;
+  }
+
+  .awards-header {
+    padding: 24px 20px;
+    border-radius: 17px;
+  }
+
+  .journey-summary {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .summary-meta {
+    min-width: 0;
+    font-size: .84rem;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .statistics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat-card {
+    min-height: 100px;
+    padding: 14px;
+  }
+
+  .awards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-stat-row {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px;
+  }
+
+  .hero-stat-row img {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+  }
+}
+
+@media (max-width: 380px) {
+  .statistics-grid {
+    grid-template-columns: 1fr;
+  }
 }
