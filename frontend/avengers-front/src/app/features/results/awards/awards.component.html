@@ -1,12 +1,13 @@
+﻿
 <main class="awards-page">
   <header class="awards-header">
-    <p class="eyebrow">RESULTADOS DEL JOURNEY</p>
+    <p class="eyebrow">EQUIPO HALCÓN</p>
     <h1>Estadísticas y Premios</h1>
-    <p>Resultado oficial de tu Journey y los premios publicados por el Game API.</p>
+    <p>Conocé el rendimiento de tu equipo, los resultados de la aventura y los reconocimientos obtenidos por tus héroes.</p>
   </header>
 
   <p *ngIf="loading" class="awards-message" role="status">
-    Cargando estadísticas y premios oficiales…
+    Cargando resultados...
   </p>
 
   <section
@@ -16,143 +17,152 @@
     [class.awards-unavailable]="unavailable"
     role="alert"
   >
-    <h2>{{ unavailable ? 'Resultados todavía no disponibles' : 'No se pudieron cargar los resultados' }}</h2>
+    <h2>
+      {{ unavailable ? 'Resultados todavía no disponibles' : 'No se pudieron cargar los resultados' }}
+    </h2>
     <p>{{ error }}</p>
     <button type="button" class="retry-button" (click)="loadAwards()">
-      Volver a consultar
+      Volver a intentar
     </button>
   </section>
 
   <ng-container *ngIf="!loading && !error && response as result">
+
+    <!-- RESUMEN DEL RESULTADO -->
     <section class="journey-summary">
       <div>
-        <p class="eyebrow">RESULTADO</p>
+        <p class="eyebrow">RESULTADO DE LA AVENTURA</p>
         <h2>{{ outcomeLabel(result.completionOutcome) }}</h2>
-        <p class="muted">Estado: {{ result.status || 'No informado' }}</p>
+        <p class="muted">Equipo Halcón</p>
+
+        <p *ngIf="result.terminalReasonCode" class="muted">
+          {{ endingReasonLabel(result.terminalReasonCode) }}
+        </p>
+
+        <p *ngIf="result.endingCode" class="muted">
+          {{ endingCodeLabel(result.endingCode) }}
+        </p>
       </div>
 
       <div class="summary-meta">
-        <span *ngIf="result.attemptId">
-          Journey: <strong>{{ result.attemptId }}</strong>
-        </span>
         <span *ngIf="result.completedAt">
-          Completado: <strong>{{ result.completedAt | date:'short' }}</strong>
-        </span>
-        <span *ngIf="result.endingCode">
-          Final: <strong>{{ result.endingCode }}</strong>
-        </span>
-        <span *ngIf="result.terminalReasonCode">
-          Motivo de finalización: <strong>{{ result.terminalReasonCode }}</strong>
+          Fecha de finalización:
+          <strong>{{ result.completedAt | date:'dd/MM/yyyy HH:mm' }}</strong>
         </span>
       </div>
     </section>
 
+    <!-- ESTADÍSTICAS DEL EQUIPO -->
     <section *ngIf="hasTeamStatistics()" class="statistics-section">
       <div class="section-heading">
-        <h2>Estadísticas del equipo</h2>
-        <p>Datos publicados oficialmente por el Game API.</p>
+        <h2>Rendimiento del equipo</h2>
+        <p>Resumen de los resultados obtenidos por el Equipo Halcón.</p>
       </div>
 
       <div class="statistics-grid">
         <article class="stat-card">
-          <span>Encuentros</span>
+          <span>Encuentros disputados</span>
           <strong>{{ teamStat('encounters') }}</strong>
         </article>
+
         <article class="stat-card">
           <span>Victorias</span>
           <strong>{{ teamStat('wins') }}</strong>
         </article>
+
         <article class="stat-card">
           <span>Empates</span>
           <strong>{{ teamStat('draws') }}</strong>
         </article>
+
         <article class="stat-card">
           <span>Derrotas</span>
           <strong>{{ teamStat('losses') }}</strong>
         </article>
+
         <article class="stat-card">
-          <span>Daño infligido</span>
+          <span>Daño causado</span>
           <strong>{{ teamStat('damageDealt') }}</strong>
         </article>
+
         <article class="stat-card">
           <span>Daño recibido</span>
           <strong>{{ teamStat('damageReceived') }}</strong>
         </article>
+
         <article class="stat-card">
-          <span>Curación</span>
+          <span>Curación realizada</span>
           <strong>{{ teamStat('healing') }}</strong>
         </article>
+
         <article class="stat-card">
-          <span>KO causados</span>
+          <span>Rivales derrotados (KO)</span>
           <strong>{{ teamStat('kosCaused') }}</strong>
         </article>
+
         <article class="stat-card">
-          <span>KO sufridos</span>
+          <span>Héroes fuera de combate (KO)</span>
           <strong>{{ teamStat('kosSuffered') }}</strong>
         </article>
+
         <article class="stat-card">
-          <span>Puntos de recompensa ganados</span>
+          <span>Puntos de recompensa obtenidos</span>
           <strong>{{ teamStat('rewardPointsEarned') }}</strong>
         </article>
+
         <article class="stat-card">
-          <span>Puntos de recompensa gastados</span>
+          <span>Puntos de recompensa utilizados</span>
           <strong>{{ teamStat('rewardPointsSpent') }}</strong>
         </article>
       </div>
     </section>
 
+    <!-- BATALLA FINAL -->
     <section *ngIf="result.competition" class="statistics-section">
       <div class="section-heading">
-        <h2>Batalla Final y recorrido</h2>
-        <p>Resumen de la progresión del Journey.</p>
+        <h2>Batalla final y recorrido</h2>
+        <p>Información sobre el desarrollo de la aventura.</p>
       </div>
 
       <div class="statistics-grid">
         <article class="stat-card">
-          <span>Encuentros del Journey</span>
+          <span>Encuentros de la aventura</span>
           <strong>{{ result.competition.journeyEncounters ?? '—' }}</strong>
         </article>
+
         <article class="stat-card">
-          <span>Batalla Final jugada</span>
+          <span>Batalla final disputada</span>
           <strong>
-            {{ result.competition.finalStagePlayed === true
-              ? 'Sí'
-              : result.competition.finalStagePlayed === false
-                ? 'No'
-                : '—' }}
+            {{ result.competition.finalStagePlayed === true ? 'Sí' : result.competition.finalStagePlayed === false ? 'No' : '—' }}
           </strong>
         </article>
+
         <article class="stat-card">
-          <span>Turnos normales de la Batalla Final</span>
+          <span>Turnos normales de la batalla final</span>
           <strong>{{ result.competition.finalStageNormalTurnsPlayed ?? '—' }}</strong>
         </article>
       </div>
     </section>
 
+    <!-- PREMIOS -->
     <section class="awards-section">
       <div class="section-heading">
-        <h2>Premios oficiales</h2>
-        <p>
-          Los ganadores y sus métricas provienen del Game API.
-          Esta pantalla no calcula ni asigna ganadores.
-        </p>
+        <h2>Premios de los héroes</h2>
+        <p>Reconocimientos otorgados según el rendimiento registrado durante la aventura.</p>
       </div>
 
       <div *ngIf="awards.length === 0" class="awards-message">
-        <h3>No hay premios publicados</h3>
-        <p>
-          El API no informó premios para este resultado.
-          No se asignarán ganadores por cuenta propia.
-        </p>
+        <h3>No hay premios disponibles</h3>
+        <p>No se publicaron reconocimientos para esta aventura.</p>
       </div>
 
       <div *ngIf="awards.length > 0" class="awards-grid">
         <article class="award-card" *ngFor="let award of awards">
+
           <div class="award-title-row">
             <span class="award-icon" aria-hidden="true">🏆</span>
             <div>
-              <p class="eyebrow">PREMIO OFICIAL</p>
-              <h3>{{ awardTitle(award.code, award.label) }}</h3>
+              <h3>{{ award.label }}</h3>
             </div>
           </div>
 
@@ -164,6 +174,7 @@
               [alt]="'Retrato de ' + heroName(winner.heroId)"
               (error)="imageError($event)"
             />
+
             <div>
               <span class="winner-label">HÉROE GANADOR</span>
               <h4>{{ heroName(winner.heroId) }}</h4>
@@ -171,7 +182,7 @@
           </div>
 
           <p *ngIf="!award.winner" class="no-winner">
-            No se asignó un ganador para este premio según los resultados oficiales del API.
+            No se registró un ganador para este premio.
           </p>
 
           <div *ngIf="award.winningFacts" class="award-metric">
@@ -184,15 +195,19 @@
             <span *ngIf="award.winningFacts['kosSuffered'] !== undefined">
               KO sufridos: {{ award.winningFacts['kosSuffered'] }}
             </span>
+
             <span *ngIf="award.winningFacts['activeEncounters'] !== undefined">
               Encuentros activos: {{ award.winningFacts['activeEncounters'] }}
             </span>
+
             <span *ngIf="award.winningFacts['winningActiveRounds'] !== undefined">
               Rondas ganadas: {{ award.winningFacts['winningActiveRounds'] }}
             </span>
+
             <span *ngIf="award.winningFacts['damageDealt'] !== undefined">
-              Daño infligido: {{ award.winningFacts['damageDealt'] }}
+              Daño causado: {{ award.winningFacts['damageDealt'] }}
             </span>
+
             <span *ngIf="award.winningFacts['healing'] !== undefined">
               Curación: {{ award.winningFacts['healing'] }}
             </span>
@@ -201,24 +216,21 @@
           <p *ngIf="award.reason" class="award-reason">
             {{ award.reason }}
           </p>
+
         </article>
       </div>
     </section>
 
-    <section
-      *ngIf="result.heroStatistics?.length"
-      class="statistics-section"
-    >
+    <!-- ESTADÍSTICAS INDIVIDUALES -->
+    <section *ngIf="result.heroStatistics?.length" class="statistics-section">
       <div class="section-heading">
-        <h2>Estadísticas de héroes</h2>
-        <p>Totales reportados por el Game API.</p>
+        <h2>Rendimiento de cada héroe</h2>
+        <p>Estadísticas individuales de los integrantes del equipo.</p>
       </div>
 
       <div class="hero-stats-list">
-        <article
-          class="hero-stat-row"
-          *ngFor="let hero of result.heroStatistics"
-        >
+        <article class="hero-stat-row" *ngFor="let hero of result.heroStatistics">
+
           <img
             [src]="portraitPath(hero.heroId)"
             [alt]="'Retrato de ' + heroName(hero.heroId)"
@@ -228,22 +240,31 @@
           <div class="hero-stat-content">
             <h3>{{ heroName(hero.heroId) }}</h3>
 
+            <p *ngIf="hero.teamId">
+              Equipo:
+              {{ hero.teamId === 'falcon' ? 'Halcón' : hero.teamId }}
+            </p>
+
             <p *ngIf="hero.eligible !== undefined">
-              Elegible para los premios: {{ hero.eligible ? 'Sí' : 'No' }}
+              Participación en premios:
+              {{ hero.eligible ? 'Elegible' : 'No elegible' }}
             </p>
 
             <div class="hero-stat-chips" *ngIf="hero.journey">
               <span *ngIf="hero.journey['activeEncounters'] !== undefined">
                 Encuentros: {{ hero.journey['activeEncounters'] }}
               </span>
+
               <span *ngIf="hero.journey['damageDealt'] !== undefined">
-                Daño: {{ hero.journey['damageDealt'] }}
+                Daño causado: {{ hero.journey['damageDealt'] }}
               </span>
+
               <span *ngIf="hero.journey['healing'] !== undefined">
                 Curación: {{ hero.journey['healing'] }}
               </span>
+
               <span *ngIf="hero.journey['kosCaused'] !== undefined">
-                KO causados: {{ hero.journey['kosCaused'] }}
+                KO: {{ hero.journey['kosCaused'] }}
               </span>
             </div>
 
@@ -251,24 +272,30 @@
               class="hero-stat-chips final-stage-chips"
               *ngIf="hero.finalStage"
             >
-              <span class="final-stage-label">Batalla Final</span>
+              <span class="final-stage-label">Batalla final</span>
+
               <span *ngIf="hero.finalStage['activeRounds'] !== undefined">
-                Rondas activas: {{ hero.finalStage['activeRounds'] }}
+                Rondas disputadas: {{ hero.finalStage['activeRounds'] }}
               </span>
+
               <span *ngIf="hero.finalStage['winningActiveRounds'] !== undefined">
                 Rondas ganadas: {{ hero.finalStage['winningActiveRounds'] }}
               </span>
+
               <span *ngIf="hero.finalStage['damageDealt'] !== undefined">
-                Daño infligido: {{ hero.finalStage['damageDealt'] }}
+                Daño causado: {{ hero.finalStage['damageDealt'] }}
               </span>
+
               <span *ngIf="hero.finalStage['damageReceived'] !== undefined">
                 Daño recibido: {{ hero.finalStage['damageReceived'] }}
               </span>
+
               <span *ngIf="hero.finalStage['healing'] !== undefined">
                 Curación: {{ hero.finalStage['healing'] }}
               </span>
+
               <span *ngIf="hero.finalStage['kosCaused'] !== undefined">
-                KO causados: {{ hero.finalStage['kosCaused'] }}
+                KO: {{ hero.finalStage['kosCaused'] }}
               </span>
             </div>
           </div>
@@ -276,11 +303,13 @@
       </div>
     </section>
 
+    <!-- SIN ESTADÍSTICAS -->
     <p
       *ngIf="!hasAnyStatistics() && awards.length === 0"
       class="awards-message"
     >
-      El API respondió, pero no publicó estadísticas ni premios para este Journey.
+      Todavía no hay estadísticas ni premios publicados para esta aventura.
     </p>
+
   </ng-container>
 </main>
