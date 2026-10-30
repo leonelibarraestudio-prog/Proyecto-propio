@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { finalize, Subscription } from 'rxjs';
+import { finalize, forkJoin, Subscription } from 'rxjs';
+import { AppContextService } from '../../../../core/services/app-context.service';
 import { FinalStageService } from '../../service/final-stage.service';
 import { toApiError } from '../../../../core/models/api-error.interface';
 import { BattleAction, BattleCommand, FinalBattleModel } from '../model/final-battle-api.interface';
 
-// Define a group of related actions.
 export interface BattleActionGroup {
   key: string;
   label: string;
@@ -12,9 +12,9 @@ export interface BattleActionGroup {
   options: BattleAction[];
 }
 
-// Manage the battle screen state and player selections.
 @Injectable({ providedIn: 'root' })
 export class FinalBattleService {
+  // API and selection state.
   status: 'loading' | 'ready' | 'error' = 'loading';
 
   data: FinalBattleModel | null = null;
@@ -42,7 +42,10 @@ export class FinalBattleService {
   private playRequest?: Subscription;
 
   // Use the shared service to communicate with the backend.
-  constructor(private readonly finalStage: FinalStageService) {}
+  constructor(
+    private readonly finalStage: FinalStageService,
+    private readonly appContextService: AppContextService,
+  ) {}
 
   // Reset the screen and load the current battle.
   initialize(): void {
@@ -71,10 +74,14 @@ export class FinalBattleService {
       return true;
     }
 
-    return (
-      this.data?.state?.status === 'ACTIVE' &&
-      !!this.data.actions.find((action) => action.actionId === this.selectedActionId)
+    const legalAction = this.data?.actions.find(
+      action => action.actionId === this.selectedActionId,
     );
+    if (this.data?.state?.status !== 'ACTIVE' || !legalAction) {
+      return false;
+    }
+    // The API owns legality, including actions involving reserve heroes.
+    return true;
   }
 
   // Reload the current battle data from the backend.
@@ -83,23 +90,28 @@ export class FinalBattleService {
       return;
     }
 
-    // Cancel the previous request and reset the screen.
+    // Cancel stale reads and clear selections before accepting new legal actions.
     this.readRequest?.unsubscribe();
     this.refreshing = true;
     this.loadError = null;
     this.clearSelection();
     this.groups = [];
 
-    // Get the latest battle data.
-    this.readRequest = this.finalStage.getBattle().subscribe({
-      next: (data) => {
+    this.readRequest = forkJoin({
+      battle: this.finalStage.getBattle(),
+      context: this.appContextService.reload(),
+    }).subscribe({
+      next: ({ battle: data }) => {
         this.data = data;
         this.status = 'ready';
         this.refreshing = false;
 
-        // Keep the selected hero or select the first available one.
         if (!data.player?.heroes.some((hero) => hero.heroId === this.selectedHeroId)) {
-          this.selectedHeroId = data.player?.heroes[0]?.heroId ?? null;
+          this.selectedHeroId = data.player?.heroes.find(
+            hero => hero.status === 'ACTIVE' && hero.condition === 'AVAILABLE',
+          )?.heroId ?? data.player?.heroes.find(
+            hero => hero.status === 'ACTIVE',
+          )?.heroId ?? null;
         }
 
         this.buildGroups();
@@ -112,9 +124,10 @@ export class FinalBattleService {
     });
   }
 
+  // Player selection.
   // Select a hero from the player's team.
   selectHero(heroId: string): void {
-    if (this.busy || this.status !== 'ready') {
+    if (this.submitting || this.status !== 'ready') {
       return;
     }
 
@@ -147,7 +160,8 @@ export class FinalBattleService {
     this.selectedActionGroup = group;
     this.selectedActionId = null;
 
-    if (group.options.length === 1 && group.options[0].target === null) {
+    if (group.options.length === 1 &&
+        group.options[0].target?.targetType !== 'ANTAGONIST') {
       this.selectedActionId = group.options[0].actionId;
     }
   }
@@ -160,6 +174,12 @@ export class FinalBattleService {
 
     if (this.selectedActionGroup?.options.some((action) => action.actionId === actionId)) {
       this.selectedActionId = actionId;
+    }
+  }
+
+  clearActionSelection(): void {
+    if (!this.busy) {
+      this.clearSelection();
     }
   }
 
@@ -227,7 +247,7 @@ export class FinalBattleService {
           this.operationError = toApiError(error).message;
           this.submitting = false;
 
-          // Reload the battle after an error without repeating the command.
+          // Reload after an error without repeating a potentially applied command.
           this.refresh();
         },
       });
@@ -239,12 +259,12 @@ export class FinalBattleService {
     this.selectedActionId = null;
   }
 
+  // Legal actions returned by the API.
   // Group legal actions by hero and tab to display similar options together.
   private buildGroups(): void {
     const groups: BattleActionGroup[] = [];
     const groupsByKey = new Map<string, BattleActionGroup>();
 
-    // Check each action and skip those from another tab or hero.
     for (const action of this.data?.actions ?? []) {
       const inventoryAction = action.actionCode === 'POWER_UP';
 
@@ -252,11 +272,19 @@ export class FinalBattleService {
         continue;
       }
 
-      if (action.actorHeroId && action.actorHeroId !== this.selectedHeroId) {
+      if (action.actionCode === 'SWAP') {
+        if (
+          this.selectedHeroId &&
+          action.outgoingHeroId !== this.selectedHeroId &&
+          action.incomingHeroId !== this.selectedHeroId
+        ) {
+          continue;
+        }
+      } else if (action.actorHeroId && action.actorHeroId !== this.selectedHeroId) {
         continue;
       }
 
-      // Create the same key for similar actions, even with different targets.
+      // Group equivalent legal choices while retaining each opaque target actionId.
       const key = JSON.stringify([
         action.actionCode,
         action.actorHeroId,
@@ -271,7 +299,6 @@ export class FinalBattleService {
         action.cost.abilityPoints,
       ]);
 
-      // Find the matching group, or create a new one.
       let group = groupsByKey.get(key);
 
       if (!group) {
@@ -285,7 +312,6 @@ export class FinalBattleService {
         groupsByKey.set(key, group);
       }
 
-      // Add each action to its group, then save all groups for the screen.
       group.options.push(action);
     }
 
