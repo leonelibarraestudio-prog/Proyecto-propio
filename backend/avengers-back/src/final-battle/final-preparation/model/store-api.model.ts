@@ -1,3 +1,5 @@
+// ---------- Game API shapes (what the Game API publishes) ----------
+
 export interface PowerUpEffectApi {
   effectCode: string;
   targetPercentage?: number;
@@ -51,29 +53,11 @@ export interface PurchaseApi {
   items: InventoryItemApi[];
 }
 
-export interface PreparationInventoryItem {
-  itemId: string;
-  name: string;
-  description: string;
-  quantity: number;
-  targetScope: 'HERO' | 'TEAM';
-}
-
 export interface UsedItemApi {
   teamId: string;
   items: InventoryItemApi[];
   usedItemId: string;
   targetHeroId: string | null;
-}
-
-export interface FinalPreparationModel {
-  balance: number;
-  powerUps: PowerUpApi[];
-  inventory: PreparationInventoryItem[]
-  heroes: PreparationHero[];
-  leaderId: string;
-  strategyCode: string;
-  strategies: StrategyApi[];
 }
 
 export interface JourneyHeroApi {
@@ -86,9 +70,19 @@ export interface JourneyHeroApi {
 
 export interface JourneyTeamApi {
   teamId: string;
+  name: string;
   leaderId: string;
   strategyCode: string;
   heroes: JourneyHeroApi[];
+}
+
+export interface JourneyTeamsApi {
+  teams: JourneyTeamApi[];
+  finalists: { playerTeamId: string; opponentTeamId: string };
+}
+
+export interface HeroIdentityCatalogApi {
+  heroes: { id: string; displayName: string }[];
 }
 
 export interface StrategyApi {
@@ -107,13 +101,25 @@ export interface SavedPreparationApi {
   activeHeroIds: string[];
 }
 
-export interface JourneyTeamsApi {
-  teams: JourneyTeamApi[];
-  finalists: { playerTeamId: string; opponentTeamId: string };
+export interface CurrentJourneyApi {
+  attempt: { attemptId: string } | null;
 }
 
-export interface HeroIdentityCatalogApi {
-  heroes: { id: string; displayName: string }[];
+export interface FinalStageStateApi {
+  status: string;
+  completion: unknown | null;
+}
+
+// ---------- Contract with the Angular frontend (what this feature returns) ----------
+
+export type FinalStageAction = 'START' | 'CONTINUE' | 'VIEW' | 'UNAVAILABLE';
+
+export interface PreparationInventoryItem {
+  itemId: string;
+  name: string;
+  description: string;
+  quantity: number;
+  targetScope: 'HERO' | 'TEAM';
 }
 
 export interface PreparationHero {
@@ -123,4 +129,18 @@ export interface PreparationHero {
   knockedOut: boolean;
   energy: number;
   abilityPoints: number;
+}
+
+export interface FinalPreparationModel {
+  available: boolean;
+  balance: number;
+  powerUps: PowerUpApi[];
+  inventory: PreparationInventoryItem[];
+  heroes: PreparationHero[];
+  leaderId: string;
+  strategyCode: string;
+  strategies: StrategyApi[];
+  playerTeamName: string;
+  opponentName: string | null;
+  finalAction: FinalStageAction;
 }
